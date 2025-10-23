@@ -1,0 +1,38 @@
+from dataclasses import dataclass
+from datetime import datetime
+
+# Store basic information about the client
+@dataclass
+class Client:
+    id: int
+    name: str
+    nickname: str | None
+    phone: str | None
+    email: str | None
+    created_at: datetime
+    updated_at: datetime
+    is_active: int
+
+    @staticmethod
+    def from_row(row):
+        return Client(
+            id = row[0],
+            name = row[1],
+            nickname = row[2],
+            phone = row[3],
+            email = row[4],
+            created_at = datetime.fromtimestamp(row[5]),
+            updated_at = datetime.fromtimestamp(row[6]),
+            is_active = row[7]
+        )
+
+    def to_tuple(self):
+        return (
+            self.name,
+            self.nickname,
+            self.phone,
+            self.email,
+            int(self.created_at.timestamp()),
+            int(self.updated_at.timestamp()),
+            self.is_active
+        )
