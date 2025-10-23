@@ -19,8 +19,8 @@ CREATE TABLE clients (
     nickname TEXT,
     phone TEXT,
     email TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     is_active INTEGER DEFAULT 1
 );
 ```
@@ -43,13 +43,14 @@ Representa uma compra fiada feita por um cliente.
 CREATE TABLE purchases (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     client_id INTEGER NOT NULL,
-    note_number TEXT UNIQUE,
     description TEXT,
     total_value REAL NOT NULL,
     total_paid_value REAL DEFAULT 0.0,
     status TEXT DEFAULT 'pending', -- 'pending', 'partial', 'paid'
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    note_number TEXT UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
     FOREIGN KEY (client_id) REFERENCES clients (id)
 );
 ```
@@ -71,11 +72,11 @@ Registra cada pagamento (total ou parcial) referente a uma compra fiada.
 CREATE TABLE payments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     purchase_id INTEGER NOT NULL,
-    receipt_number TEXT UNIQUE,
     amount REAL NOT NULL,
-    payment_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    method TEXT,
-    note TEXT,
+    note TEXT, -- added method (card, money) on insert
+    receipt_number TEXT UNIQUE,
+    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
     FOREIGN KEY (purchase_id) REFERENCES purchases (id)
 );
 ```
