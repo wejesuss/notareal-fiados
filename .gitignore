@@ -1,0 +1,5 @@
+__pycache__
+pythonvenv
+test-db.*.sql
+data/*.db
+.vscode
