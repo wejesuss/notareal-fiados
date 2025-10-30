@@ -16,12 +16,12 @@ Guarda informações básicas do cliente.
 CREATE TABLE clients (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
-    nickname TEXT,
+    nickname TEXT UNIQUE,
     phone TEXT,
     email TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    is_active INTEGER DEFAULT 1
+    is_active INTEGER DEFAULT 1,
+    created_at INTEGER,
+    updated_at INTEGER
 );
 ```
 
@@ -48,8 +48,8 @@ CREATE TABLE purchases (
     total_paid_value REAL DEFAULT 0.0,
     status TEXT DEFAULT 'pending', -- 'pending', 'partial', 'paid'
     note_number TEXT UNIQUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at INTEGER,
+    updated_at INTEGER,
 
     FOREIGN KEY (client_id) REFERENCES clients (id)
 );
@@ -75,7 +75,7 @@ CREATE TABLE payments (
     amount REAL NOT NULL,
     note TEXT, -- added method (card, money) on insert
     receipt_number TEXT UNIQUE,
-    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    payment_date INTEGER,
 
     FOREIGN KEY (purchase_id) REFERENCES purchases (id)
 );
