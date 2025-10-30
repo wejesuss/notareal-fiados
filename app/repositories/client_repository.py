@@ -1,0 +1,139 @@
+from typing import List
+from datetime import datetime
+from database import get_connection, sqlite3
+from models.client import Client
+
+def get_clients(limit: int = None, offset: int = 0) -> List[Client]:
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # Default limit if not provided (-1 means "no limit" in SQLite)
+    search_limit = -1 if limit is None else limit
+
+    cursor.execute("""
+        SELECT * FROM clients WHERE is_active = 1
+        LIMIT ? OFFSET ?
+    """, (search_limit, offset))
+
+    rows = cursor.fetchall()
+    conn.close()
+
+    if not rows:
+        return []
+
+    return [Client.from_row(row) for row in rows]
+
+def insert_client(data: dict) -> Client:
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        now = datetime.now()
+
+        cursor.execute("""
+            INSERT INTO clients (name, nickname, phone, email, is_active, created_at, updated_at)
+            VALUES (?, ?, ?, ?, 1, ?, ?)
+        """, (
+            data.get("name"),
+            data.get("nickname"),
+            data.get("phone"),
+            data.get("email"),
+            int(now.timestamp()),
+            int(now.timestamp())
+        ))
+
+        conn.commit()
+        client_id = cursor.lastrowid
+
+        return get_client_by_id(client_id)
+
+    except sqlite3.IntegrityError as e:
+        if "UNIQUE constraint failed" in str(e):
+            raise ValueError("Um cliente com esse apelido já existe.")
+        else:
+            raise ValueError("Error inesperado do banco.")
+    finally:
+        conn.close()
+
+def get_client_by_id(client_id: int) -> Client | None:
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM clients WHERE id = ?", (client_id,))
+    row = cursor.fetchone()
+    conn.close()
+
+    if not row:
+        return None
+
+    return Client.from_row(row)
+
+def update_client(client_id: int, data: dict) -> Client | None:
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # columns that are allowed to be updated
+    allowed_columns = ["name", "nickname", "phone", "email", "is_active"]
+
+    columns = []
+    values = []
+    now = int(datetime.now().timestamp())
+
+    # validate data fields
+    for key, value in data.items():
+        if key in allowed_columns:
+            columns.append(f"{key} = ?")
+            values.append(value)
+    
+    if not columns:
+        raise ValueError("No valid fields provided for update.")
+
+    # Add the updated_at timestamp
+    columns.append("updated_at = ?")
+    # Add the timestamp for the updated_at column
+    values.append(now)
+    # Add the client_id for the WHERE clause
+    values.append(client_id)
+
+    query = f"""
+        UPDATE clients SET {', '.join(columns)} 
+        WHERE id = ?
+    """
+
+    try:
+        cursor.execute(query, tuple(values))
+        conn.commit()
+
+        if cursor.rowcount == 0:
+            return None
+        
+        return get_client_by_id(client_id)
+    except sqlite3.IntegrityError as e:
+        if "UNIQUE constraint failed" in str(e):
+            raise ValueError("Um cliente com esse apelido já existe.")
+        else:
+            raise ValueError("Error inesperado do banco.")
+    finally:
+        conn.close()
+
+def delete_client(client_id: int) -> bool:
+    """Deactivate (soft delete) a client"""
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    print(client_id)
+
+    try:
+        now = int(datetime.now().timestamp())
+        cursor.execute("""
+            UPDATE clients SET is_active = 0, updated_at = ? 
+            WHERE id = ? AND is_active = 1
+        """, (now, client_id))
+
+        conn.commit()
+        print(cursor.rowcount)
+        return cursor.rowcount > 0
+    except sqlite3.IntegrityError as e:
+        raise ValueError("Error inesperado do banco.")
+    finally:
+        conn.close()
