@@ -21,9 +21,9 @@ class Client:
             nickname = row[2],
             phone = row[3],
             email = row[4],
-            created_at = datetime.fromtimestamp(row[5]),
-            updated_at = datetime.fromtimestamp(row[6]),
-            is_active = row[7]
+            is_active = row[5],
+            created_at = datetime.fromtimestamp(row[6]),
+            updated_at = datetime.fromtimestamp(row[7]),
         )
 
     def to_tuple(self):
@@ -32,7 +32,7 @@ class Client:
             self.nickname,
             self.phone,
             self.email,
+            self.is_active,
             int(self.created_at.timestamp()),
-            int(self.updated_at.timestamp()),
-            self.is_active
+            int(self.updated_at.timestamp())
         )
