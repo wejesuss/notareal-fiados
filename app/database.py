@@ -43,9 +43,13 @@ def init_database():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             purchase_id INTEGER NOT NULL,
             amount REAL NOT NULL,
-            note TEXT, -- added method (card, money) on insert
+            payment_date INTEGER, -- can be NULL
+            method TEXT,
+            description TEXT,
             receipt_number TEXT UNIQUE,
-            payment_date INTEGER,
+            is_active INTEGER DEFAULT 1,
+            created_at INTEGER NOT NULL,
+            updated_at INTEGER,
 
             FOREIGN KEY (purchase_id) REFERENCES purchases (id)
         );
