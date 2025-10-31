@@ -7,9 +7,13 @@ class Payment:
     id: int
     purchase_id: int
     amount: float
-    note: str | None
+    payment_date: datetime | None
+    method: str
+    description: str | None
     receipt_number: str # REC-0001
-    payment_date: datetime
+    is_active: int
+    created_at : datetime
+    updated_at : datetime | None
 
     @staticmethod
     def from_row(row):
@@ -17,16 +21,24 @@ class Payment:
             id = row[0],
             purchase_id = row[1],
             amount = row[2],
-            note = row[3],
-            receipt_number = row[4],
-            payment_date = datetime.fromtimestamp(row[5])
+            payment_date = datetime.fromtimestamp(row[3]) if row[3] else None,
+            method = row[4],
+            description = row[5],
+            receipt_number = row[6],
+            is_active = row[7],
+            created_at = datetime.fromtimestamp(row[8]) if row[8] else None,
+            updated_at = datetime.fromtimestamp(row[9]) if row[9] else None
         )
 
     def to_tuple(self):
         return (
             self.purchase_id,
             self.amount,
-            self.note,
-            self.receipt_number,         
-            int(self.payment_date.timestamp())            
+            int(self.payment_date.timestamp()) if self.payment_date else None,
+            self.method,
+            self.description,
+            self.receipt_number,
+            self.is_active,
+            int(self.created_at.timestamp()) if self.created_at else None,
+            int(self.updated_at.timestamp() if self.updated_at else None)
         )
