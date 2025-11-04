@@ -6,6 +6,7 @@ from services.purchase_service import (
     update_purchase,
     delete_purchase
 )
+from services.payment_service import get_payments
 
 router = APIRouter(prefix="/purchases", tags=["Purchases"])
 
@@ -26,6 +27,19 @@ def read_purchase(purchase_id: int):
     if not purchase:
         raise HTTPException(status_code=404, detail="Compra não encontrada.")
     return purchase.__dict__
+
+@router.get("/{purchase_id}/payments")
+def list_payments_for_purchase(purchase_id: int, limit: int = None, offset: int = 0):
+    """List all payments for a specific purchase."""
+    try:
+        payments = get_payments(limit, offset, purchase_id)
+        if not payments:
+            return {"message": "Nenhum pagamento encontrado para esta compra.", "payments": []}
+
+        payments_data = [p.__dict__ for p in payments]
+        return {"message": "Pagamentos encontrados.", "payments": payments_data}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 @router.post("/{client_id}")
 def add_purchase(client_id: int, data: dict):
