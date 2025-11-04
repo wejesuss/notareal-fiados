@@ -67,8 +67,8 @@ def insert_purchase(data: dict) -> Purchase:
             raise ValueError("Uma compra com esse número de nota já existe.")
         elif "FOREIGN KEY constraint failed" in str(e):
             raise ValueError("Um cliente com esse id não existe.")
-        else:
-            raise ValueError("Erro inesperado do banco.") from e
+    except sqlite3.Error as e:
+        raise ValueError("Erro inesperado do banco.") from e
     finally:
         if conn:
             conn.close()
@@ -137,8 +137,8 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase | None:
             raise ValueError("Uma compra com esse número de nota já existe.")
         elif "FOREIGN KEY constraint failed" in str(e):
             raise ValueError("Um cliente com esse id não existe.")
-        else:
-            raise ValueError("Erro inesperado do banco.")
+    except sqlite3.Error as e:
+        raise ValueError("Erro inesperado do banco.") from e
     finally:
         if conn:
             conn.close()

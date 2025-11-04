@@ -37,8 +37,8 @@ def get_payments(limit: int = None, offset: int = 0, purchase_id: int = None) ->
     except sqlite3.IntegrityError as e:
         if "FOREIGN KEY constraint failed" in str(e):
             raise ValueError("Uma compra com esse id não existe.")
-        else:
-            raise ValueError("Erro inesperado do banco.") from e
+    except sqlite3.Error as e:
+        raise ValueError("Erro inesperado do banco.") from e
     finally:
         if conn:
             conn.close()
@@ -83,8 +83,8 @@ def insert_payment(data: dict) -> Payment:
             raise ValueError("Um pagamento com esse número de recibo já existe.")
         elif "FOREIGN KEY constraint failed" in str(e):
             raise ValueError("Uma compra com esse id não existe.")
-        else:
-            raise ValueError("Erro inesperado do banco.") from e
+    except sqlite3.Error as e:
+        raise ValueError("Erro inesperado do banco.") from e
     finally:
         if conn:
             conn.close()

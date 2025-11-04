@@ -55,8 +55,8 @@ def insert_client(data: dict) -> Client:
     except sqlite3.IntegrityError as e:
         if "UNIQUE constraint failed" in str(e):
             raise ValueError("Um cliente com esse apelido já existe.")
-        else:
-            raise ValueError("Error inesperado do banco.")
+    except sqlite3.Error as e:
+        raise ValueError("Erro inesperado do banco.") from e
     finally:
         if conn:
             conn.close()
@@ -123,8 +123,8 @@ def update_client(client_id: int, data: dict) -> Client | None:
     except sqlite3.IntegrityError as e:
         if "UNIQUE constraint failed" in str(e):
             raise ValueError("Um cliente com esse apelido já existe.")
-        else:
-            raise ValueError("Error inesperado do banco.")
+    except sqlite3.Error as e:
+        raise ValueError("Erro inesperado do banco.") from e
     finally:
         if conn:
             conn.close()
@@ -145,8 +145,8 @@ def delete_client(client_id: int) -> bool:
         conn.commit()
         print(cursor.rowcount)
         return cursor.rowcount > 0
-    except sqlite3.IntegrityError as e:
-        raise ValueError("Error inesperado do banco.")
+    except sqlite3.Error as e:
+        raise ValueError("Error inesperado do banco.") from e
     finally:
         if conn:
             conn.close()
