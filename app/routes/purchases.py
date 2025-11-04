@@ -56,7 +56,7 @@ def edit_purchase(purchase_id: int, data: dict):
 
 @router.delete("/{purchase_id}")
 def remove_purchase(purchase_id: int):
-    """Delete purchase."""
+    """Delete purchase (soft delete)."""
     success = delete_purchase(purchase_id)
     if not success:
         raise HTTPException(status_code=404, detail="Compra não encontrada.")

@@ -46,7 +46,7 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase | None:
     return purchase
 
 def delete_purchase(purchase_id: int) -> bool:
-    """Delete a purchase."""
+    """Delete a purchase (soft delete)."""
     success = purchase_repository.delete_purchase(purchase_id)
     
     return success

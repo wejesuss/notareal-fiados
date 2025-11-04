@@ -31,6 +31,7 @@ def init_database():
             total_paid_value REAL DEFAULT 0.0,
             status TEXT DEFAULT 'pending',
             note_number TEXT UNIQUE,
+            is_active INTEGER DEFAULT 1,
             created_at INTEGER,
             updated_at INTEGER,
 

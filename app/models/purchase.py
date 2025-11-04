@@ -11,6 +11,7 @@ class Purchase:
     total_paid_value: float
     status: str # 'pending' (default), 'partial', 'paid'
     note_number: str # NF-0001
+    is_active: int
     created_at: datetime
     updated_at: datetime
 
@@ -24,8 +25,9 @@ class Purchase:
             total_paid_value = row[4],
             status = row[5],
             note_number = row[6],
-            created_at = datetime.fromtimestamp(row[7]),
-            updated_at = datetime.fromtimestamp(row[8])
+            is_active = row[7],
+            created_at = datetime.fromtimestamp(row[8]),
+            updated_at = datetime.fromtimestamp(row[9])
         )
 
     def to_tuple(self):
@@ -35,7 +37,8 @@ class Purchase:
             self.total_value,
             self.total_paid_value,
             self.status,
-            self.note_number,            
+            self.note_number,
+            self.is_active,    
             int(self.created_at.timestamp()),
             int(self.updated_at.timestamp())
         )

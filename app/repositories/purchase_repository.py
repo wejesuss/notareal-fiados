@@ -12,7 +12,9 @@ def get_purchases(limit: int = None, offset: int = 0, only_pending: bool = True)
         # Default limit if not provided (-1 means "no limit" in SQLite)
         search_limit = -1 if limit is None else limit
         # Create WHERE clause if only pending (or partial) purchases is requested
-        where_clause = "" if not only_pending else "WHERE status IN ('pending', 'partial')"
+        where_clause = "WHERE is_active = 1" 
+        if only_pending:
+            where_clause = "WHERE status IN ('pending', 'partial')"
 
         cursor.execute(f"""
             SELECT * FROM purchases {where_clause} ORDER BY created_at DESC
@@ -44,9 +46,10 @@ def insert_purchase(data: dict) -> Purchase:
                 total_paid_value,
                 status,
                 note_number,
+                is_active,
                 created_at,
                 updated_at
-            ) VALUES (?,?,?,?,?,?,?,?);
+            ) VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?);
         """, (
             int(data.get("client_id")),
             data.get("description"),
@@ -95,7 +98,7 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase | None:
     conn = None
 
     # columns that are allowed to be updated
-    allowed_columns = ["client_id", "description", "total_value", "total_paid_value", "status"]
+    allowed_columns = ["client_id", "description", "total_value", "total_paid_value", "status", "is_active"]
 
     columns = []
     values = []
@@ -145,15 +148,17 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase | None:
             conn.close()
 
 def delete_purchase(purchase_id: int) -> bool:
-    """Delete a purchase"""
+    """Delete a purchase (soft delete)."""
     conn = None
     try:
         conn = get_connection()
         cursor = conn.cursor()
 
+        now = int(datetime.now().timestamp())
         cursor.execute("""
-            DELETE FROM purchases WHERE id = ?
-        """, (purchase_id,))
+            UPDATE purchases SET is_active = 0, updated_at = ?
+            WHERE id = ? AND is_active = 1
+        """, (now, purchase_id))
 
         conn.commit()
 
