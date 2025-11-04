@@ -6,6 +6,9 @@ from models.purchase import Purchase
 def get_purchases(limit: int = None, offset: int = 0, only_pending: bool = True) -> List[Purchase]:
     conn = None
     try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
         # Default limit if not provided (-1 means "no limit" in SQLite)
         search_limit = -1 if limit is None else limit
         # Create WHERE clause if only pending (or partial) purchases is requested
