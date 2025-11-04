@@ -4,6 +4,7 @@ from database import get_connection, sqlite3
 from models.payment import Payment
 
 def get_payments(limit: int = None, offset: int = 0, purchase_id: int = None) -> List[Payment]:
+    conn = None
     try:
         conn = get_connection()
         cursor = conn.cursor()
@@ -27,7 +28,6 @@ def get_payments(limit: int = None, offset: int = 0, purchase_id: int = None) ->
         """, tuple(values))
 
         rows = cursor.fetchall()
-        conn.close()
 
         if not rows:
             return []
@@ -40,9 +40,11 @@ def get_payments(limit: int = None, offset: int = 0, purchase_id: int = None) ->
         else:
             raise ValueError("Erro inesperado do banco.") from e
     finally:
-        conn.close()
+        if conn:
+            conn.close()
 
 def insert_payment(data: dict) -> Payment:
+    conn = None
     try:
         conn = get_connection()
         cursor = conn.cursor()
@@ -84,29 +86,36 @@ def insert_payment(data: dict) -> Payment:
         else:
             raise ValueError("Erro inesperado do banco.") from e
     finally:
-        conn.close()
+        if conn:
+            conn.close()
 
 def get_payment_by_id(payment_id: int) -> Payment | None:
-    conn = get_connection()
-    cursor = conn.cursor()
+    conn = None
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM payments WHERE id = ?", (payment_id,))
-    row = cursor.fetchone()
-    conn.close()
+        cursor.execute("SELECT * FROM payments WHERE id = ?", (payment_id,))
+        row = cursor.fetchone()
 
-    if not row:
-        return None
+        if not row:
+            return None
 
-    return Payment.from_row(row)
+        return Payment.from_row(row)
+    finally:
+        if conn:
+            conn.close()
 
 def delete_payment(payment_id: int) -> bool:
     """Deactivate (soft delete) a payment."""
-    conn = get_connection()
-    cursor = conn.cursor()
+    conn = None
 
     now = int(datetime.now().timestamp())
 
     try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
         cursor.execute("""
             UPDATE payments SET is_active = 0, updated_at = ?
             WHERE id = ? AND is_active = 1
@@ -118,4 +127,5 @@ def delete_payment(payment_id: int) -> bool:
     except sqlite3.Error as e:
         raise ValueError("Erro inesperado do banco.") from e
     finally:
-        conn.close()
+        if conn:
+            conn.close()

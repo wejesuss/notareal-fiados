@@ -4,26 +4,31 @@ from database import get_connection, sqlite3
 from models.client import Client
 
 def get_clients(limit: int = None, offset: int = 0) -> List[Client]:
-    conn = get_connection()
-    cursor = conn.cursor()
+    conn = None
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
 
-    # Default limit if not provided (-1 means "no limit" in SQLite)
-    search_limit = -1 if limit is None else limit
+        # Default limit if not provided (-1 means "no limit" in SQLite)
+        search_limit = -1 if limit is None else limit
 
-    cursor.execute("""
-        SELECT * FROM clients WHERE is_active = 1
-        LIMIT ? OFFSET ?
-    """, (search_limit, offset))
+        cursor.execute("""
+            SELECT * FROM clients WHERE is_active = 1
+            LIMIT ? OFFSET ?
+        """, (search_limit, offset))
 
-    rows = cursor.fetchall()
-    conn.close()
+        rows = cursor.fetchall()
 
-    if not rows:
-        return []
+        if not rows:
+            return []
 
-    return [Client.from_row(row) for row in rows]
+        return [Client.from_row(row) for row in rows]
+    finally:
+        if conn:
+            conn.close()
 
 def insert_client(data: dict) -> Client:
+    conn = None
     try:
         conn = get_connection()
         cursor = conn.cursor()
@@ -53,24 +58,28 @@ def insert_client(data: dict) -> Client:
         else:
             raise ValueError("Error inesperado do banco.")
     finally:
-        conn.close()
+        if conn:
+            conn.close()
 
 def get_client_by_id(client_id: int) -> Client | None:
-    conn = get_connection()
-    cursor = conn.cursor()
+    conn = None
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM clients WHERE id = ?", (client_id,))
-    row = cursor.fetchone()
-    conn.close()
+        cursor.execute("SELECT * FROM clients WHERE id = ?", (client_id,))
+        row = cursor.fetchone()
 
-    if not row:
-        return None
+        if not row:
+            return None
 
-    return Client.from_row(row)
+        return Client.from_row(row)
+    finally:
+        if conn:
+            conn.close()
 
 def update_client(client_id: int, data: dict) -> Client | None:
-    conn = get_connection()
-    cursor = conn.cursor()
+    conn = None
 
     # columns that are allowed to be updated
     allowed_columns = ["name", "nickname", "phone", "email", "is_active"]
@@ -101,6 +110,9 @@ def update_client(client_id: int, data: dict) -> Client | None:
     """
 
     try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
         cursor.execute(query, tuple(values))
         conn.commit()
 
@@ -114,16 +126,19 @@ def update_client(client_id: int, data: dict) -> Client | None:
         else:
             raise ValueError("Error inesperado do banco.")
     finally:
-        conn.close()
+        if conn:
+            conn.close()
 
 def delete_client(client_id: int) -> bool:
     """Deactivate (soft delete) a client"""
-    conn = get_connection()
-    cursor = conn.cursor()
+    conn = None
 
     print(client_id)
 
     try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
         now = int(datetime.now().timestamp())
         cursor.execute("""
             UPDATE clients SET is_active = 0, updated_at = ? 
@@ -136,4 +151,5 @@ def delete_client(client_id: int) -> bool:
     except sqlite3.IntegrityError as e:
         raise ValueError("Error inesperado do banco.")
     finally:
-        conn.close()
+        if conn:
+            conn.close()
