@@ -33,7 +33,7 @@ def insert_client(data: dict) -> Client:
         conn = get_connection()
         cursor = conn.cursor()
         
-        now = datetime.now()
+        now = int(datetime.now().timestamp())
 
         cursor.execute("""
             INSERT INTO clients (name, nickname, phone, email, is_active, created_at, updated_at)
@@ -43,8 +43,8 @@ def insert_client(data: dict) -> Client:
             data.get("nickname"),
             data.get("phone"),
             data.get("email"),
-            int(now.timestamp()),
-            int(now.timestamp())
+            now,
+            now
         ))
 
         conn.commit()
@@ -132,9 +132,6 @@ def update_client(client_id: int, data: dict) -> Client | None:
 def delete_client(client_id: int) -> bool:
     """Deactivate (soft delete) a client"""
     conn = None
-
-    print(client_id)
-
     try:
         conn = get_connection()
         cursor = conn.cursor()
