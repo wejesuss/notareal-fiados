@@ -12,7 +12,7 @@ def get_purchases(limit: int = None, offset: int = 0, only_pending: bool = True)
         where_clause = "" if not only_pending else "WHERE status IN ('pending', 'partial')"
 
         cursor.execute(f"""
-            SELECT * FROM purchases {where_clause} ORDER BY created_at
+            SELECT * FROM purchases {where_clause} ORDER BY created_at DESC
             LIMIT ? OFFSET ?
         """, (search_limit, offset))
 

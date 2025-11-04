@@ -13,7 +13,7 @@ def get_clients(limit: int = None, offset: int = 0) -> List[Client]:
         search_limit = -1 if limit is None else limit
 
         cursor.execute("""
-            SELECT * FROM clients WHERE is_active = 1
+            SELECT * FROM clients WHERE is_active = 1 ORDER BY created_at DESC
             LIMIT ? OFFSET ?
         """, (search_limit, offset))
 

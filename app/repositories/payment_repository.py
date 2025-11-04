@@ -23,7 +23,7 @@ def get_payments(limit: int = None, offset: int = 0, purchase_id: int = None) ->
         values.append(offset)
 
         cursor.execute(f"""
-            SELECT * FROM payments {where_clause} ORDER BY created_at
+            SELECT * FROM payments {where_clause} ORDER BY created_at DESC
             LIMIT ? OFFSET ?
         """, tuple(values))
 
