@@ -4,34 +4,43 @@ from database import get_connection, sqlite3
 from models.payment import Payment
 
 def get_payments(limit: int = None, offset: int = 0, purchase_id: int = None) -> List[Payment]:
-    conn = get_connection()
-    cursor = conn.cursor()
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
 
-    # Default limit if not provided (-1 means "no limit" in SQLite)
-    search_limit = -1 if limit is None else limit
-    values = []
-    
-    where_clause = "WHERE is_active = 1"
-    if purchase_id:
-        where_clause = "WHERE purchase_id = ?"
-        values.append(purchase_id)
-    
-    # add search_limit and offset to query parameters (values list)
-    values.append(search_limit)
-    values.append(offset)
+        # Default limit if not provided (-1 means "no limit" in SQLite)
+        search_limit = -1 if limit is None else limit
+        values = []
 
-    cursor.execute(f"""
-        SELECT * FROM payments {where_clause} ORDER BY created_at
-        LIMIT ? OFFSET ?
-    """, tuple(values))
+        where_clause = "WHERE is_active = 1"
+        if purchase_id:
+            where_clause = "WHERE purchase_id = ?"
+            values.append(purchase_id)
+        
+        # add search_limit and offset to query parameters (values list)
+        values.append(search_limit)
+        values.append(offset)
 
-    rows = cursor.fetchall()
-    conn.close()
+        cursor.execute(f"""
+            SELECT * FROM payments {where_clause} ORDER BY created_at
+            LIMIT ? OFFSET ?
+        """, tuple(values))
 
-    if not rows:
-        return []
+        rows = cursor.fetchall()
+        conn.close()
 
-    return [Payment.from_row(row) for row in rows]
+        if not rows:
+            return []
+
+        return [Payment.from_row(row) for row in rows]
+
+    except sqlite3.IntegrityError as e:
+        if "FOREIGN KEY constraint failed" in str(e):
+            raise ValueError("Uma compra com esse id não existe.")
+        else:
+            raise ValueError("Erro inesperado do banco.") from e
+    finally:
+        conn.close()
 
 def insert_payment(data: dict) -> Payment:
     try:
