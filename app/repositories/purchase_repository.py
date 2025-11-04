@@ -8,10 +8,8 @@ def get_purchases(limit: int = None, offset: int = 0, only_pending: bool = True)
     try:
         # Default limit if not provided (-1 means "no limit" in SQLite)
         search_limit = -1 if limit is None else limit
-        
-        where_clause = "WHERE 1"
-        if only_pending:
-            where_clause = "WHERE status IN ('pending', 'partial')"
+        # Create WHERE clause if only pending (or partial) purchases is requested
+        where_clause = "" if not only_pending else "WHERE status IN ('pending', 'partial')"
 
         cursor.execute(f"""
             SELECT * FROM purchases {where_clause} ORDER BY created_at
