@@ -147,22 +147,51 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase | None:
         if conn:
             conn.close()
 
-def delete_purchase(purchase_id: int) -> bool:
-    """Delete a purchase (soft delete)."""
+def get_purchases_ids_by_client_id(client_id: int) -> List[int]:
+    """Get all purchases ids for a given client."""
     conn = None
     try:
         conn = get_connection()
         cursor = conn.cursor()
 
+        # get all purchases ids for that client
+        cursor.execute("""
+            SELECT id FROM purchases WHERE client_id = ? AND is_active = 1
+        """, (client_id,))
+        purchase_ids = [row[0] for row in cursor.fetchall()]
+
+        conn.commit()
+
+        return purchase_ids
+    except sqlite3.IntegrityError as e:
+        if "FOREIGN KEY constraint failed" in str(e):
+            raise ValueError("Um cliente com esse id não existe.")
+    except sqlite3.Error as e:
+        raise ValueError("Erro inesperado do banco.") from e
+    finally:
+        if conn:
+            conn.close()
+
+def deactivate_purchases_by_client_id(client_id: int) -> bool:
+    """Deactivate all purchases for a given client."""
+    conn = None
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
         now = int(datetime.now().timestamp())
+
+        # disable all purchases related to that client
         cursor.execute("""
             UPDATE purchases SET is_active = 0, updated_at = ?
-            WHERE id = ? AND is_active = 1
-        """, (now, purchase_id))
+            WHERE client_id = ? AND is_active = 1
+        """, (now, client_id))
 
         conn.commit()
 
         return cursor.rowcount > 0
+    except sqlite3.IntegrityError as e:
+        if "FOREIGN KEY constraint failed" in str(e):
+            raise ValueError("Um cliente com esse id não existe.")
     except sqlite3.Error as e:
         raise ValueError("Erro inesperado do banco.") from e
     finally:
