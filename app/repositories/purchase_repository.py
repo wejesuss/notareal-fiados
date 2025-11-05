@@ -94,6 +94,23 @@ def get_purchase_by_id(purchase_id: int) -> Purchase | None:
         if conn:
             conn.close()
 
+def get_purchase_by_note_number(note_number: str) -> Purchase | None:
+    conn = None
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT * FROM purchases WHERE note_number = ?", (note_number,))
+        row = cursor.fetchone()
+
+        if not row:
+            return None
+
+        return Purchase.from_row(row)
+    finally:
+        if conn:
+            conn.close()
+
 def update_purchase(purchase_id: int, data: dict) -> Purchase | None:
     conn = None
 

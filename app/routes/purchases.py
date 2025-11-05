@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from services.purchase_service import (
     get_purchase_by_id,
+    get_purchase_by_note_number,
     get_purchases,
     create_purchase,
     update_purchase,
@@ -24,6 +25,14 @@ def list_purchases(limit: int = None, offset: int = 0, only_pending: bool = True
 def read_purchase(purchase_id: int):
     """Get purchase by ID."""
     purchase = get_purchase_by_id(purchase_id)
+    if not purchase:
+        raise HTTPException(status_code=404, detail="Compra não encontrada.")
+    return purchase.__dict__
+
+@router.get("/by-note/{note_number}")
+def read_purchase_by_note(note_number: str):
+    """Get purchase by note_number."""
+    purchase = get_purchase_by_note_number(note_number)
     if not purchase:
         raise HTTPException(status_code=404, detail="Compra não encontrada.")
     return purchase.__dict__
