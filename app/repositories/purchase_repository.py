@@ -160,8 +160,6 @@ def get_purchases_ids_by_client_id(client_id: int) -> List[int]:
         """, (client_id,))
         purchase_ids = [row[0] for row in cursor.fetchall()]
 
-        conn.commit()
-
         return purchase_ids
     except sqlite3.IntegrityError as e:
         if "FOREIGN KEY constraint failed" in str(e):
