@@ -130,7 +130,7 @@ def update_client(client_id: int, data: dict) -> Client | None:
             conn.close()
 
 def delete_client(client_id: int) -> bool:
-    """Deactivate (soft delete) a client"""
+    """Deactivate (soft delete) a client."""
     conn = None
     try:
         conn = get_connection()
@@ -143,10 +143,10 @@ def delete_client(client_id: int) -> bool:
         """, (now, client_id))
 
         conn.commit()
-        print(cursor.rowcount)
+
         return cursor.rowcount > 0
     except sqlite3.Error as e:
-        raise ValueError("Error inesperado do banco.") from e
+        raise ValueError("Erro inesperado do banco.") from e
     finally:
         if conn:
             conn.close()
