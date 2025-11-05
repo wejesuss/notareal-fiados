@@ -1,5 +1,6 @@
 from typing import List
 from models.client import Client
+from services.purchase_service import deactivate_purchases_by_client
 import repositories.client_repository as client_repository
 
 def get_client_by_id(client_id: int) -> Client | None:
@@ -25,7 +26,10 @@ def update_client(client_id: int, data: dict) -> Client | None:
     return client
 
 def delete_client(client_id: int) -> bool:
-    """Deactivate (soft delete) a client."""
+    """Deactivate (soft delete) a client and cascade deactivate related purchases/payments."""
     success = client_repository.delete_client(client_id)
+    if success:
+        # cascade disable purchases and payments
+        deactivate_purchases_by_client(client_id)
     
     return success

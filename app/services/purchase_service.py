@@ -1,5 +1,6 @@
 from typing import List
 from models.purchase import Purchase
+from services import payment_service
 from repositories import purchase_repository
 
 def get_purchase_by_id(purchase_id: int) -> Purchase | None:
@@ -46,7 +47,23 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase | None:
     return purchase
 
 def delete_purchase(purchase_id: int) -> bool:
-    """Delete a purchase (soft delete)."""
+    """Deactivate a purchase."""
     success = purchase_repository.delete_purchase(purchase_id)
     
+    return success
+
+# Client related services (business logic)
+def deactivate_purchases_by_client(client_id: int) -> None:
+    """Deactivate all purchases (and related payments) for a given client."""
+    # get purchases ids related to that client
+    purchases_ids = purchase_repository.get_purchases_ids_by_client_id(client_id)
+
+    # disable all purchases related to that client
+    success = purchase_repository.deactivate_purchases_by_client_id(client_id)
+
+    # cascade to payments
+    if success:
+        for purchase_id in purchase_ids:
+            payment_service.deactivate_payments_by_purchase(purchase_id)
+
     return success

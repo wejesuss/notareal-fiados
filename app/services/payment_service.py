@@ -18,3 +18,8 @@ def create_payment(data: dict) -> Payment:
 def delete_payment(payment_id: int):
     """Deactivate (soft delete) a payment."""
     return payment_repository.delete_payment(payment_id)
+
+# Payment related services (business logic)
+def deactivate_payments_by_purchase(purchase_id: int):
+    """Deactivate all payments for a given purchase."""
+    return payment_repository.deactivate_payments_by_purchase_id(purchase_id)
