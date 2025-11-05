@@ -16,7 +16,7 @@ def list_clients(limit: int = None, offset: int = 0):
  
     clients = get_clients(limit, offset)
     if not clients:
-        return {"message": "Cliente não encontrado.", "clients": []}
+        return {"message": "Clientes não encontrado.", "clients": []}
 
     clients_data = [c.__dict__ for c in clients]
     return {"message": "Clientes encontrados.", "clients": clients_data}
