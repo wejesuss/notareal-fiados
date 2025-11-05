@@ -63,7 +63,7 @@ def deactivate_purchases_by_client(client_id: int) -> None:
 
     # cascade to payments
     if success:
-        for purchase_id in purchase_ids:
+        for purchase_id in purchases_ids:
             payment_service.deactivate_payments_by_purchase(purchase_id)
 
     return success
