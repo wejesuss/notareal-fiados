@@ -6,6 +6,7 @@ from services.client_service import (
     update_client,
     delete_client
 )
+from services.purchase_service import (get_purchases_by_client)
 
 router = APIRouter(prefix="/clients", tags=["Clients"])
 
@@ -56,3 +57,17 @@ def remove_client(client_id: int):
     if not success:
         raise HTTPException(status_code=404, detail="Cliente não encontrado ou já desativado.")
     return {"message": "Cliente removido com sucesso."}
+
+# Purchase related routes
+@router.get("/{client_id}/purchases")
+def list_purchases_for_client(client_id: int, only_active: bool = True):
+    """List all purchases for a specific client."""
+    try:
+        purchases = get_purchases_by_client(client_id, only_active)
+        if not purchases:
+            return {"message": "Compras não encontrado.", "purchases": []}
+
+        purchases_data = [p.__dict__ for p in purchases]
+        return {"message": "Compras encontradas.", "purchases": purchases_data}
+    except ValueError as e:
+        raise HTTPException(status_code=409, detail=str(e))

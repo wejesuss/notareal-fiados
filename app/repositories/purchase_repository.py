@@ -147,6 +147,30 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase | None:
         if conn:
             conn.close()
 
+def get_purchases_by_client_id(client_id: int, only_active: bool = True) -> List[Purchase]:
+    conn = None
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        where_clause = "WHERE client_id = ?"
+        if only_active:
+            where_clause += " AND is_active = 1"
+
+        cursor.execute(f"SELECT * FROM purchases {where_clause} ORDER BY created_at DESC", (client_id,))
+
+        rows = cursor.fetchall()
+
+        return [Purchase.from_row(row) for row in rows] if rows else []
+    except sqlite3.IntegrityError as e:
+        if "FOREIGN KEY constraint failed" in str(e):
+            raise ValueError("Um cliente com esse id não existe.")
+    except sqlite3.Error as e:
+        raise ValueError("Erro inesperado do banco.") from e
+    finally:
+        if conn:
+            conn.close()
+
 def get_purchases_ids_by_client_id(client_id: int) -> List[int]:
     """Get all purchases ids for a given client."""
     conn = None

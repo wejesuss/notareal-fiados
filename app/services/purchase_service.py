@@ -53,6 +53,9 @@ def delete_purchase(purchase_id: int) -> bool:
     return success
 
 # Client related services (business logic)
+def get_purchases_by_client(client_id: int, only_active: bool = True) -> List[Purchase]:
+    return purchase_repository.get_purchases_by_client_id(client_id, only_active)
+
 def deactivate_purchases_by_client(client_id: int) -> None:
     """Deactivate all purchases (and related payments) for a given client."""
     # get purchases ids related to that client
