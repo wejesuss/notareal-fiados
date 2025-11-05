@@ -14,7 +14,7 @@ def get_purchases(limit: int = None, offset: int = 0, only_pending: bool = True)
         # Create WHERE clause if only pending (or partial) purchases is requested
         where_clause = "WHERE is_active = 1" 
         if only_pending:
-            where_clause = "WHERE status IN ('pending', 'partial')"
+            where_clause = "WHERE status IN ('pending', 'partial') AND is_active = 1"
 
         cursor.execute(f"""
             SELECT * FROM purchases {where_clause} ORDER BY created_at DESC
