@@ -65,13 +65,12 @@ O sistema funciona **offline**, utilizando um **servidor local** (instalado no c
 
 ## 📦 Próximos Passos
 
-1. Definir o design visual e identidade (cores, logo, estilo).  
-2. Criar a estrutura básica do servidor Flask + SQLite.  
-3. Modelar as tabelas de **clientes**, **compras** e **pagamentos**.  
-4. Implementar endpoints para registro, consulta e impressão.  
-5. Desenvolver a interface desktop.  
-6. Testar funções de backup e impressão.  
-7. Planejar e iniciar o desenvolvimento da versão mobile.  
+1. Definir o design visual e identidade (cores, logo, estilo).
+2. Implementar endpoints para impressão.  
+3. Desenvolver a interface desktop.
+4. Testar funções de backup e impressão.  
+5. Planejar e iniciar o desenvolvimento da versão mobile.
+6. Reorganizar rotas para coincidir com o modelo de negócios
 
 ---
 
