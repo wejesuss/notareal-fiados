@@ -1,7 +1,5 @@
 # NotaReal Fiados - Escopo e Objetivos
 
-<br>
-> Nome personalizável conforme marca (ex: AgroReal)
 
 ## 🧩 Visão Geral
 
