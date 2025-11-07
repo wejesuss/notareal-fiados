@@ -17,9 +17,9 @@ def get_payment_by_id(payment_id: int) -> Payment | None:
 def create_payment(data: dict) -> Payment:
     return payment_repository.insert_payment(data)
 
-def delete_payment(payment_id: int):
+def deactivate_payment(payment_id: int) -> bool:
     """Deactivate (soft delete) a payment."""
-    return payment_repository.delete_payment(payment_id)
+    return payment_repository.deactivate_payment(payment_id)
 
 # Payment related services (business logic)
 def deactivate_payments_by_purchase(purchase_id: int):

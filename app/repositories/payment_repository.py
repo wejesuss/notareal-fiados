@@ -106,7 +106,7 @@ def get_payment_by_id(payment_id: int) -> Payment | None:
         if conn:
             conn.close()
 
-def delete_payment(payment_id: int) -> bool:
+def deactivate_payment(payment_id: int) -> bool:
     """Deactivate (soft delete) a payment."""
     conn = None
 
