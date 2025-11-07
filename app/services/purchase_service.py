@@ -90,6 +90,10 @@ def deactivate_purchases_by_client(client_id: int) -> None:
     if success:
         for purchase_id in purchases_ids:
             payment_service.deactivate_payments_by_purchase(purchase_id)
+            purchase_repository.update_purchase(purchase_id, {
+                "total_paid_value": 0,
+                "status": "pending"
+            })
 
     return success
 
