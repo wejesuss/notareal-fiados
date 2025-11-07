@@ -16,7 +16,7 @@ def list_purchases(limit: int = None, offset: int = 0, only_pending: bool | None
     """List all purchases."""
     purchases = get_purchases(limit, offset, only_pending)
     if not purchases:
-        return {"message": "Compra não encontrada.", "purchases": []}
+        return {"message": "Compras não encontradas.", "purchases": []}
     
     purchases_data = [p.__dict__ for p in purchases]
     return {"message": "Compras encontradas.", "purchases": purchases_data}
