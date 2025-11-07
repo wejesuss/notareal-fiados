@@ -1,41 +1,37 @@
 from fastapi import APIRouter, HTTPException
-from services.payment_service import (
-    get_payment_by_id,
-    get_payments,
+from services.purchase_service import (
+    get_payments_for_purchase,
     create_payment,
-    delete_payment
+    deactivate_payment
 )
 
-router = APIRouter(prefix="/payments", tags=["Payments"])
+router = APIRouter(prefix="/{purchase_id}/payments", tags=["Payments"])
 
 @router.get("/")
-def list_payments(limit: int = None, offset: int = 0):
-    """List all payments."""
-    payments = get_payments(limit, offset)
-    if not payments:
-        return {"message": "Pagamentos não encontrados.", "payments": []}
-    
-    payments_data = [p.__dict__ for p in payments]
-    return {"message": "Pagamentos encontrados.", "payments": payments_data}
+def list_payments_for_purchase(purchase_id: int, limit: int = None, offset: int = 0):
+    """List all payments for a specific purchase."""
+    try:
+        payments = get_payments_for_purchase(purchase_id, limit, offset)
+        if not payments:
+            return {"message": "Nenhum pagamento encontrado para esta compra.", "payments": []}
 
-@router.get("/{payment_id}")
-def read_payment(payment_id: int):
-    """Get payment by ID."""
-    payment = get_payment_by_id(payment_id)
-    if not payment:
-        raise HTTPException(status_code=404, detail="Pagamento não encontrado.")
-    return payment.__dict__
+        return {"message": "Pagamentos encontrados.", "payments": [p.__dict__ for p in payments]}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 @router.post("/")
-def add_payment(data: dict):
-    """Add new payment."""
-    payment = create_payment(data)
-    return {"message": "Pagamento registrado com sucesso.", "payment": payment.__dict__}
+def add_payment(purchase_id: int, data: dict):
+    """Create a new payment for a specific purchase."""
+    try:
+        payment = create_payment(data)
+        return {"message": "Pagamento criado com sucesso.", "payment": payment.__dict__}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 @router.delete("/{payment_id}")
-def remove_payment(payment_id: int):
-    """Delete payment (soft delete)."""
-    success = delete_payment(payment_id)
+def remove_payment(purchase_id: int, payment_id: int):
+    """Deactivate (soft delete) a payment."""
+    success = deactivate_payment(purchase_id, payment_id)
     if not success:
-        raise HTTPException(status_code=404, detail="Pagamento não encontrado.")
-    return {"message": "Pagamento removido com sucesso."}
+        raise HTTPException(status_code=404, detail="Pagamento não encontrado ou já desativado.")
+    return {"message": "Pagamento desativado com sucesso."}
