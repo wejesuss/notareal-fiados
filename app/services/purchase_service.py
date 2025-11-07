@@ -41,7 +41,7 @@ def create_purchase(client_id: int, data: dict) -> Purchase:
             "amount": total_paid_value,
             "payment_date": data.get("payment_date"),
             "method": data.get("method"),
-            "description": data.get("description"),
+            "description": data.get("payment_description"),
             "receipt_number": data.get("receipt_number")
         }
 
