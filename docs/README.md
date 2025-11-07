@@ -32,15 +32,25 @@ O sistema funciona **offline**, utilizando um **servidor local** (instalado no c
 
 ---
 
+## Arquitetura Técnica
+
+- Back-end desenvolvido em **Python 3** usando o framework **FastAPI**.  
+- Banco de dados local SQLite, sem uso de ORM, para máxima leveza e portabilidade.  
+- Aplicação desenhada para rodar em computador principal da loja, com possibilidade de acesso por outros dispositivos via rede local.  
+- Suporte para exportação e restauração de backups.  
+- Impressão de notas e recibos em PDF ou por impressora conectada.
+
+---
+
 ## 🧠 Escopo Técnico (Planejado)
 
 | Componente | Tecnologia sugerida | Observações |
 |-------------|--------------------|--------------|
-| **Servidor Central (PC)** | Python + Flask | Gerencia o banco de dados e comunicação entre dispositivos. |
+| **Servidor Central (PC)** | Python + FastAPI | Gerencia o banco de dados e comunicação entre dispositivos. |
 | **Banco de Dados** | SQLite | Local, leve e portátil, ideal para operação offline. |
 | **Interface Desktop** | Python + Toga ou PySide6 | Interface simples e nativa com aparência de aplicativo. |
 | **App Mobile** | Kivy/KivyMD | Mesmas funções do desktop, adaptadas para telas menores. |
-| **Impressão** | Endpoint Flask ou biblioteca OS | Envia comandos de impressão para o servidor. |
+| **Impressão** | Endpoint FastAPI ou biblioteca OS | Envia comandos de impressão para o servidor. |
 | **Backup** | Exportação automática + envio opcional (Drive ou e-mail) | Evita perda de dados. |
 
 ---
