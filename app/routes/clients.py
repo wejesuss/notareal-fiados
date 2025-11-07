@@ -4,7 +4,7 @@ from services.client_service import (
     get_clients,
     create_client,
     update_client,
-    delete_client
+    deactivate_client
 )
 from services.purchase_service import (get_purchases_by_client)
 
@@ -53,7 +53,7 @@ def edit_client(client_id: int, data: dict):
 @router.delete("/{client_id}")
 def remove_client(client_id: int):
     """Delete a client (soft delete)."""
-    success = delete_client(client_id)
+    success = deactivate_client(client_id)
     if not success:
         raise HTTPException(status_code=404, detail="Cliente não encontrado ou já desativado.")
     return {"message": "Cliente removido com sucesso."}

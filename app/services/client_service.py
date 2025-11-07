@@ -25,9 +25,9 @@ def update_client(client_id: int, data: dict) -> Client | None:
     client = client_repository.update_client(client_id, data)
     return client
 
-def delete_client(client_id: int) -> bool:
+def deactivate_client(client_id: int) -> bool:
     """Deactivate (soft delete) a client and cascade deactivate related purchases/payments."""
-    success = client_repository.delete_client(client_id)
+    success = client_repository.deactivate_client(client_id)
     if success:
         # cascade disable purchases and payments
         deactivate_purchases_by_client(client_id)

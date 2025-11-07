@@ -129,7 +129,7 @@ def update_client(client_id: int, data: dict) -> Client | None:
         if conn:
             conn.close()
 
-def delete_client(client_id: int) -> bool:
+def deactivate_client(client_id: int) -> bool:
     """Deactivate (soft delete) a client."""
     conn = None
     try:
