@@ -15,6 +15,13 @@ def get_payment_by_id(payment_id: int) -> Payment | None:
     return payment_repository.get_payment_by_id(payment_id)
 
 def create_payment(data: dict) -> Payment:
+    """Create a new payment record."""
+    # Validate fields, method, note_number etc.
+    if not data.get("purchase_id"):
+        raise ValueError("O pagamento precisa estar vinculado a uma compra.")
+    if not data.get("amount") or data.get("amount") <= 0:
+        raise ValueError("O valor do pagamento deve ser maior que zero.")
+
     return payment_repository.insert_payment(data)
 
 def deactivate_payment(payment_id: int) -> bool:
