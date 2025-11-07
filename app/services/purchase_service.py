@@ -32,10 +32,21 @@ def create_purchase(client_id: int, data: dict) -> Purchase:
 
     data.update({"client_id": client_id, "status": status})
 
-    if create_new_payment:
-        print(f"Creating new payment based on purchase id: {data.get('id')}")
+    purchase = purchase_repository.insert_purchase(data)
 
-    return purchase_repository.insert_purchase(data)
+    if create_new_payment:
+        payment_data: dict = {
+            "purchase_id": purchase.id,
+            "amount": total_paid_value,
+            "payment_date": data.get("payment_date"),
+            "method": data.get("method"),
+            "description": data.get("description"),
+            "receipt_number": data.get("receipt_number")
+        }
+
+        payment_service.create_payment(payment_data)
+
+    return purchase
 
 def update_purchase(purchase_id: int, data: dict) -> Purchase | None:
     purchase_exists = purchase_repository.get_purchase_by_id(purchase_id)
