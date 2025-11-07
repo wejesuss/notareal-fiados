@@ -214,7 +214,7 @@ SELECT * FROM payments WHERE purchase_id = ? ORDER BY payment_date;
 
 ### 🔗 Documentos relacionados
 
-- 📘 **[Escopo e visão do projeto](./notareal_fiados_scope.md)**  
+- 📘 **[Escopo e visão do projeto](./README.md)**  
   Descreve o propósito, público-alvo e principais funcionalidades do sistema Nota Real Fiados.
 
 - 🗃️ **[Modelo de dados e fluxo de informações](./db_model_and_flow.md)**  
