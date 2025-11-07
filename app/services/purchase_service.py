@@ -22,6 +22,11 @@ def create_purchase(client_id: int, data: dict) -> Purchase:
     total_value = float(data.get("total_value"))
     amount = float(data.get("amount"))
 
+    if not total_value or total_value <= 0:
+        raise ValueError("O preço da compra deve ser maior que zero.")
+    if not amount or amount <= 0:
+        raise ValueError("O valor do pagamento deve ser maior que zero.")
+
     create_new_payment = False
 
     status = "pending"
