@@ -23,7 +23,7 @@ def list_payments_for_purchase(purchase_id: int, limit: int = None, offset: int 
 def add_payment(purchase_id: int, data: dict):
     """Create a new payment for a specific purchase."""
     try:
-        payment = create_payment(data)
+        payment = create_payment(purchase_id, data)
         return {"message": "Pagamento criado com sucesso.", "payment": payment.__dict__}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
