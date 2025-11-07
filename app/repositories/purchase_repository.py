@@ -3,7 +3,7 @@ from datetime import datetime
 from database import get_connection, sqlite3
 from models.purchase import Purchase
 
-def get_purchases(limit: int = None, offset: int = 0, only_pending: bool = True) -> List[Purchase]:
+def get_purchases(limit: int = None, offset: int = 0, only_pending: bool | None = True) -> List[Purchase]:
     conn = None
     try:
         conn = get_connection()
@@ -11,10 +11,13 @@ def get_purchases(limit: int = None, offset: int = 0, only_pending: bool = True)
 
         # Default limit if not provided (-1 means "no limit" in SQLite)
         search_limit = -1 if limit is None else limit
+
         # Create WHERE clause if only pending (or partial) purchases is requested
-        where_clause = "WHERE is_active = 1" 
-        if only_pending:
+        where_clause = "" # include inactive ones if only_pending is None
+        if only_pending is True:
             where_clause = "WHERE status IN ('pending', 'partial') AND is_active = 1"
+        elif only_pending is False:
+            where_clause = "WHERE is_active = 1"
 
         cursor.execute(f"""
             SELECT * FROM purchases {where_clause} ORDER BY created_at DESC

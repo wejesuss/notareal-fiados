@@ -10,7 +10,7 @@ def get_purchase_by_id(purchase_id: int) -> Purchase | None:
 def get_purchase_by_note_number(note_number: str) -> Purchase | None:
     return purchase_repository.get_purchase_by_note_number(note_number)
 
-def get_purchases(limit: int = None, offset: int = 0, only_pending: bool = True) -> List[Purchase]:
+def get_purchases(limit: int = None, offset: int = 0, only_pending: bool | None = True) -> List[Purchase]:
     purchases = purchase_repository.get_purchases(limit, offset, only_pending)
     if not purchases:
         return []

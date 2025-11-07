@@ -12,7 +12,7 @@ from routes.payments import router as payment_router
 router = APIRouter(prefix="/purchases", tags=["Purchases"])
 
 @router.get("/")
-def list_purchases(limit: int = None, offset: int = 0, only_pending: bool = True):
+def list_purchases(limit: int = None, offset: int = 0, only_pending: bool | None = True):
     """List all purchases."""
     purchases = get_purchases(limit, offset, only_pending)
     if not purchases:
