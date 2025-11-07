@@ -1,7 +1,8 @@
 from typing import List
-from models.purchase import Purchase
+from datetime import datetime
+from models import (Purchase, Payment)
 from services import payment_service
-from repositories import purchase_repository
+from repositories import (purchase_repository, payment_repository)
 
 def get_purchase_by_id(purchase_id: int) -> Purchase | None:
     return purchase_repository.get_purchase_by_id(purchase_id)
@@ -83,4 +84,24 @@ def deactivate_purchases_by_client(client_id: int) -> None:
         for purchase_id in purchases_ids:
             payment_service.deactivate_payments_by_purchase(purchase_id)
 
+    return success
+
+# Payment related services (business logic)
+def get_payments_for_purchase(purchase_id: int, limit: int = None, offset: int = 0) -> List[Payment]:
+    """List payments for a specific purchase."""
+    return payment_service.get_payments(limit, offset, purchase_id)
+
+def get_payment_by_id(payment_id: int) -> Payment | None:
+    return payment_service.get_payment_by_id(payment_id)
+
+def create_payment(purchase_id: int, data: dict) -> Payment:
+    """Create a new payment and update purchase totals."""
+    data["purchase_id"] = purchase_id
+    payment = payment_service.create_payment(data)
+
+    return payment
+
+def deactivate_payment(purchase_id: int, payment_id: int) -> bool:
+    """Deactivate a payment and update purchase totals."""
+    success = payment_service.deactivate_payment(payment_id)
     return success
