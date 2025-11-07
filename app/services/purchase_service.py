@@ -18,16 +18,18 @@ def get_purchases(limit: int = None, offset: int = 0, only_pending: bool | None 
     return purchases
 
 def create_purchase(client_id: int, data: dict) -> Purchase:
-    # TODO - validate fields
+    total_paid_value = float(data.get("total_paid_value"))
+    total_value = float(data.get("total_value"))
+    amount = float(data.get("amount"))
+
     create_new_payment = False
 
-    total_paid_value = float(data.get("total_paid_value"))
-
     status = "pending"
-    if total_paid_value >= float(data.get("total_value")):
+    if total_paid_value >= total_value:
         create_new_payment = True
         status = "paid"
-    elif total_paid_value > 0:
+    elif amount > 0:
+        total_paid_value = amount
         create_new_payment = True
         status = "partial"
 
@@ -38,7 +40,7 @@ def create_purchase(client_id: int, data: dict) -> Purchase:
     if create_new_payment:
         payment_data: dict = {
             "purchase_id": purchase.id,
-            "amount": total_paid_value,
+            "amount": amount,
             "payment_date": data.get("payment_date"),
             "method": data.get("method"),
             "description": data.get("payment_description"),
