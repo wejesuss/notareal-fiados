@@ -59,9 +59,7 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase | None:
         raise ValueError("Status inválido. Use 'pending', 'partial' ou 'paid'.")
 
     purchase = purchase_repository.update_purchase(purchase_id, data)
-
-    if "total_value" in data or data.get("is_active") == 1:
-        recalculate_purchase_totals(purchase_id)
+    recalculate_purchase_totals(purchase_id)
 
     return purchase
 
@@ -122,13 +120,13 @@ def deactivate_payment(purchase_id: int, payment_id: int) -> bool:
 
 def recalculate_purchase_totals(purchase_id: int):
     """Recalculate purchase total_paid_value and status based on active payments."""
+    purchase = purchase_repository.get_purchase_by_id(purchase_id)
+    if not purchase or not purchase.is_active:
+        return
+
     payments = payment_service.get_payments(limit = None, offset = 0, purchase_id = purchase_id)
     active_payments = [p for p in payments if p.is_active]
     total_paid = sum(p.amount for p in active_payments)
-
-    purchase = purchase_repository.get_purchase_by_id(purchase_id)
-    if not purchase:
-        return
 
     new_status = "pending"
     if total_paid >= purchase.total_value:
