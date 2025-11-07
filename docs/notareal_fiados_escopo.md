@@ -1,8 +1,8 @@
-# AgroReal Fiados - Escopo e Objetivos
+# NotaReal Fiados - Escopo e Objetivos
 
 ## 🧩 Visão Geral
 
-O **AgroReal Fiados** é um sistema local (para PC e dispositivos móveis) projetado para **gerenciar compras fiadas** em pequenas lojas, mercearias e comércios rurais. O objetivo é **substituir o registro manual em papel** por uma ferramenta **simples, segura e confiável**, mantendo a possibilidade de **impressão e assinatura física** como validação.
+O **NotaReal Fiados** é um sistema local (para PC e dispositivos móveis) projetado para **gerenciar compras fiadas** em pequenas lojas, mercearias e comércios rurais. O objetivo é **substituir o registro manual em papel** por uma ferramenta **simples, segura e confiável**, mantendo a possibilidade de **impressão e assinatura física** como validação.
 
 O sistema funciona **offline**, utilizando um **servidor local** (instalado no computador principal da loja) com possibilidade de **acesso via rede local** por celulares ou outros PCs autorizados. Todos os dados ficam armazenados em um banco **SQLite local**, com opção de **backup automático ou manual** para evitar perdas.
 
@@ -74,5 +74,5 @@ O sistema funciona **offline**, utilizando um **servidor local** (instalado no c
 
 ---
 
-> **Nota:** O AgroReal Fiados tem como prioridade a segurança e a simplicidade operacional, buscando oferecer uma experiência acessível para vendedores de pequeno porte sem exigir conexão constante com a internet.
+> **Nota:** O NotaReal Fiados tem como prioridade a segurança e a simplicidade operacional, buscando oferecer uma experiência acessível para vendedores de pequeno porte sem exigir conexão constante com a internet.
 

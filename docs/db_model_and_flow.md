@@ -1,7 +1,7 @@
-# Modelo do Banco de Dados e Mapa de Telas - AgroReal Fiados (MVP)
+# Modelo do Banco de Dados e Mapa de Telas - NotaReal Fiados (MVP)
 
 ## Objetivo deste documento
-Este arquivo contém o **modelo de dados atualizado** (SQL `CREATE TABLE`) do banco SQLite do AgroReal Fiados, além do **mapa de telas e fluxo** do programa (MVP). Use este documento como referência para implementar o banco e as telas iniciais.
+Este arquivo contém o **modelo de dados atualizado** (SQL `CREATE TABLE`) do banco SQLite do NotaReal Fiados, além do **mapa de telas e fluxo** do programa (MVP). Use este documento como referência para implementar o banco e as telas iniciais.
 
 ---
 
