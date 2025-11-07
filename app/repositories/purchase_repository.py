@@ -164,6 +164,30 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase | None:
         if conn:
             conn.close()
 
+def deactivate_purchase(purchase_id: int) -> bool:
+    """Deactivate a purchase."""
+    conn = None
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        now = int(datetime.now().timestamp())
+
+        # disable purchase with the given ID
+        cursor.execute("""
+            UPDATE purchases SET is_active = 0, updated_at = ?
+            WHERE id = ? AND is_active = 1
+        """, (now, purchase_id))
+
+        conn.commit()
+
+        return cursor.rowcount > 0
+    except sqlite3.Error as e:
+        raise ValueError("Erro inesperado do banco.") from e
+    finally:
+        if conn:
+            conn.close()
+
+
 def get_purchases_by_client_id(client_id: int, only_active: bool = True) -> List[Purchase]:
     conn = None
     try:
