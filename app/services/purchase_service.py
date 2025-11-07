@@ -49,9 +49,9 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase | None:
     purchase = purchase_repository.update_purchase(purchase_id, data)
     return purchase
 
-def delete_purchase(purchase_id: int) -> bool:
+def deactivate_purchase(purchase_id: int) -> bool:
     """Deactivate a purchase."""
-    success = purchase_repository.delete_purchase(purchase_id)
+    success = purchase_repository.deactivate_purchase(purchase_id)
     
     return success
 

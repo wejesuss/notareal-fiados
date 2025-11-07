@@ -5,7 +5,7 @@ from services.purchase_service import (
     get_purchases,
     create_purchase,
     update_purchase,
-    delete_purchase
+    deactivate_purchase
 )
 from routes.payments import router as payment_router
 
@@ -66,7 +66,7 @@ def edit_purchase(purchase_id: int, data: dict):
 @router.delete("/{purchase_id}")
 def remove_purchase(purchase_id: int):
     """Delete purchase (soft delete)."""
-    success = delete_purchase(purchase_id)
+    success = deactivate_purchase(purchase_id)
     if not success:
         raise HTTPException(status_code=404, detail="Compra não encontrada.")
     return {"message": "Compra removida com sucesso."}
