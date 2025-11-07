@@ -3,6 +3,7 @@ from models.payment import Payment
 from repositories import payment_repository
 
 def get_payments(limit: int = None, offset: int = 0, purchase_id: int = None) -> List[Payment]:
+    """Retrieve payments, optionally filtered by purchase."""
     payments = payment_repository.get_payments(limit, offset, purchase_id)
     if not payments:
         return []
@@ -10,6 +11,7 @@ def get_payments(limit: int = None, offset: int = 0, purchase_id: int = None) ->
     return payments
 
 def get_payment_by_id(payment_id: int) -> Payment | None:
+    """Retrieve a single payment by ID."""
     return payment_repository.get_payment_by_id(payment_id)
 
 def create_payment(data: dict) -> Payment:
