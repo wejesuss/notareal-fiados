@@ -1,5 +1,5 @@
 from typing import List
-from models.payment import Payment
+from models import Payment
 from repositories import payment_repository
 
 def get_payments(limit: int = None, offset: int = 0, purchase_id: int = None) -> List[Payment]:

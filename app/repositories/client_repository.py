@@ -1,7 +1,7 @@
 from typing import List
 from datetime import datetime
 from database import get_connection, sqlite3
-from models.client import Client
+from models import Client
 
 def get_clients(limit: int = None, offset: int = 0) -> List[Client]:
     conn = None

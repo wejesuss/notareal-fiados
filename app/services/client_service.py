@@ -1,5 +1,5 @@
 from typing import List
-from models.client import Client
+from models import Client
 from services.purchase_service import deactivate_purchases_by_client
 import repositories.client_repository as client_repository
 

@@ -1,7 +1,7 @@
 from typing import List
 from datetime import datetime
 from database import get_connection, sqlite3
-from models.purchase import Purchase
+from models import Purchase
 
 def get_purchases(limit: int = None, offset: int = 0, only_pending: bool | None = True) -> List[Purchase]:
     conn = None
