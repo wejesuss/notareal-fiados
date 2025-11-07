@@ -1,4 +1,7 @@
-# Organização de pastas para projeto Python com FastAPI e SQLite (sem ORM)
+# Organização de pastas para projeto Nota Real Fiados (Python + FastAPI + SQLite)
+
+Este documento descreve como estruturar o backend do projeto **Nota Real Fiados**, usando **FastAPI** com **SQLite**, sem dependência de ORM.
+A arquitetura busca **separar responsabilidades** — API, lógica de negócio e persistência de dados — permitindo fácil manutenção e testes isolados.
 
 ## Estrutura sugerida de pastas
 
@@ -131,3 +134,15 @@ def get_user(user_id: int):
 - Facilita trocar SQLite por outro banco sem mudar a API.
 - Evita acoplamento direto de frameworks.
 
+---
+
+### 🔗 Documentos relacionados
+
+- 📘 **[Escopo e visão do projeto](./notareal_fiados_scope.md)**  
+  Descreve o propósito, público-alvo e principais funcionalidades do sistema Nota Real Fiados.
+
+- 🗃️ **[Modelo de dados e fluxo de informações](./db_model_and_flow.md)**  
+  Mostra como clientes, notas e pagamentos se relacionam no banco de dados e no fluxo do app.
+
+- 🧱 **[Exemplo de arquitetura limpa (FastAPI + SQLite)](./project_clean-code_example.md)**  
+  Explica a organização de pastas e o desacoplamento entre API, serviços e repositórios, com código exemplo.

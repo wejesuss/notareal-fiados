@@ -210,3 +210,15 @@ SELECT * FROM payments WHERE purchase_id = ? ORDER BY payment_date;
 - Este modelo prioriza **simplicidade operacional** e **facilidade de backup** (arquivo único `.db`).  
 - A lógica de negócios (numeração de notas, regras de status, geração de PDFs e impressão) deve ser implementada pela aplicação (server/app) para garantir consistência.
 
+---
+
+### 🔗 Documentos relacionados
+
+- 📘 **[Escopo e visão do projeto](./notareal_fiados_scope.md)**  
+  Descreve o propósito, público-alvo e principais funcionalidades do sistema Nota Real Fiados.
+
+- 🗃️ **[Modelo de dados e fluxo de informações](./db_model_and_flow.md)**  
+  Mostra como clientes, notas e pagamentos se relacionam no banco de dados e no fluxo do app.
+
+- 🧱 **[Exemplo de arquitetura limpa (FastAPI + SQLite)](./project_clean-code_example.md)**  
+  Explica a organização de pastas e o desacoplamento entre API, serviços e repositórios, com código exemplo.

@@ -78,3 +78,16 @@ O sistema funciona **offline**, utilizando um **servidor local** (instalado no c
 ---
 
 > **Nota:** O NotaReal Fiados tem como prioridade a segurança e a simplicidade operacional, buscando oferecer uma experiência acessível para vendedores de pequeno porte sem exigir conexão constante com a internet.
+
+---
+
+### 🔗 Documentos relacionados
+
+- 📘 **[Escopo e visão do projeto](./notareal_fiados_scope.md)**  
+  Descreve o propósito, público-alvo e principais funcionalidades do sistema Nota Real Fiados.
+
+- 🗃️ **[Modelo de dados e fluxo de informações](./db_model_and_flow.md)**  
+  Mostra como clientes, notas e pagamentos se relacionam no banco de dados e no fluxo do app.
+
+- 🧱 **[Exemplo de arquitetura limpa (FastAPI + SQLite)](./project_clean-code_example.md)**  
+  Explica a organização de pastas e o desacoplamento entre API, serviços e repositórios, com código exemplo.
