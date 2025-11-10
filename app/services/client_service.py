@@ -3,15 +3,15 @@ from models import Client
 from services.purchase_service import deactivate_purchases_by_client
 import repositories.client_repository as client_repository
 
-def get_client_by_id(client_id: int) -> Client | None:
-    return client_repository.get_client_by_id(client_id)
-
 def get_clients(limit: int = None, offset: int = 0) -> List[Client]:
     clients = client_repository.get_clients(limit, offset)
     if not clients:
         return []
     
     return clients
+
+def get_client_by_id(client_id: int) -> Client | None:
+    return client_repository.get_client_by_id(client_id)
 
 def create_client(data: dict) -> Client:
     # TODO - validate fields
