@@ -65,7 +65,7 @@ def list_purchases_for_client(client_id: int, only_active: bool = True):
     try:
         purchases = get_purchases_by_client(client_id, only_active)
         if not purchases:
-            return {"message": "Compras não encontrado.", "purchases": []}
+            return {"message": "Compras não encontradas.", "purchases": []}
 
         purchases_data = [p.__dict__ for p in purchases]
         return {"message": "Compras encontradas.", "purchases": purchases_data}
