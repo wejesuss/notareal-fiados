@@ -3,49 +3,57 @@
 Este documento descreve como estruturar o backend do projeto **Nota Real Fiados**, usando **FastAPI** com **SQLite**, sem dependência de ORM.
 A arquitetura busca **separar responsabilidades** — API, lógica de negócio e persistência de dados — permitindo fácil manutenção e testes isolados.
 
-## Estrutura sugerida de pastas
+## Estrutura atual do projeto
 
 ```
-my_project/
+notareal-fiados/
 │
 ├── app/
-│   ├── __init__.py
-│   ├── main.py              # Inicializa FastAPI, registra rotas
-│   ├── api/                 # Rotas da API
-│   │   ├── __init__.py
-│   │   ├── v1/
-│   │   │   ├── __init__.py
-│   │   │   ├── endpoints.py # Ex: rotas de usuários, produtos etc.
-│   │   │   └── dependencies.py  # Dependências do FastAPI
-│   │   └── v2/
-│   ├── core/                # Configurações gerais
-│   │   ├── __init__.py
-│   │   ├── config.py        # Configs, por ex. caminho do SQLite
-│   │   └── settings.py
-│   ├── services/            # Lógica de negócio pura
-│   │   ├── __init__.py
-│   │   ├── user_service.py
-│   │   └── product_service.py
-│   ├── repositories/        # Acesso ao banco de dados
-│   │   ├── __init__.py
-│   │   ├── user_repository.py
-│   │   └── product_repository.py
-│   └── models/              # Modelos de dados internos (POPOs, não dependem de FastAPI)
-│       ├── __init__.py
-│       ├── user.py
-│       └── product.py
+│ ├── main.py # Inicializa o FastAPI e registra rotas
+│ ├── database.py # Criação e conexão com banco SQLite
+│ │
+│ ├── routes/ # Rotas da API
+│ │ ├── clients.py
+│ │ ├── purchases.py
+│ │ └── payments.py
+│ │
+│ ├── models/ # Modelos de dados (sem ORM)
+│ │ ├── client.py
+│ │ ├── purchase.py
+│ │ └── payment.py
+│ │
+│ ├── repositories/ # Camada de acesso ao banco de dados
+│ │ ├── client_repository.py
+│ │ ├── purchase_repository.py
+│ │ └── payment_repository.py
+│ │
+│ └── services/ # Lógica de negócio
+│ ├── client_service.py
+│ ├── purchase_service.py
+│ └── payment_service.py
 │
-├── tests/                   # Testes unitários e de integração
-│   ├── __init__.py
-│   └── test_user.py
+├── utils/ # Scripts utilitários
+│ ├── backup.py # Backup de dados SQLite
+│ ├── printer.py # Impressão de relatórios
+│ └── helpers.py # Funções auxiliares genéricas
 │
-├── requirements.txt
-└── README.md
+├── data/ # Banco de dados local
+│ ├── notareal.db # Banco de dados SQLite
+│
+├── docs/ # Documentação e diagramas
+│ ├── db_model_and_flow.md # Queries e estrutura do banco
+│ ├── project_clean-code_example.md # Organização do código
+│ ├── README.md # Documentação principal do projeto
+│ └── ChatGPT-fluxograma.png # Lógica simples de fluxo dos dados do sistema
+│
+├── config.py # Configurações gerais
+├── test-db.session.sql # Script de teste de banco
+├── requirements.txt # Dependências Python
 ```
 
 ## Como o desacoplamento funciona
 
-1. **FastAPI (app/main.py e app/api/)**  
+1. **FastAPI (app/main.py e app/routes/)**
    - Apenas lida com rotas, requests e responses.
    - Não contém lógica de negócio nem SQL.
 
@@ -62,77 +70,131 @@ my_project/
    - Estruturas de dados internas (POPOs = Plain Old Python Objects).  
    - Não dependem de ORM nem do FastAPI.
 
-5. **Dependências (app/api/v1/dependencies.py)**  
-   - Injetar serviços ou conexões com banco nas rotas do FastAPI.
+5. **Database** → inicializa e mantém o banco SQLite, com configurações otimizadas.
+
+6. **Utils** → scripts auxiliares (backup, impressão, etc.).
 
 ## Exemplo rápido de implementação sem ORM
 
-**models/user.py**
+**models/client.py**
 ```python
 from dataclasses import dataclass
+from datetime import datetime
 
+# Store basic information about the client
 @dataclass
-class User:
+class Client:
     id: int
     name: str
-    email: str
+    nickname: str | None
+    phone: str | None
+    email: str | None
+    created_at: datetime
+    updated_at: datetime
+    is_active: int
 ```
 
-**repositories/user_repository.py**
+**repositories/client_repository.py**
 ```python
-import sqlite3
-from app.models.user import User
+from typing import List
+from datetime import datetime
+from database import get_connection, sqlite3
+from models import Client
 
-DB_PATH = "database.db"
+def get_clients(limit: int = None, offset: int = 0) -> List[Client]:
+    conn = None
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
 
-def get_connection():
-    return sqlite3.connect(DB_PATH)
+        # Default limit if not provided (-1 means "no limit" in SQLite)
+        search_limit = -1 if limit is None else limit
 
-def get_user_by_id(user_id: int) -> User | None:
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, name, email FROM users WHERE id=?", (user_id,))
-    row = cursor.fetchone()
-    conn.close()
-    if row:
-        return User(*row)
-    return None
+        cursor.execute("""
+            SELECT * FROM clients WHERE is_active = 1 ORDER BY created_at DESC
+            LIMIT ? OFFSET ?
+        """, (search_limit, offset))
+
+        rows = cursor.fetchall()
+
+        if not rows:
+            return []
+
+        return [Client.from_row(row) for row in rows]
+    finally:
+        if conn:
+            conn.close()
+
+def get_client_by_id(client_id: int) -> Client | None:
+    conn = None
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT * FROM clients WHERE id = ?", (client_id,))
+        row = cursor.fetchone()
+
+        if not row:
+            return None
+
+        return Client.from_row(row)
+    finally:
+        if conn:
+            conn.close()
 ```
 
-**services/user_service.py**
+**services/client_service.py**
 ```python
-from app.repositories.user_repository import get_user_by_id
+from typing import List
+from models import Client
+import repositories.client_repository as client_repository
 
-def fetch_user(user_id: int):
-    user = get_user_by_id(user_id)
-    if not user:
-        raise ValueError("User not found")
-    # Lógica de negócio adicional aqui
-    return user
+def get_clients(limit: int = None, offset: int = 0) -> List[Client]:
+    clients = client_repository.get_clients(limit, offset)
+    if not clients:
+        return []
+    
+    return clients
+
+def get_client_by_id(client_id: int) -> Client | None:
+    return client_repository.get_client_by_id(client_id)
 ```
 
-**api/v1/endpoints.py**
+**routes/clients.py**
 ```python
 from fastapi import APIRouter, HTTPException
-from app.services.user_service import fetch_user
+from services.client_service import (
+    get_client_by_id,
+    get_clients
+)
 
-router = APIRouter()
+router = APIRouter(prefix="/clients", tags=["Clients"])
 
-@router.get("/users/{user_id}")
-def get_user(user_id: int):
-    try:
-        user = fetch_user(user_id)
-        return user.__dict__  # Retorna como JSON simples
-    except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+@router.get("/")
+def list_clients(limit: int = None, offset: int = 0):
+    """List all clients."""
+ 
+    clients = get_clients(limit, offset)
+    if not clients:
+        return {"message": "Clientes não encontrado.", "clients": []}
+
+    clients_data = [c.__dict__ for c in clients]
+    return {"message": "Clientes encontrados.", "clients": clients_data}
+
+@router.get("/{client_id}")
+def read_client(client_id: int):
+    """Get client by ID."""
+    client = get_client_by_id(client_id)
+    if not client:
+        raise HTTPException(status_code=404, detail="Cliente não encontrado.")
+    return client.__dict__
 ```
 
 ## Vantagens dessa abordagem
-
-- FastAPI não “vaza” para o banco de dados.
-- Serviços e repositórios podem ser **testados isoladamente**.
-- Facilita trocar SQLite por outro banco sem mudar a API.
-- Evita acoplamento direto de frameworks.
+- Facilita manutenção e testes unitários isolados
+- Permite trocar o banco de dados facilmente
+- Mantém o código desacoplado do framework
+- Evita duplicação de lógica entre rotas e serviços
 
 ---
 
