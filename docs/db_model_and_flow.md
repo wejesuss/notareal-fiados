@@ -1,19 +1,22 @@
 # Modelo do Banco de Dados e Mapa de Telas - NotaReal Fiados (MVP)
 
 ## Objetivo deste documento
-Este arquivo contém o **modelo de dados atualizado** (SQL `CREATE TABLE`) do banco SQLite do NotaReal Fiados, além do **mapa de telas e fluxo** do programa (MVP). Use este documento como referência para implementar o banco e as telas iniciais.
+Este arquivo contém o **modelo de dados atualizado** (SQL `CREATE TABLE`) do banco SQLite do NotaReal Fiados, além do **mapa de telas e fluxo** do programa (MVP). Este documento é uma referência para implementar o banco e as telas iniciais.
 
 ---
 
-## Modelo de Dados (SQLite)
+## Modelo de Dados (SQLite) — `app/database.py`
+
+> O banco de dados SQLite é criado automaticamente no diretório `data/` com o nome `notareal.db`.
+A inicialização ocorre via `init_database()` no startup do app FastAPI.
 
 > Observação: os nomes das colunas e tabelas estão em inglês (código), enquanto os textos e descrições para o usuário estão em português.
 
-### clients
+### 🧍 clients
 Guarda informações básicas do cliente.
 
 ```sql
-CREATE TABLE clients (
+CREATE TABLE IF NOT EXISTS clients (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     nickname TEXT UNIQUE,
@@ -30,24 +33,36 @@ CREATE TABLE clients (
 - `nickname`: Apelido ou identificação curta (útil para distinguir nomes iguais).  
 - `phone`: Telefone de contato (opcional).  
 - `email`: E-mail (opcional).  
-- `created_at`: Data de cadastro.  
-- `updated_at`: Última atualização do cadastro.  
+- `created_at`: Data de cadastro em segundos.
+- `updated_at`: Última atualização do cadastro em segundos.
 - `is_active`: 1 = ativo, 0 = inativo (permite "desativar" sem excluir).
+
+| Campo | Tipo | Descrição |
+|-------|------|------------|
+| `id` | INTEGER (PK) | Identificador único |
+| `name` | TEXT | Nome completo |
+| `nickname` | TEXT (UNIQUE) | Nome abreviado ou apelido |
+| `phone` | TEXT | Telefone |
+| `email` | TEXT | E-mail |
+| `is_active` | INTEGER | (1=ativo, 0=inativo) |
+| `created_at` | INTEGER (timestamp) | Data de criação em segundos. |
+| `updated_at` | INTEGER (timestamp) | Data de atualização em segundos. |
 
 ---
 
-### purchases
+### 🧾 purchases
 Representa uma compra fiada feita por um cliente.
 
 ```sql
-CREATE TABLE purchases (
+CREATE TABLE IF NOT EXISTS purchases (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     client_id INTEGER NOT NULL,
     description TEXT,
     total_value REAL NOT NULL,
     total_paid_value REAL DEFAULT 0.0,
-    status TEXT DEFAULT 'pending', -- 'pending', 'partial', 'paid'
+    status TEXT DEFAULT 'pending',
     note_number TEXT UNIQUE,
+    is_active INTEGER DEFAULT 1,
     created_at INTEGER,
     updated_at INTEGER,
 
@@ -61,21 +76,38 @@ CREATE TABLE purchases (
 - `total_value`: Valor total da compra.  
 - `total_paid_value`: Soma acumulada dos pagamentos realizados até o momento.  
 - `status`: Estado da dívida (`pending`, `partial`, `paid`).  
-- `created_at` e `updated_at`: datas de criação e alteração.
+- `created_at` e `updated_at`: Datas de criação e atualização em segundos.
+
+| Campo | Tipo | Descrição |
+|--------|------|------------|
+| `id` | INTEGER (PK) | Identificador único |
+| `client_id` | INTEGER (FK → clients.id) | Chave estrangeira para o cliente
+| `description` | TEXT | Descrição da compra |
+| `total_value` | REAL | Valor total |
+| `total_paid_value` | REAL | Valor total pago |
+| `status` | TEXT | Estado da compra (`pending`, `partial`, `paid`). |
+| `note_number` | TEXT (UNIQUE) | Número único da nota (ex: `NF-001`) |
+| `is_active` | INTEGER | (1=ativo, 0=inativo) |
+| `created_at` | INTEGER | Data de criação em segundos. |
+| `updated_at` | INTEGER | Data de atualização em segundos. |
 
 ---
 
-### payments
+### 💰 payments
 Registra cada pagamento (total ou parcial) referente a uma compra fiada.
 
 ```sql
-CREATE TABLE payments (
+CREATE TABLE IF NOT EXISTS payments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     purchase_id INTEGER NOT NULL,
     amount REAL NOT NULL,
-    note TEXT, -- added method (card, money) on insert
+    payment_date INTEGER, -- can be NULL
+    method TEXT,
+    description TEXT,
     receipt_number TEXT UNIQUE,
-    payment_date INTEGER,
+    is_active INTEGER DEFAULT 1,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER,
 
     FOREIGN KEY (purchase_id) REFERENCES purchases (id)
 );
@@ -84,9 +116,23 @@ CREATE TABLE payments (
 **Descrição dos campos (para o vendedor):**
 - `receipt_number`: Número do recibo de pagamento (ex: REC-001).  
 - `amount`: Valor pago nesta transação.  
-- `payment_date`: Data e hora do pagamento.  
+- `payment_date`: Data e hora do pagamento (pode ser desconhecido).
 - `method`: Forma de pagamento (ex: dinheiro, pix, transferência).  
-- `note`: Observações adicionais (ex: "parcial com troco").
+- `description`: Observações adicionais (ex: "parcial com troco").
+- `created_at` e `updated_at`: Datas de criação e atualização em segundos.
+
+| Campo | Tipo | Descrição |
+|--------|------|------------|
+| `id` | INTEGER (PK) | Identificador único |
+| `purchase_id` | INTEGER (FK → purchases.id) | Chave estrangeira para a compra |
+| `amount` | REAL | Valor pago |
+| `payment_date` | INTEGER | Data do pagamento (timestamp em segundos) |
+| `method` | TEXT | Forma de pagamento (ex: `pix`) |
+| `description` | TEXT | Observações adicionais |
+| `receipt_number` | TEXT (UNIQUE) | Número único do recibo (ex: `REC-001-001`) |
+| `is_active` | INTEGER | (1=ativo, 0=inativo) |
+| `created_at` | INTEGER | Data de criação em segundos. |
+| `updated_at` | INTEGER | Data de atualização em segundos. |
 
 ---
 
@@ -109,14 +155,38 @@ CREATE TABLE purchase_items (
 
 ---
 
-## Índices recomendados
+### Índices
 Para performance em buscas e relatórios simples:
 
+- `idx_clients_name` — busca por nome
+- `idx_clients_nickname` — busca por apelido
+- `idx_purchases_client` — compras por cliente
+- `idx_payments_purchase` — pagamentos por compra
+
+---
+
 ```sql
-CREATE INDEX idx_clients_name ON clients(name);
-CREATE INDEX idx_purchases_client ON purchases(client_id);
-CREATE INDEX idx_payments_purchase ON payments(purchase_id);
+CREATE INDEX IF NOT EXISTS idx_clients_name ON clients(name)
+CREATE INDEX IF NOT EXISTS idx_clients_nickname ON clients(nickname)
+CREATE INDEX IF NOT EXISTS idx_purchases_client ON purchases(client_id)
+CREATE INDEX IF NOT EXISTS idx_payments_purchase ON payments(purchase_id)
 ```
+
+---
+
+### Configurações de Banco (PRAGMA)
+
+Executadas a cada conexão via `get_connection()`:
+
+| PRAGMA | Valor | Função |
+|--------|--------|--------|
+| `foreign_keys` | `ON` | Mantém integridade referencial |
+| `journal_mode` | `WAL` | Melhora performance e segurança |
+| `synchronous` | `NORMAL` | Balanceia segurança e velocidade |
+| `cache_size` | `-4000` | ~4 MB de cache em memória |
+| `temp_store` | `MEMORY` | Usa memória RAM p/ tabelas temporárias |
+| `mmap_size` | `50000000` | Mapeia até 50 MB em RAM p/ leitura |
+| `busy_timeout` | `5000` | Espera até 5s se o BD estiver ocupado |
 
 ---
 
@@ -131,7 +201,7 @@ CREATE INDEX idx_payments_purchase ON payments(purchase_id);
 
 2. Geração de números:
    - `note_number` para `purchases`: série incremental (ex: `NF-0001`).
-   - `receipt_number` para `payments`: série incremental (ex: `REC-0001`).
+   - `receipt_number` para `payments`: série incremental com id da compra (ex: `REC-0001-0001`).
    - Armazenar o número gerado no registro correspondente.
 
 3. Nunca apagar registros históricos; usar `is_active` para desativar clientes ou marcar compras como canceladas, preservando o histórico.
@@ -196,12 +266,12 @@ ORDER BY total_due DESC;
 
 - Lista de compras pendentes:
 ```sql
-SELECT * FROM purchases WHERE status IN ('pending', 'partial') ORDER BY created_at;
+SELECT * FROM purchases WHERE status IN ('pending', 'partial') ORDER BY created_at DESC;
 ```
 
 - Pagamentos de uma compra:
 ```sql
-SELECT * FROM payments WHERE purchase_id = ? ORDER BY payment_date;
+SELECT * FROM payments WHERE purchase_id = ? ORDER BY payment_date DESC;
 ```
 
 ---
