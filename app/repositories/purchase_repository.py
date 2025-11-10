@@ -3,7 +3,7 @@ from datetime import datetime
 from database import get_connection, sqlite3
 from models import Purchase
 
-def get_purchases(limit: int = None, offset: int = 0, only_pending: bool | None = True) -> List[Purchase]:
+def get_purchases(limit: int = None, offset: int = 0, only_pending: bool | None = None) -> List[Purchase]:
     conn = None
     try:
         conn = get_connection()
