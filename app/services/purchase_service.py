@@ -18,28 +18,27 @@ def get_purchases(limit: int = None, offset: int = 0, only_pending: bool | None 
     return purchases
 
 def create_purchase(client_id: int, data: dict) -> Purchase:
-    total_paid_value = float(data.get("total_paid_value"))
-    total_value = float(data.get("total_value"))
-    amount = float(data.get("amount"))
+    total_value = float(data.get("total_value", 0))
+    amount = float(data.get("amount", 0))
 
-    if not total_value or total_value <= 0:
-        raise ValueError("O preço da compra deve ser maior que zero.")
-    if not amount or amount <= 0:
-        raise ValueError("O valor do pagamento deve ser maior que zero.")
+    if total_value <= 0:
+        raise ValueError("O valor total da compra deve ser maior que zero.")
+    if amount < 0:
+        raise ValueError("O valor do pagamento deve ser maior ou igual a zero.")
 
     create_new_payment = False
-
     status = "pending"
-    if total_paid_value >= total_value:
+    total_paid_value = 0.0
+    if amount >= total_value:
         create_new_payment = True
+        total_paid_value = total_value
         status = "paid"
     elif amount > 0:
-        total_paid_value = amount
         create_new_payment = True
+        total_paid_value = amount
         status = "partial"
 
-    data.update({"client_id": client_id, "status": status})
-
+    data.update({"client_id": client_id, "status": status, "total_paid_value": total_paid_value})
     purchase = purchase_repository.insert_purchase(data)
 
     if create_new_payment:
