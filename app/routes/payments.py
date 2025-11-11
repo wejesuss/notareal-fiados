@@ -31,7 +31,10 @@ def add_payment(purchase_id: int, data: dict):
 @router.delete("/{payment_id}")
 def remove_payment(purchase_id: int, payment_id: int):
     """Deactivate (soft delete) a payment."""
-    success = deactivate_payment(purchase_id, payment_id)
-    if not success:
-        raise HTTPException(status_code=404, detail="Pagamento não encontrado ou já desativado.")
-    return {"message": "Pagamento desativado com sucesso."}
+    try:
+        success = deactivate_payment(purchase_id, payment_id)
+        if not success:
+            raise HTTPException(status_code=404, detail="Pagamento não encontrado ou já desativado.")
+        return {"message": "Pagamento desativado com sucesso."}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e

@@ -118,10 +118,18 @@ def create_payment(purchase_id: int, data: dict) -> Payment:
     return payment
 
 def deactivate_payment(purchase_id: int, payment_id: int) -> bool:
-    """Deactivate a payment and update purchase totals."""
+    """Deactivate a payment that belongs to the given purchase and update totals."""
+    payment = payment_service.get_payment_by_id(payment_id)
+    
+    if not payment:
+        return False
+    if payment.purchase_id != purchase_id:
+        raise ValueError("O identificador da compra é diferente do identificador do pagamento associado a ela.")
+    
     success = payment_service.deactivate_payment(payment_id)
     if success:
         recalculate_purchase_totals(purchase_id)
+    
     return success
 
 def recalculate_purchase_totals(purchase_id: int):
