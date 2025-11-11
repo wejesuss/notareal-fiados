@@ -3,8 +3,8 @@ from models import Client
 from services.purchase_service import deactivate_purchases_by_client
 import repositories.client_repository as client_repository
 
-def get_clients(limit: int = None, offset: int = 0) -> List[Client]:
-    clients = client_repository.get_clients(limit, offset)
+def get_clients(limit: int = None, offset: int = 0, only_active: bool = True) -> List[Client]:
+    clients = client_repository.get_clients(limit, offset, only_active)
     if not clients:
         return []
     

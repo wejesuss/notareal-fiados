@@ -3,7 +3,7 @@ from datetime import datetime
 from database import get_connection, sqlite3
 from models import Client
 
-def get_clients(limit: int = None, offset: int = 0) -> List[Client]:
+def get_clients(limit: int = None, offset: int = 0, only_active: bool = True) -> List[Client]:
     conn = None
     try:
         conn = get_connection()
@@ -11,9 +11,12 @@ def get_clients(limit: int = None, offset: int = 0) -> List[Client]:
 
         # Default limit if not provided (-1 means "no limit" in SQLite)
         search_limit = -1 if limit is None else limit
+        where_clause = ""
+        if only_active:
+            where_clause = "WHERE is_active = 1"
 
-        cursor.execute("""
-            SELECT * FROM clients WHERE is_active = 1 ORDER BY created_at DESC
+        cursor.execute(f"""
+            SELECT * FROM clients {where_clause} ORDER BY created_at DESC
             LIMIT ? OFFSET ?
         """, (search_limit, offset))
 

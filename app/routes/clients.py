@@ -11,10 +11,10 @@ from services.purchase_service import (get_purchases_by_client)
 router = APIRouter(prefix="/clients", tags=["Clients"])
 
 @router.get("/")
-def list_clients(limit: int = None, offset: int = 0):
+def list_clients(limit: int = None, offset: int = 0, only_active: bool = True):
     """List all clients."""
  
-    clients = get_clients(limit, offset)
+    clients = get_clients(limit, offset, only_active)
     if not clients:
         return {"message": "Clientes não encontrados.", "clients": []}
 
