@@ -190,7 +190,7 @@ def deactivate_purchase(purchase_id: int) -> bool:
         if conn:
             conn.close()
 
-
+# Client related functions
 def get_purchases_by_client_id(client_id: int, only_active: bool = True) -> List[Purchase]:
     conn = None
     try:
