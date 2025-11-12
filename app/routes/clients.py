@@ -7,10 +7,12 @@ from services.client_service import (
     deactivate_client
 )
 from services.purchase_service import (get_purchases_by_client)
+from utils.exceptions import handle_service_exceptions
 
 router = APIRouter(prefix="/clients", tags=["Clients"])
 
 @router.get("/")
+@handle_service_exceptions
 def list_clients(limit: int = None, offset: int = 0, only_active: bool = True):
     """List all clients."""
  
@@ -22,35 +24,30 @@ def list_clients(limit: int = None, offset: int = 0, only_active: bool = True):
     return {"message": "Clientes encontrados.", "clients": clients_data}
 
 @router.get("/{client_id}")
+@handle_service_exceptions
 def read_client(client_id: int):
     """Get client by ID."""
     client = get_client_by_id(client_id)
-    if not client:
-        raise HTTPException(status_code=404, detail="Cliente não encontrado.")
+    # if not client:
+    #     raise HTTPException(status_code=404, detail="Cliente não encontrado.")
     return client.__dict__
 
 @router.post("/")
+@handle_service_exceptions
 def add_client(data: dict):
     """Add new client."""
-    try:
-        client = create_client(data)
-        return {"message": "Cliente criado com sucesso.", "client": client.__dict__}
-    except ValueError as e:
-        raise HTTPException(status_code=409, detail=str(e))
+    client = create_client(data)
+    return {"message": "Cliente criado com sucesso.", "client": client.__dict__}
 
 @router.put("/{client_id}")
+@handle_service_exceptions
 def edit_client(client_id: int, data: dict):
     """Update client data."""
-    try:
-        client = update_client(client_id, data)
-        if not client:
-            raise HTTPException(status_code=404, detail="Cliente não encontrado.")
-        return {"message": "Cliente atualizado.", "client": client.__dict__}
-
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    client = update_client(client_id, data)
+    return {"message": "Cliente atualizado.", "client": client.__dict__}
 
 @router.delete("/{client_id}")
+@handle_service_exceptions
 def remove_client(client_id: int):
     """Delete a client (soft delete)."""
     success = deactivate_client(client_id)

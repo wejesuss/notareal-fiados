@@ -19,3 +19,4 @@ PAYMENT_ALREADY_DISABLED = "Pagamento já desativado."
 # === Database / Generic ===
 DATABASE_ERROR = "Erro inesperado no banco de dados."
 FOREIGN_KEY_ERROR = "Uma referência estrangeira não existe."
+DATA_FIELDS_EMPTY = "Nenhum campo válido fornecido para a atualização do recurso."

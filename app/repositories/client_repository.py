@@ -2,6 +2,10 @@ from typing import List
 from datetime import datetime
 from database import get_connection, sqlite3
 from models import Client
+from utils.exceptions import (
+    ValidationError, BusinessRuleError, DatabaseError,
+    error_messages
+)
 
 def get_clients(limit: int = None, offset: int = 0, only_active: bool = True) -> List[Client]:
     conn = None
@@ -26,6 +30,8 @@ def get_clients(limit: int = None, offset: int = 0, only_active: bool = True) ->
             return []
 
         return [Client.from_row(row) for row in rows]
+    except sqlite3.Error as e:
+        raise DatabaseError(error_messages.DATABASE_ERROR) from e
     finally:
         if conn:
             conn.close()
@@ -57,9 +63,9 @@ def insert_client(data: dict) -> Client:
 
     except sqlite3.IntegrityError as e:
         if "UNIQUE constraint failed" in str(e):
-            raise ValueError("Um cliente com esse apelido já existe.")
+            raise BusinessRuleError(error_messages.CLIENT_ALREADY_EXISTS) from e
     except sqlite3.Error as e:
-        raise ValueError("Erro inesperado do banco.") from e
+        raise DatabaseError(error_messages.DATABASE_ERROR) from e
     finally:
         if conn:
             conn.close()
@@ -77,6 +83,8 @@ def get_client_by_id(client_id: int) -> Client | None:
             return None
 
         return Client.from_row(row)
+    except sqlite3.Error as e:
+        raise DatabaseError(error_messages.DATABASE_ERROR) from e
     finally:
         if conn:
             conn.close()
@@ -98,7 +106,7 @@ def update_client(client_id: int, data: dict) -> Client | None:
             values.append(value)
     
     if not columns:
-        raise ValueError("No valid fields provided for update.")
+        raise ValidationError(error_messages.DATA_FIELDS_EMPTY)
 
     # Add the updated_at timestamp
     columns.append("updated_at = ?")
@@ -125,9 +133,9 @@ def update_client(client_id: int, data: dict) -> Client | None:
         return get_client_by_id(client_id)
     except sqlite3.IntegrityError as e:
         if "UNIQUE constraint failed" in str(e):
-            raise ValueError("Um cliente com esse apelido já existe.")
+            raise BusinessRuleError(error_messages.CLIENT_ALREADY_EXISTS) from e
     except sqlite3.Error as e:
-        raise ValueError("Erro inesperado do banco.") from e
+        raise DatabaseError(error_messages.DATABASE_ERROR) from e
     finally:
         if conn:
             conn.close()
@@ -149,7 +157,7 @@ def deactivate_client(client_id: int) -> bool:
 
         return cursor.rowcount > 0
     except sqlite3.Error as e:
-        raise ValueError("Erro inesperado do banco.") from e
+        raise DatabaseError(error_messages.DATABASE_ERROR) from e
     finally:
         if conn:
             conn.close()
