@@ -3,6 +3,10 @@ from datetime import datetime
 from models import (Purchase, Payment)
 from services import payment_service
 from repositories import (purchase_repository, payment_repository)
+from utils.exceptions import (
+    BusinessRuleError, NotFoundError, ValidationError,
+    error_messages
+)
 
 def get_purchase_by_id(purchase_id: int) -> Purchase | None:
     return purchase_repository.get_purchase_by_id(purchase_id)
@@ -22,9 +26,9 @@ def create_purchase(client_id: int, data: dict) -> Purchase:
     amount = float(data.get("amount", 0))
 
     if total_value <= 0:
-        raise ValueError("O valor total da compra deve ser maior que zero.")
+        raise ValidationError(error_messages.PURCHASE_INVALID_TOTAL)
     if amount < 0:
-        raise ValueError("O valor do pagamento deve ser maior ou igual a zero.")
+        raise ValidationError(error_messages.PAYMENT_INVALID_AMOUNT)
 
     create_new_payment = False
     status = "pending"
@@ -58,11 +62,11 @@ def create_purchase(client_id: int, data: dict) -> Purchase:
 def update_purchase(purchase_id: int, data: dict) -> Purchase | None:
     purchase_exists = purchase_repository.get_purchase_by_id(purchase_id)
     if not purchase_exists:
-        return None
+        raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
 
     valid_status = {"pending", "partial", "paid"}
     if "status" in data and data["status"] not in valid_status:
-        raise ValueError("Status inválido. Use 'pending', 'partial' ou 'paid'.")
+        raise ValidationError(error_messages.PURCHASE_INVALID_STATUS)
 
     purchase = purchase_repository.update_purchase(purchase_id, data)
     recalculate_purchase_totals(purchase_id)

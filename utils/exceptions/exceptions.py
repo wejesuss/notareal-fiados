@@ -4,7 +4,7 @@ class NotFoundError(Exception):
 
 
 class BusinessRuleError(Exception):
-    """Raised when a business logic rule is violated."""
+    """Raised when a business logic rule or data integrity constraint is violated."""
     pass
 
 

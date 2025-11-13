@@ -57,14 +57,12 @@ def remove_client(client_id: int):
 
 # Purchase related routes
 @router.get("/{client_id}/purchases")
+@handle_service_exceptions
 def list_purchases_for_client(client_id: int, only_active: bool = True):
     """List all purchases for a specific client."""
-    try:
-        purchases = get_purchases_by_client(client_id, only_active)
-        if not purchases:
-            return {"message": "Compras não encontradas.", "purchases": []}
+    purchases = get_purchases_by_client(client_id, only_active)
+    if not purchases:
+        return {"message": "Compras não encontradas.", "purchases": []}
 
-        purchases_data = [p.__dict__ for p in purchases]
-        return {"message": "Compras encontradas.", "purchases": purchases_data}
-    except ValueError as e:
-        raise HTTPException(status_code=409, detail=str(e))
+    purchases_data = [p.__dict__ for p in purchases]
+    return {"message": "Compras encontradas.", "purchases": purchases_data}

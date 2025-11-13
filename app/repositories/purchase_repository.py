@@ -2,6 +2,10 @@ from typing import List
 from datetime import datetime
 from database import get_connection, sqlite3
 from models import Purchase
+from utils.exceptions import (
+    ValidationError, BusinessRuleError, DatabaseError,
+    error_messages
+)
 
 def get_purchases(limit: int = None, offset: int = 0, only_pending: bool | None = None) -> List[Purchase]:
     conn = None
@@ -30,6 +34,8 @@ def get_purchases(limit: int = None, offset: int = 0, only_pending: bool | None 
             return []
 
         return [Purchase.from_row(row) for row in rows]
+    except sqlite3.Error as e:
+        raise DatabaseError(error_messages.DATABASE_ERROR) from e
     finally:
         if conn:
             conn.close()
@@ -71,11 +77,11 @@ def insert_purchase(data: dict) -> Purchase:
 
     except sqlite3.IntegrityError as e:
         if "UNIQUE constraint failed" in str(e):
-            raise ValueError("Uma compra com esse número de nota já existe.")
+            raise BusinessRuleError(error_messages.PURCHASE_ALREADY_EXISTS) from e
         elif "FOREIGN KEY constraint failed" in str(e):
-            raise ValueError("Um cliente com esse id não existe.")
+            raise BusinessRuleError(error_messages.PURCHASE_CLIENT_NOT_FOUND) from e
     except sqlite3.Error as e:
-        raise ValueError("Erro inesperado do banco.") from e
+        raise DatabaseError(error_messages.DATABASE_ERROR) from e
     finally:
         if conn:
             conn.close()
@@ -93,6 +99,8 @@ def get_purchase_by_id(purchase_id: int) -> Purchase | None:
             return None
 
         return Purchase.from_row(row)
+    except sqlite3.Error as e:
+        raise DatabaseError(error_messages.DATABASE_ERROR) from e
     finally:
         if conn:
             conn.close()
@@ -110,6 +118,8 @@ def get_purchase_by_note_number(note_number: str) -> Purchase | None:
             return None
 
         return Purchase.from_row(row)
+    except sqlite3.Error as e:
+        raise DatabaseError(error_messages.DATABASE_ERROR) from e
     finally:
         if conn:
             conn.close()
@@ -131,7 +141,7 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase | None:
             values.append(value)
     
     if not columns:
-        raise ValueError("Nenhum campo válido fornecido para a atualização da compra.")
+        raise ValidationError(error_messages.DATA_FIELDS_EMPTY)
 
     # Add the updated_at column
     columns.append("updated_at = ?")
@@ -157,12 +167,10 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase | None:
         
         return get_purchase_by_id(purchase_id)
     except sqlite3.IntegrityError as e:
-        if "UNIQUE constraint failed" in str(e):
-            raise ValueError("Uma compra com esse número de nota já existe.")
-        elif "FOREIGN KEY constraint failed" in str(e):
-            raise ValueError("Um cliente com esse id não existe.")
+        if "FOREIGN KEY constraint failed" in str(e):
+            raise BusinessRuleError(error_messages.PURCHASE_CLIENT_NOT_FOUND)
     except sqlite3.Error as e:
-        raise ValueError("Erro inesperado do banco.") from e
+        raise DatabaseError(error_messages.DATABASE_ERROR) from e
     finally:
         if conn:
             conn.close()
@@ -185,7 +193,7 @@ def deactivate_purchase(purchase_id: int) -> bool:
 
         return cursor.rowcount > 0
     except sqlite3.Error as e:
-        raise ValueError("Erro inesperado do banco.") from e
+        raise DatabaseError(error_messages.DATABASE_ERROR) from e
     finally:
         if conn:
             conn.close()
@@ -208,9 +216,9 @@ def get_purchases_by_client_id(client_id: int, only_active: bool = True) -> List
         return [Purchase.from_row(row) for row in rows] if rows else []
     except sqlite3.IntegrityError as e:
         if "FOREIGN KEY constraint failed" in str(e):
-            raise ValueError("Um cliente com esse id não existe.")
+            raise BusinessRuleError(error_messages.PURCHASE_CLIENT_NOT_FOUND)
     except sqlite3.Error as e:
-        raise ValueError("Erro inesperado do banco.") from e
+        raise DatabaseError(error_messages.DATABASE_ERROR) from e
     finally:
         if conn:
             conn.close()
@@ -231,9 +239,9 @@ def get_purchases_ids_by_client_id(client_id: int) -> List[int]:
         return purchase_ids
     except sqlite3.IntegrityError as e:
         if "FOREIGN KEY constraint failed" in str(e):
-            raise ValueError("Um cliente com esse id não existe.")
+            raise BusinessRuleError(error_messages.PURCHASE_CLIENT_NOT_FOUND)
     except sqlite3.Error as e:
-        raise ValueError("Erro inesperado do banco.") from e
+        raise DatabaseError(error_messages.DATABASE_ERROR) from e
     finally:
         if conn:
             conn.close()
@@ -257,9 +265,9 @@ def deactivate_purchases_by_client_id(client_id: int) -> bool:
         return cursor.rowcount > 0
     except sqlite3.IntegrityError as e:
         if "FOREIGN KEY constraint failed" in str(e):
-            raise ValueError("Um cliente com esse id não existe.")
+            raise BusinessRuleError(error_messages.PURCHASE_CLIENT_NOT_FOUND)
     except sqlite3.Error as e:
-        raise ValueError("Erro inesperado do banco.") from e
+        raise DatabaseError(error_messages.DATABASE_ERROR) from e
     finally:
         if conn:
             conn.close()
