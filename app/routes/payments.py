@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 from services.purchase_service import (
     get_payments_for_purchase,
     create_payment,
+    activate_payment,
     deactivate_payment
 )
 
@@ -25,6 +26,15 @@ def add_payment(purchase_id: int, data: dict):
     try:
         payment = create_payment(purchase_id, data)
         return {"message": "Pagamento criado com sucesso.", "payment": payment.__dict__}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.put("/{payment_id}/restore")
+def restore_payment(purchase_id: int, payment_id: int):
+    """Activate payment changing is_active field if related purchase is active. Purchase totals are recalculated."""
+    try:
+        payment = activate_payment(purchase_id, payment_id, {"is_active": 1})
+        return {"message": "Pagamento atualizado.", "payment": payment.__dict__}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 

@@ -24,6 +24,10 @@ def create_payment(data: dict) -> Payment:
 
     return payment_repository.insert_payment(data)
 
+def activate_payment(payment_id: int, data: dict) -> Payment:
+    """Activate payment for the given ID"""
+    return payment_repository.update_payment(payment_id, data)
+
 def deactivate_payment(payment_id: int) -> bool:
     """Deactivate (soft delete) a payment."""
     return payment_repository.deactivate_payment(payment_id)

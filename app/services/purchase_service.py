@@ -131,6 +131,24 @@ def create_payment(purchase_id: int, data: dict) -> Payment:
 
     return payment
 
+def activate_payment(purchase_id: int, payment_id: int, data: dict) -> Payment | None:
+    """Activate a payment that belongs to the given purchase and update totals."""
+    purchase_exists = purchase_repository.get_purchase_by_id(purchase_id)
+    if not purchase_exists:
+        raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
+
+    payment = payment_service.get_payment_by_id(payment_id)
+    if not payment:
+        return None
+    if payment.purchase_id != purchase_id:
+        raise ValidationError(error_messages.PAYMENT_NOT_LINKED)
+
+    payment = payment_service.activate_payment(payment_id, data)
+    if payment:
+        recalculate_purchase_totals(purchase_id)
+
+    return payment
+
 def deactivate_payment(purchase_id: int, payment_id: int) -> bool:
     """Deactivate a payment that belongs to the given purchase and update totals."""
     payment = payment_service.get_payment_by_id(payment_id)
