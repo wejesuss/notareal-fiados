@@ -128,7 +128,7 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase | None:
     conn = None
 
     # columns that are allowed to be updated
-    allowed_columns = ["client_id", "description", "total_value", "status", "is_active"]
+    allowed_columns = ["client_id", "description", "total_value", "total_paid_value", "status", "is_active"]
 
     columns = []
     values = []

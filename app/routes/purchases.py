@@ -5,6 +5,7 @@ from services.purchase_service import (
     get_purchases,
     create_purchase,
     update_purchase,
+    activate_purchase,
     deactivate_purchase
 )
 from routes.payments import router as payment_router
@@ -59,6 +60,15 @@ def add_purchase(client_id: int, data: dict):
 def edit_purchase(purchase_id: int, data: dict):
     """Update purchase."""
     purchase = update_purchase(purchase_id, data)
+    if not purchase:
+        raise HTTPException(status_code=404, detail="Compra não encontrada.")
+    return {"message": "Compra atualizada.", "purchase": purchase.__dict__}
+
+@router.put("/{purchase_id}/restore")
+@handle_service_exceptions
+def restore_purchase(purchase_id: int):
+    """Activate purchase changing is_active field. Related payments remain unchanged, but totals are recalculated."""
+    purchase = activate_purchase(purchase_id, {"is_active": 1})
     if not purchase:
         raise HTTPException(status_code=404, detail="Compra não encontrada.")
     return {"message": "Compra atualizada.", "purchase": purchase.__dict__}

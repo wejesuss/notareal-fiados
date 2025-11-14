@@ -73,6 +73,16 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase | None:
 
     return purchase
 
+def activate_purchase(purchase_id: int, data: dict) -> Purchase | None:
+    purchase_exists = purchase_repository.get_purchase_by_id(purchase_id)
+    if not purchase_exists:
+        raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
+
+    purchase_repository.update_purchase(purchase_id, data)
+    purchase = recalculate_purchase_totals(purchase_id)
+
+    return purchase
+
 def deactivate_purchase(purchase_id: int) -> bool:
     """Deactivate a purchase."""
     success = purchase_repository.deactivate_purchase(purchase_id)
@@ -136,11 +146,11 @@ def deactivate_payment(purchase_id: int, payment_id: int) -> bool:
     
     return success
 
-def recalculate_purchase_totals(purchase_id: int):
+def recalculate_purchase_totals(purchase_id: int) -> Purchase | None:
     """Recalculate purchase total_paid_value and status based on active payments."""
     purchase = purchase_repository.get_purchase_by_id(purchase_id)
     if not purchase or not purchase.is_active:
-        return
+        return None
 
     payments = payment_service.get_payments(limit = None, offset = 0, purchase_id = purchase_id)
     active_payments = [p for p in payments if p.is_active]
@@ -152,7 +162,7 @@ def recalculate_purchase_totals(purchase_id: int):
     elif total_paid > 0:
         new_status = "partial"
 
-    purchase_repository.update_purchase(purchase_id, {
+    return purchase_repository.update_purchase(purchase_id, {
         "total_paid_value": total_paid,
         "status": new_status
     })
