@@ -1,8 +1,10 @@
 from fastapi import APIRouter, HTTPException
 from services.purchase_service import (
     get_payments_for_purchase,
+    get_payment_by_id,
     create_payment,
     activate_payment,
+    update_payment,
     deactivate_payment
 )
 
@@ -26,6 +28,23 @@ def add_payment(purchase_id: int, data: dict):
     try:
         payment = create_payment(purchase_id, data)
         return {"message": "Pagamento criado com sucesso.", "payment": payment.__dict__}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.put("/{payment_id}")
+def edit_payment(purchase_id: int, payment_id: int, data: dict):
+    """Edit allowed fields of a payment (method, description, payment_date)."""
+    payment = get_payment_by_id(payment_id)
+    if not payment:
+        raise HTTPException(status_code=404, detail="Pagamento não encontrado.")
+    if payment.purchase_id != purchase_id:
+        raise HTTPException(status_code=400, detail="Pagamento não pertence a esta compra.")
+
+    try:
+        updated = update_payment(payment_id, data)
+        if not updated:
+            raise HTTPException(status_code=400, detail="Nada foi atualizado.")
+        return {"message": "Pagamento atualizado com sucesso.", "payment": updated.__dict__}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 

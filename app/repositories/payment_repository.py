@@ -125,7 +125,7 @@ def update_payment(payment_id: int, data: dict) -> Payment | None:
 
     if not columns:
         raise ValidationError(error_messages.DATA_FIELDS_EMPTY)
-    
+
     # Add the updated_at column
     columns.append("updated_at = ?")
     # Add the timestamp for the updated_at column
@@ -179,6 +179,7 @@ def deactivate_payment(payment_id: int) -> bool:
         if conn:
             conn.close()
 
+# Purchase related functions
 def deactivate_payments_by_purchase_id(purchase_id: int) -> bool:
     conn = None
     try:

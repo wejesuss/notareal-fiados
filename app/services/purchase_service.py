@@ -149,6 +149,14 @@ def activate_payment(purchase_id: int, payment_id: int, data: dict) -> Payment |
 
     return payment
 
+def update_payment(purchase_id: int, payment_id: int, data: dict) -> Payment | None:
+    payment = payment_repository.get_payment_by_id(payment_id)
+    if not payment:
+        return None
+
+    updated = payment_repository.update_payment(payment_id, data)
+    return updated
+
 def deactivate_payment(purchase_id: int, payment_id: int) -> bool:
     """Deactivate a payment that belongs to the given purchase and update totals."""
     payment = payment_service.get_payment_by_id(payment_id)

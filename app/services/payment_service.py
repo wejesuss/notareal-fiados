@@ -24,6 +24,14 @@ def create_payment(data: dict) -> Payment:
 
     return payment_repository.insert_payment(data)
 
+def update_payment(payment_id: int, data: dict) -> Payment | None:
+    payment = payment_repository.get_payment_by_id(payment_id)
+    if not payment:
+        return None
+
+    updated = payment_repository.update_payment(payment_id, data)
+    return updated
+
 def activate_payment(payment_id: int, data: dict) -> Payment:
     """Activate payment for the given ID"""
     return payment_repository.update_payment(payment_id, data)
