@@ -106,30 +106,17 @@ def get_payment_by_id(payment_id: int) -> Payment | None:
         if conn:
             conn.close()
 
-def update_payment(payment_id: int, data: dict) -> Payment | None:    
+def update_payment(payment_id: int, data: dict) -> Payment | None:
     """Update a payment."""
     conn = None
 
-    # columns that are allowed to be updated
-    allowed_columns = ["amount", "payment_date", "method", "description", "is_active"]
-
-    columns = []
-    values = []
-    now = int(datetime.now().timestamp())
-
-    # validate data fields
-    for key, value in data.items():
-        if key in allowed_columns:
-            columns.append(f"{key} = ?")
-            values.append(value)
-
-    if not columns:
-        raise ValidationError(error_messages.DATA_FIELDS_EMPTY)
-
     # Add the updated_at column
-    columns.append("updated_at = ?")
-    # Add the timestamp for the updated_at column
-    values.append(now)
+    now = int(datetime.now().timestamp())
+    data["updated_at"] = now
+
+    columns = [f"{key} = ?" for key in data.keys()]
+    values = list(data.values())
+
     # Add the payment_id for the WHERE clause
     values.append(payment_id)
 

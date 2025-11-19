@@ -1,6 +1,10 @@
 from typing import List
 from models import Payment
 from repositories import payment_repository
+from utils.exceptions import (
+    ValidationError, NotFoundError,
+    error_messages
+)
 
 def get_payments(limit: int = None, offset: int = 0, purchase_id: int = None) -> List[Payment]:
     """Retrieve payments, optionally filtered by purchase."""
@@ -25,9 +29,23 @@ def create_payment(data: dict) -> Payment:
     return payment_repository.insert_payment(data)
 
 def update_payment(payment_id: int, data: dict) -> Payment | None:
-    payment = payment_repository.get_payment_by_id(payment_id)
-    if not payment:
-        return None
+    # fields that are allowed to be updated
+    allowed_fields = ["amount", "payment_date", "method", "description"]
+
+    # filter data fields
+    validated_data = {k: v for k, v in data.items() if k in allowed_fields}
+    if not validated_data:
+        raise ValidationError(error_messages.DATA_FIELDS_EMPTY)
+
+    # validate is_active, only allowing deactivation from the correct route
+    if validated_data.get("is_active") == 0:
+        raise ValidationError(error_messages.PURCHASE_INVALID_ACTIVATION_ROUTE)
+
+    # Validate amount
+    if "amount" in update_data:
+        amount = float(update_data["amount"])
+        if amount < 0:
+            raise ValidationError(error_messages.PAYMENT_INVALID_AMOUNT)
 
     updated = payment_repository.update_payment(payment_id, data)
     return updated

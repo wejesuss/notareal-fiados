@@ -160,11 +160,17 @@ def activate_payment(purchase_id: int, payment_id: int, data: dict) -> Payment |
     return payment
 
 def update_payment(purchase_id: int, payment_id: int, data: dict) -> Payment | None:
+    """Update a payment and recalculate the related purchase totals."""
     payment = payment_repository.get_payment_by_id(payment_id)
     if not payment:
-        return None
+        return NotFoundError(error_messages.PAYMENT_NOT_FOUND)
 
-    updated = payment_repository.update_payment(payment_id, data)
+    if payment.purchase_id != purchase_id:
+        raise BusinessRuleError(error_messages.PAYMENT_NOT_LINKED)
+
+    updated = payment_service.update_payment(payment_id, data)
+    recalculate_purchase_totals(purchase_id)
+
     return updated
 
 def deactivate_payment(purchase_id: int, payment_id: int) -> bool:
