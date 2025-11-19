@@ -64,12 +64,22 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase | None:
     if not purchase_exists:
         raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
 
-    valid_status = {"pending", "partial", "paid"}
-    if "status" in data and data["status"] not in valid_status:
-        raise ValidationError(error_messages.PURCHASE_INVALID_STATUS)
+     # fields that are allowed to be updated
+    allowed_fields = ["client_id", "description", "total_value"]
 
-    purchase = purchase_repository.update_purchase(purchase_id, data)
-    recalculate_purchase_totals(purchase_id)
+    # validate data fields
+    validated_data = {k: v for k, v in data.items() if k in allowed_fields}
+    if not validated_data:
+        raise ValidationError(error_messages.DATA_FIELDS_EMPTY)
+
+    # validate is_active, only allowing deactivation from the correct route
+    if validated_data.get("is_active") == 0:
+        raise ValidationError(error_messages.PURCHASE_INVALID_ACTIVATION_ROUTE)
+
+    purchase = purchase_repository.update_purchase(purchase_id, validated_data)
+    # Recalculate totals if relevant fields changed
+    if "total_value" in data or data.get("is_active") == 1:
+        recalculate_purchase_totals(purchase_id)
 
     return purchase
 

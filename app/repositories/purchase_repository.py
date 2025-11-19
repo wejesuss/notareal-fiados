@@ -127,31 +127,18 @@ def get_purchase_by_note_number(note_number: str) -> Purchase | None:
 def update_purchase(purchase_id: int, data: dict) -> Purchase | None:
     conn = None
 
-    # columns that are allowed to be updated
-    allowed_columns = ["client_id", "description", "total_value", "total_paid_value", "status", "is_active"]
-
-    columns = []
-    values = []
-    now = int(datetime.now().timestamp())
-
-    # validate data fields
-    for key, value in data.items():
-        if key in allowed_columns:
-            columns.append(f"{key} = ?")
-            values.append(value)
-    
-    if not columns:
-        raise ValidationError(error_messages.DATA_FIELDS_EMPTY)
-
     # Add the updated_at column
-    columns.append("updated_at = ?")
-    # Add the timestamp for the updated_at column
-    values.append(now)
+    now = int(datetime.now().timestamp())
+    data["updated_at"] = now
+
+    columns = [f"{key} = ?" for key in data.keys()]
+    values = list(data.values())
+
     # Add the purchase_id for the WHERE clause
     values.append(purchase_id)
 
     query = f"""
-        UPDATE purchases SET {', '.join(columns)} 
+        UPDATE purchases SET {', '.join(columns)}
         WHERE id = ?
     """
 
@@ -164,7 +151,7 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase | None:
 
         if cursor.rowcount == 0:
             return None
-        
+
         return get_purchase_by_id(purchase_id)
     except sqlite3.IntegrityError as e:
         if "FOREIGN KEY constraint failed" in str(e):
