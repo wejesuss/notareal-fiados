@@ -1,5 +1,7 @@
 __pycache__
 pythonvenv
 test-db.*.sql
+export_files_content.py
+exported_file.md
 data/*.db
 .vscode
