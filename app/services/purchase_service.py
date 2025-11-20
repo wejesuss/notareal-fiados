@@ -2,7 +2,7 @@ from typing import List
 from datetime import datetime
 from models import (Purchase, Payment)
 from services import payment_service
-from repositories import (purchase_repository, payment_repository)
+from repositories import (purchase_repository)
 from utils.exceptions import (
     BusinessRuleError, NotFoundError, ValidationError,
     error_messages
@@ -147,7 +147,7 @@ def create_payment(purchase_id: int, data: dict) -> Payment:
 
 def update_payment(purchase_id: int, payment_id: int, data: dict) -> Payment | None:
     """Update a payment and recalculate the related purchase totals."""
-    payment = payment_repository.get_payment_by_id(payment_id)
+    payment = payment_service.get_payment_by_id(payment_id)
     if not payment:
         return NotFoundError(error_messages.PAYMENT_NOT_FOUND)
 
