@@ -21,8 +21,8 @@ def get_payment_by_id(payment_id: int) -> Payment | None:
 def create_payment(data: dict) -> Payment:
     """Create a new payment record."""
     # Validate fields, method, note_number etc.
-    if not data.get("amount") or data.get("amount") <= 0:
-        raise ValueError("O valor do pagamento deve ser maior que zero.")
+    if not float(data.get("amount")) or float(data.get("amount")) < 0:
+        raise ValidationError(error_messages.PAYMENT_INVALID_AMOUNT)
 
     return payment_repository.insert_payment(data)
 
@@ -41,12 +41,12 @@ def update_payment(payment_id: int, data: dict) -> Payment | None:
         raise ValidationError(error_messages.PURCHASE_INVALID_ACTIVATION_ROUTE)
 
     # Validate amount
-    if "amount" in update_data:
-        amount = float(update_data["amount"])
+    if "amount" in validated_data:
+        amount = float(validated_data["amount"])
         if amount < 0:
             raise ValidationError(error_messages.PAYMENT_INVALID_AMOUNT)
 
-    updated = payment_repository.update_payment(payment_id, data)
+    updated = payment_repository.update_payment(payment_id, validated_data)
     return updated
 
 def activate_payment(payment_id: int, data: dict) -> Payment:
