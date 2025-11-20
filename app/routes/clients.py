@@ -1,13 +1,13 @@
 from fastapi import APIRouter, HTTPException
-from services.client_service import (
+from app.services.client_service import (
     get_client_by_id,
     get_clients,
     create_client,
     update_client,
     deactivate_client
 )
-from services.purchase_service import (get_purchases_by_client)
-from utils.exceptions import handle_service_exceptions
+from app.services.purchase_service import (get_purchases_by_client)
+from app.utils.exceptions import handle_service_exceptions
 
 router = APIRouter(prefix="/clients", tags=["Clients"])
 

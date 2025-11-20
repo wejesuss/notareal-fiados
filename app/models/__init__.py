@@ -1,3 +1,3 @@
-from models.client import Client
-from models.purchase import Purchase
-from models.payment import Payment
+from app.models.client import Client
+from app.models.purchase import Purchase
+from app.models.payment import Payment

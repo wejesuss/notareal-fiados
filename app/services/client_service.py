@@ -1,8 +1,8 @@
 from typing import List
-from models import Client
-from services.purchase_service import deactivate_purchases_by_client
-import repositories.client_repository as client_repository
-from utils.exceptions import (
+from app.models import Client
+from app.services.purchase_service import deactivate_purchases_by_client
+import app.repositories.client_repository as client_repository
+from app.utils.exceptions import (
     NotFoundError,
     error_messages
 )

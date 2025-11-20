@@ -1,8 +1,8 @@
 from typing import List
 from datetime import datetime
-from database import get_connection, sqlite3
-from models import Client
-from utils.exceptions import (
+from app.database import get_connection, sqlite3
+from app.models import Client
+from app.utils.exceptions import (
     ValidationError, BusinessRuleError, DatabaseError,
     error_messages
 )

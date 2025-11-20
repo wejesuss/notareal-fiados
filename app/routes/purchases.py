@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from services.purchase_service import (
+from app.services.purchase_service import (
     get_purchase_by_id,
     get_purchase_by_note_number,
     get_purchases,
@@ -8,8 +8,8 @@ from services.purchase_service import (
     activate_purchase,
     deactivate_purchase
 )
-from routes.payments import router as payment_router
-from utils.exceptions import handle_service_exceptions
+from app.routes.payments import router as payment_router
+from app.utils.exceptions import handle_service_exceptions
 
 router = APIRouter(prefix="/purchases", tags=["Purchases"])
 

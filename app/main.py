@@ -1,6 +1,6 @@
 from fastapi import FastAPI, APIRouter
-from routes import clients, purchases
-from database import init_database
+from app.routes import clients, purchases
+from app.database import init_database
 
 app = FastAPI()
 

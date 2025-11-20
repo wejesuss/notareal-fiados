@@ -1,9 +1,9 @@
 from typing import List
 from datetime import datetime
-from models import (Purchase, Payment)
-from services import payment_service
-from repositories import (purchase_repository)
-from utils.exceptions import (
+from app.models import (Purchase, Payment)
+from app.services import payment_service
+from app.repositories import (purchase_repository)
+from app.utils.exceptions import (
     BusinessRuleError, NotFoundError, ValidationError,
     error_messages
 )

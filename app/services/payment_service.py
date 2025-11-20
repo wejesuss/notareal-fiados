@@ -1,7 +1,7 @@
 from typing import List
-from models import Payment
-from repositories import payment_repository
-from utils.exceptions import (
+from app.models import Payment
+from app.repositories import payment_repository
+from app.utils.exceptions import (
     ValidationError, NotFoundError,
     error_messages
 )
