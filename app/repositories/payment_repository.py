@@ -137,7 +137,7 @@ def update_payment(payment_id: int, data: dict) -> Payment | None:
             return None
 
         return get_payment_by_id(payment_id)
-    except sqlite3.IntegrityError:
+    except sqlite3.IntegrityError as e:
         if "UNIQUE constraint failed" in str(e):
             raise BusinessRuleError(error_messages.PAYMENT_ALREADY_EXISTS) from e
         elif "FOREIGN KEY constraint failed" in str(e):
