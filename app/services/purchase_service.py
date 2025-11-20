@@ -95,6 +95,10 @@ def activate_purchase(purchase_id: int, data: dict) -> Purchase | None:
 
 def deactivate_purchase(purchase_id: int) -> bool:
     """Deactivate a purchase."""
+    purchase = purchase_repository.get_purchase_by_id(purchase_id)
+    if not purchase:
+        raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
+
     success = purchase_repository.deactivate_purchase(purchase_id)
     if success:
         payment_service.deactivate_payments_by_purchase(purchase_id)
