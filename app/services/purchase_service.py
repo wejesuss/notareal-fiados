@@ -154,7 +154,7 @@ def update_payment(purchase_id: int, payment_id: int, data: dict) -> Payment | N
     """Update a payment and recalculate the related purchase totals."""
     payment = payment_service.get_payment_by_id(payment_id)
     if not payment:
-        return NotFoundError(error_messages.PAYMENT_NOT_FOUND)
+        raise NotFoundError(error_messages.PAYMENT_NOT_FOUND)
 
     if payment.purchase_id != purchase_id:
         raise BusinessRuleError(error_messages.PAYMENT_NOT_LINKED)
