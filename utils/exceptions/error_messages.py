@@ -15,6 +15,7 @@ PURCHASE_INVALID_ACTIVATION_ROUTE = "Chamada inválida. Utilize a rota correta p
 PAYMENT_NOT_FOUND = "Pagamento não encontrado."
 PAYMENT_ALREADY_EXISTS = "Um pagamento com esse número de recibo já existe."
 PAYMENT_INVALID_AMOUNT = "O valor do pagamento deve ser maior ou igual a zero."
+PAYMENT_PURCHASE_NOT_FOUND = "Uma compra com esse id não existe."
 PAYMENT_NOT_LINKED = "Pagamento não pertence à compra especificada."
 PAYMENT_ALREADY_DISABLED = "Pagamento já desativado."
 

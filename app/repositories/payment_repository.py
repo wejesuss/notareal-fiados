@@ -2,6 +2,10 @@ from typing import List
 from datetime import datetime
 from database import get_connection, sqlite3
 from models import Payment
+from utils.exceptions import (
+    BusinessRuleError, DatabaseError,
+    error_messages
+)
 
 def get_payments(limit: int = None, offset: int = 0, purchase_id: int = None) -> List[Payment]:
     conn = None
@@ -34,11 +38,8 @@ def get_payments(limit: int = None, offset: int = 0, purchase_id: int = None) ->
 
         return [Payment.from_row(row) for row in rows]
 
-    except sqlite3.IntegrityError as e:
-        if "FOREIGN KEY constraint failed" in str(e):
-            raise ValueError("Uma compra com esse id não existe.")
     except sqlite3.Error as e:
-        raise ValueError("Erro inesperado do banco.") from e
+        raise DatabaseError(error_messages.DATABASE_ERROR) from e
     finally:
         if conn:
             conn.close()
@@ -80,11 +81,11 @@ def insert_payment(data: dict) -> Payment:
 
     except sqlite3.IntegrityError as e:
         if "UNIQUE constraint failed" in str(e):
-            raise ValueError("Um pagamento com esse número de recibo já existe.")
+            raise BusinessRuleError(error_messages.PAYMENT_ALREADY_EXISTS) from e
         elif "FOREIGN KEY constraint failed" in str(e):
-            raise ValueError("Uma compra com esse id não existe.")
+            raise BusinessRuleError(error_messages.PAYMENT_PURCHASE_NOT_FOUND) from e
     except sqlite3.Error as e:
-        raise ValueError("Erro inesperado do banco.") from e
+        raise DatabaseError(error_messages.DATABASE_ERROR) from e
     finally:
         if conn:
             conn.close()
@@ -136,8 +137,13 @@ def update_payment(payment_id: int, data: dict) -> Payment | None:
             return None
 
         return get_payment_by_id(payment_id)
+    except sqlite3.IntegrityError:
+        if "UNIQUE constraint failed" in str(e):
+            raise BusinessRuleError(error_messages.PAYMENT_ALREADY_EXISTS) from e
+        elif "FOREIGN KEY constraint failed" in str(e):
+            raise BusinessRuleError(error_messages.PAYMENT_PURCHASE_NOT_FOUND) from e
     except sqlite3.Error as e:
-        raise ValueError("Erro inesperado do banco.") from e
+        raise DatabaseError(error_messages.DATABASE_ERROR) from e
     finally:
         if conn:
             conn.close()
@@ -161,7 +167,7 @@ def deactivate_payment(payment_id: int) -> bool:
 
         return cursor.rowcount > 0
     except sqlite3.Error as e:
-        raise ValueError("Erro inesperado do banco.") from e
+        raise DatabaseError(error_messages.DATABASE_ERROR) from e
     finally:
         if conn:
             conn.close()
@@ -183,11 +189,8 @@ def deactivate_payments_by_purchase_id(purchase_id: int) -> bool:
         conn.commit()
 
         return cursor.rowcount > 0
-    except sqlite3.IntegrityError as e:
-        if "FOREIGN KEY constraint failed" in str(e):
-            raise ValueError("Uma compra com esse id não existe.")
     except sqlite3.Error as e:
-        raise ValueError("Erro inesperado do banco.") from e
+        raise DatabaseError(error_messages.DATABASE_ERROR) from e
     finally:
         if conn:
             conn.close()

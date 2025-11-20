@@ -29,6 +29,7 @@ def create_payment(data: dict) -> Payment:
     return payment_repository.insert_payment(data)
 
 def update_payment(payment_id: int, data: dict) -> Payment | None:
+    """Update payment for allowed payment fields (amount, payment_date, method, description)"""
     # fields that are allowed to be updated
     allowed_fields = ["amount", "payment_date", "method", "description"]
 
