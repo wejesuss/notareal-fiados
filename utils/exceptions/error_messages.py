@@ -18,6 +18,7 @@ PAYMENT_INVALID_AMOUNT = "O valor do pagamento deve ser maior ou igual a zero."
 PAYMENT_PURCHASE_NOT_FOUND = "Uma compra com esse id não existe."
 PAYMENT_NOT_LINKED = "Pagamento não pertence à compra especificada."
 PAYMENT_ALREADY_DISABLED = "Pagamento já desativado."
+PAYMENT_CREATION_FAILED = "Não é possível adicionar pagamento a uma compra desativada."
 
 # === Database / Generic ===
 DATABASE_ERROR = "Erro inesperado no banco de dados."

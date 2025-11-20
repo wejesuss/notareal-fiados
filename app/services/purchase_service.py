@@ -140,6 +140,10 @@ def get_payment_by_id(payment_id: int) -> Payment | None:
 
 def create_payment(purchase_id: int, data: dict) -> Payment:
     """Create a new payment and update purchase totals."""
+    purchase = purchase_repository.get_purchase_by_id(purchase_id)
+    if not purchase or not purchase.is_active:
+        raise BusinessRuleError(error_messages.PAYMENT_CREATION_FAILED)
+
     data["purchase_id"] = purchase_id
     payment = payment_service.create_payment(data)
     recalculate_purchase_totals(purchase_id)
