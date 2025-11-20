@@ -78,7 +78,8 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase | None:
 
     purchase = purchase_repository.update_purchase(purchase_id, validated_data)
     # Recalculate totals if relevant fields changed
-    if "total_value" in data or data.get("is_active") == 1:
+    relevant_fields_changed = "total_value" in data or "client_id" in data
+    if relevant_fields_changed:
         recalculate_purchase_totals(purchase_id)
 
     return purchase
