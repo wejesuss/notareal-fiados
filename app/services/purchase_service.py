@@ -68,10 +68,10 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase | None:
     if not purchase_exists:
         raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
 
-     # fields that are allowed to be updated
+    # fields that are allowed to be updated
     allowed_fields = ["client_id", "description", "total_value"]
 
-    # validate data fields
+    # filter data fields
     validated_data = {k: v for k, v in data.items() if k in allowed_fields}
     if not validated_data:
         raise ValidationError(error_messages.DATA_FIELDS_EMPTY)
