@@ -9,7 +9,7 @@ PURCHASE_ALREADY_EXISTS = "Uma compra com esse número de nota já existe."
 PURCHASE_INVALID_TOTAL = "O valor total da compra deve ser maior que zero."
 PURCHASE_INVALID_STATUS = "Status inválido. Use 'pending', 'partial' ou 'paid'."
 PURCHASE_CLIENT_NOT_FOUND = "Um cliente com esse id não existe."
-PURCHASE_INVALID_ACTIVATION_ROUTE = "Chamada inválida. Utilize a rota correta para a ativação da compra."
+PURCHASE_INVALID_ACTIVATION_ROUTE = "Chamada inválida. Utilize a rota correta para a ativação ou desativação da compra."
 
 # === Payments ===
 PAYMENT_NOT_FOUND = "Pagamento não encontrado."
