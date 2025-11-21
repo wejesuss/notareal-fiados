@@ -80,7 +80,7 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase | None:
     # Recalculate totals if relevant fields changed
     relevant_fields_changed = "total_value" in data or "client_id" in data
     if relevant_fields_changed:
-        recalculate_purchase_totals(purchase_id)
+        return recalculate_purchase_totals(purchase_id)
 
     return purchase
 
