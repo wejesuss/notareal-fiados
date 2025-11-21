@@ -198,6 +198,23 @@ def deactivate_payment(purchase_id: int, payment_id: int) -> bool:
     
     return success
 
+def compute_purchase_totals(purchase: Purchase, payments: list[Payment]):
+    """Pure function: given a purchase + payments, returns the recalculated fields."""
+    active_payments = [p for p in payments if p.is_active]
+    total_paid = sum(p.amount for p in active_payments)
+
+    if total_paid >= purchase.total_value:
+        new_status = "paid"
+    elif total_paid > 0:
+        new_status = "partial"
+    else:
+        new_status = "pending"
+
+    return {
+        "total_paid_value": total_paid,
+        "status": new_status
+    }
+
 def recalculate_purchase_totals(purchase_id: int) -> Purchase | None:
     """Recalculate purchase total_paid_value and status based on active payments."""
     purchase = purchase_repository.get_purchase_by_id(purchase_id)
@@ -205,16 +222,6 @@ def recalculate_purchase_totals(purchase_id: int) -> Purchase | None:
         return None
 
     payments = payment_service.get_payments(limit = None, offset = 0, purchase_id = purchase_id)
-    active_payments = [p for p in payments if p.is_active]
-    total_paid = sum(p.amount for p in active_payments)
+    updates = compute_purchase_totals(purchase, payments)
 
-    new_status = "pending"
-    if total_paid >= purchase.total_value:
-        new_status = "paid"
-    elif total_paid > 0:
-        new_status = "partial"
-
-    return purchase_repository.update_purchase(purchase_id, {
-        "total_paid_value": total_paid,
-        "status": new_status
-    })
+    return purchase_repository.update_purchase(purchase_id, updates)
