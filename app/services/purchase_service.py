@@ -55,7 +55,11 @@ def create_purchase(client_id: int, data: dict) -> Purchase:
             "receipt_number": data.get("receipt_number")
         }
 
-        payment_service.create_payment(payment_data)
+        try:
+            payment_service.create_payment(payment_data)
+        except Exception:
+            purchase_repository.deactivate_purchase(purchase.id)
+            raise BusinessRuleError(error_messages.PAYMENT_PURCHASE_CREATION_FAILED)
 
     return purchase
 
