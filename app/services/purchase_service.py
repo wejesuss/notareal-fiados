@@ -22,8 +22,11 @@ def get_purchases(limit: int = None, offset: int = 0, only_pending: bool | None 
     return purchases
 
 def create_purchase(client_id: int, data: dict) -> Purchase:
-    total_value = float(data.get("total_value", 0))
-    amount = float(data.get("amount", 0))
+    try:
+        total_value = float(data.get("total_value", 0))
+        amount = float(data.get("amount", 0))
+    except ValueError:
+        raise ValidationError(error_messages.RESOURCE_CREATION_VALUE_ERROR)
 
     if total_value <= 0:
         raise ValidationError(error_messages.PURCHASE_INVALID_TOTAL)

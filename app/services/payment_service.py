@@ -43,7 +43,10 @@ def update_payment(payment_id: int, data: dict) -> Payment | None:
 
     # Validate amount
     if "amount" in validated_data:
-        amount = float(validated_data["amount"])
+        try:
+            amount = float(validated_data["amount"])
+        except (ValueError):
+            raise ValidationError(error_messages.PAYMENT_INVALID_AMOUNT)
         if amount < 0:
             raise ValidationError(error_messages.PAYMENT_INVALID_AMOUNT)
 
