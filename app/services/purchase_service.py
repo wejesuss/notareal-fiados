@@ -24,26 +24,32 @@ def get_purchases(limit: int = None, offset: int = 0, only_pending: bool | None 
 def create_purchase(client_id: int, data: dict) -> Purchase:
     try:
         total_value = float(data.get("total_value", 0))
-        amount = float(data.get("amount", 0))
+
+        # Attempt to get and convert amount to float
+        amount = data.get("amount")
+        if amount is not None:
+            amount = float(amount)  # Convert only if it's not None
+            if amount <= 0:
+                raise ValidationError(error_messages.PAYMENT_INVALID_AMOUNT)
     except ValueError:
         raise ValidationError(error_messages.RESOURCE_CREATION_VALUE_ERROR)
 
     if total_value <= 0:
         raise ValidationError(error_messages.PURCHASE_INVALID_TOTAL)
-    if amount < 0:
-        raise ValidationError(error_messages.PAYMENT_INVALID_AMOUNT)
 
     create_new_payment = False
     status = "pending"
     total_paid_value = 0.0
-    if amount >= total_value:
-        create_new_payment = True
-        total_paid_value = total_value
-        status = "paid"
-    elif amount > 0:
-        create_new_payment = True
-        total_paid_value = amount
-        status = "partial"
+
+    if amount is not None:
+        if amount >= total_value:
+            create_new_payment = True
+            total_paid_value = total_value
+            status = "paid"
+        elif amount > 0:
+            create_new_payment = True
+            total_paid_value = amount
+            status = "partial"
 
     data.update({"client_id": client_id, "status": status, "total_paid_value": total_paid_value})
     purchase = purchase_repository.insert_purchase(data)

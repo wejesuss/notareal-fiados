@@ -22,7 +22,7 @@ def create_payment(data: dict) -> Payment:
     """Create a new payment record."""
     # Validate fields, method, note_number etc.
     amount = data.get("amount")
-    if amount is None or float(amount) < 0:
+    if amount is None or float(amount) <= 0:
         raise ValidationError(error_messages.PAYMENT_INVALID_AMOUNT)
 
     return payment_repository.insert_payment(data)
@@ -45,9 +45,9 @@ def update_payment(payment_id: int, data: dict) -> Payment | None:
     if "amount" in validated_data:
         try:
             amount = float(validated_data["amount"])
-        except (ValueError):
-            raise ValidationError(error_messages.PAYMENT_INVALID_AMOUNT)
-        if amount < 0:
+            if amount <= 0:
+                raise ValidationError(error_messages.PAYMENT_INVALID_AMOUNT)
+        except (ValueError, TypeError):
             raise ValidationError(error_messages.PAYMENT_INVALID_AMOUNT)
 
     updated = payment_repository.update_payment(payment_id, validated_data)
