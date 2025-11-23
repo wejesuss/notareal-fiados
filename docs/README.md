@@ -65,23 +65,52 @@ O sistema funciona **offline**, utilizando um **servidor local** (instalado no c
 
 ## 🧰 Extensões Planejadas (Futuras)
 
-- Autenticação de usuários (PIN ou senha).  
-- Geração de relatórios semanais/mensais.  
-- Assinatura digital opcional.  
-- Sincronização via nuvem.  
-- Notificações automáticas sobre débitos pendentes.  
-- Interface web simplificada para administração remota.  
+- Autenticação de usuários (PIN ou senha).
+- Geração de relatórios semanais/mensais.
+- Assinatura digital opcional.
+- Sincronização via nuvem.
+- Notificações automáticas sobre débitos pendentes.
+- Interface web simplificada para administração remota.
 
 ---
 
 ## 📦 Próximos Passos
 
 1. Definir o design visual e identidade (cores, logo, estilo).
-2. Implementar endpoints para impressão.  
+2. Implementar endpoints para impressão.
 3. Desenvolver a interface desktop.
-4. Testar funções de backup e impressão.  
+4. Testar funções de backup e impressão.
 5. Planejar e iniciar o desenvolvimento da versão mobile.
-6. Reorganizar rotas para coincidir com o modelo de negócios
+
+[] Aplicar response_model em todas as rotas
+
+. Garantir que TODAS as rotas usem schemas de resposta (ClientResponseSchema, PurchaseResponseSchema, PaymentResponseSchema).
+
+. Remover retornos como return client.__dict__.
+
+. Garantir consistência entre serviços, repositórios e API.
+
+[] Documentar rotas (OpenAPI + exemplos)
+
+. Adicionar exemplos (example=) nos schemas.
+
+. Criar exemplos explícitos usando responses={} nas rotas, se necessário.
+
+. Adicionar docstrings claras, incluindo payload esperado.
+
+. Criar documentação separada com exemplos prontos de JSON (se quiser).
+
+[] Implementar autenticação (se seu projeto exigir)
+
+. Avaliar necessidade de login/autorização.
+
+. Caso necessário, usar:
+
+JWT (via fastapi.security)
+
+níveis de permissão (admin, user)
+
+middleware de autenticação
 
 ---
 
