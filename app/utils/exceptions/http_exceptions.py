@@ -1,8 +1,10 @@
+import functools
 from fastapi import HTTPException
 from .exceptions import NotFoundError, BusinessRuleError, ValidationError, DatabaseError
 
 def handle_service_exceptions(func):
     """Decorator to translate service exceptions into HTTP errors."""
+    @functools.wraps(func)
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
