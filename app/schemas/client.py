@@ -8,6 +8,8 @@ class ClientBase(BaseModel):
     phone: str | None = Field(None, example="(11) 99999-9999")
     email: EmailStr | None = Field(None, example="joao@example.com")
 
+    model_config = dict(extra="ignore")
+
 # ===== CREATE =====
 class ClientCreateSchema(ClientBase):
     pass
@@ -31,9 +33,7 @@ class ClientResponseSchema(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-
-    class Config:
-        from_attributes = True
+    model_config = dict(from_attributes = True)
 
 class ClientCreateResponseSchema(BaseModel):
     message: str

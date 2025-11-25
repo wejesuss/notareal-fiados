@@ -41,5 +41,4 @@ class PurchaseResponseSchema(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = dict(from_attributes = True)
