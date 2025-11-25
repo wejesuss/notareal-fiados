@@ -8,6 +8,10 @@ from app.services.client_service import (
 )
 from app.services.purchase_service import (get_purchases_by_client)
 from app.utils.exceptions import handle_service_exceptions
+from app.schemas.client import (
+    ClientCreateSchema,
+    ClientCreateResponseSchema
+)
 
 router = APIRouter(prefix="/clients", tags=["Clients"])
 
@@ -32,11 +36,11 @@ def read_client(client_id: int):
     #     raise HTTPException(status_code=404, detail="Cliente não encontrado.")
     return client.__dict__
 
-@router.post("/")
+@router.post("/", response_model=ClientCreateResponseSchema)
 @handle_service_exceptions
-def add_client(data: dict):
+def add_client(data: ClientCreateSchema):
     """Add new client."""
-    client = create_client(data)
+    client = create_client(data.model_dump())
     return {"message": "Cliente criado com sucesso.", "client": client.__dict__}
 
 @router.put("/{client_id}")

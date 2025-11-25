@@ -31,5 +31,10 @@ class ClientResponseSchema(BaseModel):
     created_at: datetime
     updated_at: datetime
 
+
     class Config:
         from_attributes = True
+
+class ClientCreateResponseSchema(BaseModel):
+    message: str
+    client: ClientResponseSchema

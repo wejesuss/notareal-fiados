@@ -22,11 +22,6 @@ def get_client_by_id(client_id: int) -> Client | None:
     return client
 
 def create_client(data: dict) -> Client:
-    # TODO - validate fields
-    # data.get("name"),
-    # data.get("nickname"),
-    # data.get("phone"),
-    # data.get("email"),
     return client_repository.insert_client(data)
 
 def update_client(client_id: int, data: dict) -> Client | None:
