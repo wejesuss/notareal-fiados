@@ -15,6 +15,7 @@ class ClientBase(NameValidatorMixin, BaseModel):
 class ClientCreateSchema(ClientBase):
     pass
 
+
 # ===== UPDATE =====
 class ClientUpdateSchema(BaseModel):
     name: str | None = Field(None)
@@ -22,6 +23,7 @@ class ClientUpdateSchema(BaseModel):
     phone: str | None = Field(None)
     email: EmailStr | None = Field(None)
     is_active: int | None = Field(None)
+
 
 # ===== RESPONSE =====
 class ClientResponseSchema(BaseModel):
