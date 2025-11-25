@@ -1,9 +1,10 @@
 from datetime import datetime
 from pydantic import BaseModel, EmailStr, Field
+from app.schemas.mixins import NameValidatorMixin
 
 # ===== Base =====
-class ClientBase(BaseModel):
-    name: str = Field(..., example="João da Silva")
+class ClientBase(NameValidatorMixin, BaseModel):
+    name: str = Field(..., example="João da Silva", min_length=2)
     nickname: str | None = Field(None, example="Joãozinho")
     phone: str | None = Field(None, example="(11) 99999-9999")
     email: EmailStr | None = Field(None, example="joao@example.com")
