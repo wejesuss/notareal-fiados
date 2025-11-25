@@ -4,7 +4,7 @@ from app.schemas.mixins import AmountValidatorMixin
 from app.utils.exceptions import (ValidationError, error_messages)
 
 # ===== Base =====
-class PaymentBase(AmountValidatorMixin):
+class PaymentBase(AmountValidatorMixin, BaseModel):
     amount: float = Field(..., example=60.00)
     payment_date: int | None = Field(None, example=1700000000)  # timestamp
     method: str = Field(..., example="pix")
@@ -18,7 +18,7 @@ class PaymentCreateSchema(PaymentBase):
 
 
 # ===== UPDATE =====
-class PaymentUpdateSchema(AmountValidatorMixin):
+class PaymentUpdateSchema(AmountValidatorMixin, BaseModel):
     amount: float | None = None
     payment_date: int | None = None
     method: str | None = None

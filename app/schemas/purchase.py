@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 from app.schemas.mixins import AmountValidatorMixin
 
 # ===== Base =====
-class PurchaseBase(AmountValidatorMixin):
+class PurchaseBase(AmountValidatorMixin, BaseModel):
     description: str = Field(..., example="Compra de produtos agrícolas")
     total_value: float = Field(..., example=150.75)
     note_number: str | None = Field(None, example="NF-0001")
