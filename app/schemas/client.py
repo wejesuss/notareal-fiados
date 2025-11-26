@@ -4,7 +4,7 @@ from app.schemas.mixins import NameValidatorMixin
 
 # ===== Base =====
 class ClientBase(NameValidatorMixin, BaseModel):
-    name: str = Field(..., example="João da Silva", min_length=2)
+    name: str = Field(..., example="João da Silva", min_length=2, max_length=40)
     nickname: str | None = Field(None, example="Joãozinho")
     phone: str | None = Field(None, example="(11) 99999-9999", \
         min_length=8, max_length=20, \
