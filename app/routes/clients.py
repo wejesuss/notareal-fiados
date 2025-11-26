@@ -33,14 +33,14 @@ def list_clients(limit: int = None, offset: int = 0, only_active: bool = True):
 def read_client(client_id: int):
     """Get client by ID."""
     client = get_client_by_id(client_id)
-    return client.__dict__
+    return client
 
 @router.post("/", response_model=ClientCreateResponseSchema)
 @handle_service_exceptions
 def add_client(data: ClientCreateSchema):
     """Add new client."""
     client = create_client(data.model_dump())
-    return {"message": "Cliente criado com sucesso.", "client": client.__dict__}
+    return {"message": "Cliente criado com sucesso.", "client": client}
 
 @router.put("/{client_id}")
 @handle_service_exceptions
