@@ -17,19 +17,19 @@ class NameValidatorMixin:
     def validate_name(cls, v):
         v = " ".join(v.split())  # Remove multiple spaces
 
-        # Check for multiple repetitions of allowed symbols like hifens
-        if re.search(r"[' -]{2,}", v): 
-            raise ValueError(error_messages.CLIENT_INVALID_NAME)
-        
-        # Check for multiple repetitions of allowed symbols like hifens
-        if re.search(r"[ '-]$", v):
+        # Invalid end char: space, apostrophe, hyphen
+        if re.search(r"[ '\-]$", v):
             raise ValueError(error_messages.CLIENT_INVALID_NAME)
 
-        # Check for multiple repetitions of the same string
+        # Multiple allowed symbols in sequence
+        if re.search(r"['\-]{2,}", v):
+            raise ValueError(error_messages.CLIENT_INVALID_NAME)
+
+        # Excessive repetition of any character
         if re.search(r"(.)\1\1\1", v):
             raise ValueError(error_messages.CLIENT_INVALID_NAME)
 
-        # Check if string has any invalid chars (not similar to letters)
+        # Global invalid characters
         if not is_valid_name(v):
             raise ValueError(error_messages.CLIENT_INVALID_NAME)
 
@@ -38,16 +38,19 @@ class NameValidatorMixin:
 class NicknameValidatorMixin:
     @field_validator("nickname", mode="after")
     def validate_nickname(cls, v):
-        v = " ".join(v.split())  # Remove multiple spaces
+        if v is None:
+            return None
 
-        # Ensure nickname is always lowercase
-        v = v.casefold()
+        v = " ".join(v.split())  # Remove multiple spaces
+        v = v.casefold()         # Normalize
 
         return v
 
 class PhoneValidatorMixin:
     @field_validator("phone", mode="after")
     def validate_phone(cls, v):
-        v = " ".join(v.split())  # Remove multiple spaces
+        if v is None:
+            return None
 
+        v = " ".join(v.split())  # Remove multiple spaces
         return v
