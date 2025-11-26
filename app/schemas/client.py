@@ -6,7 +6,11 @@ from app.schemas.mixins import NameValidatorMixin
 class ClientBase(NameValidatorMixin, BaseModel):
     name: str = Field(..., example="João da Silva", min_length=2)
     nickname: str | None = Field(None, example="Joãozinho")
-    phone: str | None = Field(None, example="(11) 99999-9999")
+    phone: str | None = Field(None, example="(11) 99999-9999", \
+        min_length=8, max_length=20, \
+        # regex for Brazillian and USA phone numbers
+        pattern=r"(?:^\+?\d{1,3}?\s?)?(?:\(\d{1,4}\)|\d{1,4})[\s\-\.]?(?:9?\s?\d{3,4})[\s\-\.]?\d{4}$"
+    )
     email: EmailStr | None = Field(None, example="joao@example.com")
 
     model_config = dict(extra="ignore")
