@@ -10,7 +10,8 @@ from app.services.purchase_service import (get_purchases_by_client)
 from app.utils.exceptions import handle_service_exceptions
 from app.schemas.client import (
     ClientCreateSchema,
-    ClientCreateResponseSchema
+    ClientCreateResponseSchema,
+    ClientResponseSchema
 )
 
 router = APIRouter(prefix="/clients", tags=["Clients"])
@@ -27,7 +28,7 @@ def list_clients(limit: int = None, offset: int = 0, only_active: bool = True):
     clients_data = [c.__dict__ for c in clients]
     return {"message": "Clientes encontrados.", "clients": clients_data}
 
-@router.get("/{client_id}")
+@router.get("/{client_id}", response_model=ClientResponseSchema)
 @handle_service_exceptions
 def read_client(client_id: int):
     """Get client by ID."""
