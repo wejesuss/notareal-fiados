@@ -33,8 +33,6 @@ def list_clients(limit: int = None, offset: int = 0, only_active: bool = True):
 def read_client(client_id: int):
     """Get client by ID."""
     client = get_client_by_id(client_id)
-    # if not client:
-    #     raise HTTPException(status_code=404, detail="Cliente não encontrado.")
     return client.__dict__
 
 @router.post("/", response_model=ClientCreateResponseSchema)
