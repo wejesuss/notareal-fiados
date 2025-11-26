@@ -9,9 +9,9 @@ class Client:
     nickname: str | None
     phone: str | None
     email: str | None
+    is_active: int
     created_at: datetime
     updated_at: datetime
-    is_active: int
 
     @staticmethod
     def from_row(row):
