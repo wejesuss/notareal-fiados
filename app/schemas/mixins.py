@@ -34,3 +34,20 @@ class NameValidatorMixin:
             raise ValueError(error_messages.CLIENT_INVALID_NAME)
 
         return v
+
+class NicknameValidatorMixin:
+    @field_validator("nickname", mode="after")
+    def validate_nickname(cls, v):
+        v = " ".join(v.split())  # Remove multiple spaces
+
+        # Ensure nickname is always lowercase
+        v = v.casefold()
+
+        return v
+
+class PhoneValidatorMixin:
+    @field_validator("phone", mode="after")
+    def validate_phone(cls, v):
+        v = " ".join(v.split())  # Remove multiple spaces
+
+        return v
