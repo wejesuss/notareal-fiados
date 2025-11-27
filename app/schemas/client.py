@@ -43,7 +43,7 @@ class ClientResponseSchema(BaseModel):
 
     model_config = dict(from_attributes = True)
 
-class ClientCreateResponseSchema(BaseModel):
+class ClientWithMessageResponseSchema(BaseModel):
     message: str
     client: ClientResponseSchema
 

@@ -12,8 +12,9 @@ from app.schemas.client import (
     ClientCreateSchema,
     ClientCreateResponseSchema,
     ClientListResponseSchema,
+    ClientListQuerySchema,
     ClientResponseSchema,
-    ClientListQuerySchema
+    ClientWithMessageResponseSchema,
 )
 
 router = APIRouter(prefix="/clients", tags=["Clients"])
@@ -37,7 +38,7 @@ def read_client(client_id: int):
     client = get_client_by_id(client_id)
     return client
 
-@router.post("/", response_model=ClientCreateResponseSchema)
+@router.post("/", response_model=ClientWithMessageResponseSchema)
 @handle_service_exceptions
 def add_client(data: ClientCreateSchema):
     """Add new client."""
