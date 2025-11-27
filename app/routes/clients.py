@@ -22,11 +22,7 @@ def list_clients(limit: int = None, offset: int = 0, only_active: bool = True):
     """List all clients."""
  
     clients = get_clients(limit, offset, only_active)
-    if not clients:
-        return {"message": "Clientes não encontrados.", "clients": []}
-
-    clients_data = [c.__dict__ for c in clients]
-    return {"message": "Clientes encontrados.", "clients": clients_data}
+    return {"message": "Clientes encontrados.", "clients": clients}
 
 @router.get("/{client_id}", response_model=ClientResponseSchema)
 @handle_service_exceptions
