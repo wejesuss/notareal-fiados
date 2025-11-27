@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from app.services.client_service import (
     get_client_by_id,
     get_clients,
@@ -11,15 +11,21 @@ from app.utils.exceptions import handle_service_exceptions
 from app.schemas.client import (
     ClientCreateSchema,
     ClientCreateResponseSchema,
-    ClientResponseSchema
+    ClientListResponseSchema,
+    ClientResponseSchema,
+    ClientListQuerySchema
 )
 
 router = APIRouter(prefix="/clients", tags=["Clients"])
 
-@router.get("/")
+@router.get("/", response_model=ClientListResponseSchema)
 @handle_service_exceptions
-def list_clients(limit: int = None, offset: int = 0, only_active: bool = True):
+def list_clients(params: ClientListQuerySchema = Depends()):
     """List all clients."""
+
+    limit = params.limit
+    offset = params.offset
+    only_active = params.only_active
  
     clients = get_clients(limit, offset, only_active)
     return {"message": "Clientes encontrados.", "clients": clients}
