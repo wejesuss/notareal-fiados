@@ -52,7 +52,7 @@ def edit_client(client_id: int, data: ClientUpdateSchema):
     client = update_client(client_id, data.model_dump(exclude_none=True))
     return {"message": "Cliente atualizado.", "client": client}
 
-@router.delete("/{client_id}")
+@router.delete("/{client_id}", response_model=ClientWithMessageResponseSchema, response_model_exclude_none=True)
 @handle_service_exceptions
 def remove_client(client_id: int):
     """Delete a client (soft delete)."""

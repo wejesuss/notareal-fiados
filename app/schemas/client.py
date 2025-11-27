@@ -41,7 +41,7 @@ class ClientResponseSchema(BaseModel):
 
 class ClientWithMessageResponseSchema(BaseModel):
     message: str
-    client: ClientResponseSchema
+    client: ClientResponseSchema | None = None
 
 class ClientListResponseSchema(BaseModel):
     message: str
