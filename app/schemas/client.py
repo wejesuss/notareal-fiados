@@ -5,7 +5,7 @@ from app.schemas.mixins import NameValidatorMixin, NicknameValidatorMixin, Phone
 
 # ===== Base =====
 class ClientBase(NameValidatorMixin, NicknameValidatorMixin, PhoneValidatorMixin, BaseModel):
-    name: str = Field(..., example="João da Silva", min_length=2, max_length=40)
+    name: str | None = Field(None, example="João da Silva", min_length=2, max_length=40)
     nickname: str | None = Field(None, example="Joãozinho")
     phone: str | None = Field(None, example="(11) 99999-9999", \
         min_length=8, max_length=20, \
@@ -18,16 +18,12 @@ class ClientBase(NameValidatorMixin, NicknameValidatorMixin, PhoneValidatorMixin
 
 # ===== CREATE =====
 class ClientCreateSchema(ClientBase):
-    pass
+    name: str # required for creation
 
 
 # ===== UPDATE =====
-class ClientUpdateSchema(BaseModel):
-    name: str | None = Field(None)
-    nickname: str | None = Field(None)
-    phone: str | None = Field(None)
-    email: EmailStr | None = Field(None)
-    is_active: int | None = Field(None)
+class ClientUpdateSchema(ClientBase):
+    is_active: int | None = Field(None, ge=0, le=1)
 
 
 # ===== RESPONSE =====

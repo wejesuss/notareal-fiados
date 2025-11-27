@@ -9,12 +9,12 @@ from app.services.client_service import (
 from app.services.purchase_service import (get_purchases_by_client)
 from app.utils.exceptions import handle_service_exceptions
 from app.schemas.client import (
-    ClientCreateSchema,
-    ClientCreateResponseSchema,
     ClientListResponseSchema,
     ClientListQuerySchema,
     ClientResponseSchema,
     ClientWithMessageResponseSchema,
+    ClientCreateSchema,
+    ClientUpdateSchema
 )
 
 router = APIRouter(prefix="/clients", tags=["Clients"])
@@ -45,12 +45,12 @@ def add_client(data: ClientCreateSchema):
     client = create_client(data.model_dump())
     return {"message": "Cliente criado com sucesso.", "client": client}
 
-@router.put("/{client_id}")
+@router.put("/{client_id}", response_model=ClientWithMessageResponseSchema)
 @handle_service_exceptions
-def edit_client(client_id: int, data: dict):
+def edit_client(client_id: int, data: ClientUpdateSchema):
     """Update client data."""
-    client = update_client(client_id, data)
-    return {"message": "Cliente atualizado.", "client": client.__dict__}
+    client = update_client(client_id, data.model_dump(exclude_none=True))
+    return {"message": "Cliente atualizado.", "client": client}
 
 @router.delete("/{client_id}")
 @handle_service_exceptions
