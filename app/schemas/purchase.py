@@ -1,3 +1,4 @@
+from typing import List
 from datetime import datetime
 from pydantic import BaseModel, Field
 from app.schemas.mixins import AmountValidatorMixin
@@ -42,3 +43,7 @@ class PurchaseResponseSchema(BaseModel):
     updated_at: datetime
 
     model_config = dict(from_attributes = True)
+
+class PurchaseListResponseSchema(BaseModel):
+    message: str
+    purchases: List[PurchaseResponseSchema]

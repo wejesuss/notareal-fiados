@@ -16,6 +16,7 @@ from app.schemas.client import (
     ClientCreateSchema,
     ClientUpdateSchema
 )
+from app.schemas.purchase import PurchaseListResponseSchema
 
 router = APIRouter(prefix="/clients", tags=["Clients"])
 
@@ -62,7 +63,7 @@ def remove_client(client_id: int):
     return {"message": "Cliente removido com sucesso."}
 
 # Purchase related routes
-@router.get("/{client_id}/purchases")
+@router.get("/{client_id}/purchases", response_model=PurchaseListResponseSchema)
 @handle_service_exceptions
 def list_purchases_for_client(client_id: int, only_active: bool = True):
     """List all purchases for a specific client."""
