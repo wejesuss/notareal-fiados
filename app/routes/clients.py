@@ -67,8 +67,5 @@ def remove_client(client_id: int):
 def list_purchases_for_client(client_id: int, only_active: bool = True):
     """List all purchases for a specific client."""
     purchases = get_purchases_by_client(client_id, only_active)
-    if not purchases:
-        return {"message": "Compras não encontradas.", "purchases": []}
 
-    purchases_data = [p.__dict__ for p in purchases]
-    return {"message": "Compras encontradas.", "purchases": purchases_data}
+    return {"message": "Compras encontradas.", "purchases": purchases}
