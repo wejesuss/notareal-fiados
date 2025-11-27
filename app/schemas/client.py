@@ -54,6 +54,6 @@ class ClientListResponseSchema(BaseModel):
 
 # ===== LISTING =====
 class ClientListQuerySchema(BaseModel):
-    limit: int | None = Field(default=None, ge=1, description="Número máximo de clientes")
-    offset: int = Field(default=0, ge=0, description="Número de clientes para pular")
-    only_active: bool = Field(default=True, description="Retorna somente cliente ativos")
+    limit: int | None = Field(default=None, ge=1, description="Número máximo de clientes na listagem")
+    offset: int = Field(default=0, ge=0, description="Número de clientes para ignorar antes da listagem")
+    only_active: bool = Field(default=True, description="Filtrar somente clientes ativos")
