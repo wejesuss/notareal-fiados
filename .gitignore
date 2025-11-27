@@ -5,3 +5,4 @@ export_files_content.py
 exported_file.md
 data/*.db
 .vscode
+*.db-*
