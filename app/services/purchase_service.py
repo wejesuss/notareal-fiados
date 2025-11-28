@@ -9,10 +9,18 @@ from app.utils.exceptions import (
 )
 
 def get_purchase_by_id(purchase_id: int) -> Purchase | None:
-    return purchase_repository.get_purchase_by_id(purchase_id)
+    purchase = purchase_repository.get_purchase_by_id(purchase_id)
+    if not purchase:
+        raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
+
+    return purchase
 
 def get_purchase_by_note_number(note_number: str) -> Purchase | None:
-    return purchase_repository.get_purchase_by_note_number(note_number)
+    purchase = purchase_repository.get_purchase_by_note_number(note_number)
+    if not purchase:
+        raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
+
+    return purchase
 
 def get_purchases(limit: int = None, offset: int = 0, only_pending: bool | None = None) -> List[Purchase]:
     purchases = purchase_repository.get_purchases(limit, offset, only_pending)
@@ -72,7 +80,7 @@ def create_purchase(client_id: int, data: dict) -> Purchase:
 
     return purchase
 
-def update_purchase(purchase_id: int, data: dict) -> Purchase | None:
+def update_purchase(purchase_id: int, data: dict) -> Purchase:
     # validate is_active, only allowing deactivation from the correct route
     if "is_active" in data:
         raise ValidationError(error_messages.PURCHASE_INVALID_ACTIVATION_ROUTE)
@@ -97,7 +105,7 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase | None:
 
     return purchase
 
-def activate_purchase(purchase_id: int, data: dict) -> Purchase | None:
+def activate_purchase(purchase_id: int, data: dict) -> Purchase:
     purchase_exists = purchase_repository.get_purchase_by_id(purchase_id)
     if not purchase_exists:
         raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
