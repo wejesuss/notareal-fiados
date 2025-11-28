@@ -15,7 +15,7 @@ def get_purchase_by_id(purchase_id: int) -> Purchase:
 
     return purchase
 
-def get_purchase_by_note_number(note_number: str) -> Purchase | None:
+def get_purchase_by_note_number(note_number: str) -> Purchase:
     purchase = purchase_repository.get_purchase_by_note_number(note_number)
     if not purchase:
         raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)

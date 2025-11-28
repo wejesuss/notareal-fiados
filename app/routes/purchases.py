@@ -36,12 +36,12 @@ def read_purchase(purchase_id: int):
     purchase = get_purchase_by_id(purchase_id)
     return purchase
 
-@router.get("/by-note/{note_number}")
+@router.get("/by-note/{note_number}", response_model=PurchaseResponseSchema)
 @handle_service_exceptions
 def read_purchase_by_note(note_number: str):
     """Get purchase by note_number."""
     purchase = get_purchase_by_note_number(note_number)
-    return purchase.__dict__
+    return purchase
 
 @router.post("/{client_id}")
 @handle_service_exceptions
