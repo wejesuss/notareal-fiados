@@ -15,5 +15,5 @@ def handle_service_exceptions(func):
         except BusinessRuleError as e:
             raise HTTPException(status_code=409, detail=str(e))
         except DatabaseError as e:
-            raise HTTPException(status_code=500, detail="Erro interno no banco de dados.")
+            raise HTTPException(status_code=500, detail=str(e))
     return wrapper
