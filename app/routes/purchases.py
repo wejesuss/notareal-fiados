@@ -11,8 +11,9 @@ from app.services.purchase_service import (
 from app.routes.payments import router as payment_router
 from app.utils.exceptions import handle_service_exceptions
 from app.schemas.purchase import (
-    PurchaseListQuerySchema,
     PurchaseListResponseSchema,
+    PurchaseListQuerySchema,
+    PurchaseResponseSchema,
 )
 
 router = APIRouter(prefix="/purchases", tags=["Purchases"])
@@ -28,12 +29,12 @@ def list_purchases(params: PurchaseListQuerySchema = Depends()):
     purchases = get_purchases(limit, offset, only_pending)
     return {"message": "Compras encontradas.", "purchases": purchases}
 
-@router.get("/{purchase_id}")
+@router.get("/{purchase_id}", response_model=PurchaseResponseSchema)
 @handle_service_exceptions
 def read_purchase(purchase_id: int):
     """Get purchase by ID."""
     purchase = get_purchase_by_id(purchase_id)
-    return purchase.__dict__
+    return purchase
 
 @router.get("/by-note/{note_number}")
 @handle_service_exceptions

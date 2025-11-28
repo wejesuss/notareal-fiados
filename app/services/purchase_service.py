@@ -8,7 +8,7 @@ from app.utils.exceptions import (
     error_messages
 )
 
-def get_purchase_by_id(purchase_id: int) -> Purchase | None:
+def get_purchase_by_id(purchase_id: int) -> Purchase:
     purchase = purchase_repository.get_purchase_by_id(purchase_id)
     if not purchase:
         raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
