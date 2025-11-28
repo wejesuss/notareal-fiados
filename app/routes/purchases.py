@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from app.services.purchase_service import (
     get_purchase_by_id,
     get_purchase_by_note_number,
@@ -10,19 +10,23 @@ from app.services.purchase_service import (
 )
 from app.routes.payments import router as payment_router
 from app.utils.exceptions import handle_service_exceptions
+from app.schemas.purchase import (
+    PurchaseListQuerySchema,
+    PurchaseListResponseSchema,
+)
 
 router = APIRouter(prefix="/purchases", tags=["Purchases"])
 
-@router.get("/")
+@router.get("/", response_model=PurchaseListResponseSchema)
 @handle_service_exceptions
-def list_purchases(limit: int = None, offset: int = 0, only_pending: bool | None = None):
+def list_purchases(params: PurchaseListQuerySchema = Depends()):
     """List all purchases."""
+    limit = params.limit
+    offset = params.offset
+    only_pending = params.only_pending
+
     purchases = get_purchases(limit, offset, only_pending)
-    if not purchases:
-        return {"message": "Compras não encontradas.", "purchases": []}
-    
-    purchases_data = [p.__dict__ for p in purchases]
-    return {"message": "Compras encontradas.", "purchases": purchases_data}
+    return {"message": "Compras encontradas.", "purchases": purchases}
 
 @router.get("/{purchase_id}")
 @handle_service_exceptions

@@ -47,3 +47,10 @@ class PurchaseResponseSchema(BaseModel):
 class PurchaseListResponseSchema(BaseModel):
     message: str
     purchases: List[PurchaseResponseSchema]
+
+
+# ===== LISTING =====
+class PurchaseListQuerySchema(BaseModel):
+    limit: int | None = Field(default=None, ge=1, description="Número máximo de compras na listagem")
+    offset: int = Field(default=0, ge=0, description="Número de compras para ignorar antes da listagem")
+    only_pending: bool | None = Field(default=None, description="Filtrar somente compras ativas não quitadas. Se nulo, busca compras já desativadas.")
