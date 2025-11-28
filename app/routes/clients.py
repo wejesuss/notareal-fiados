@@ -60,7 +60,7 @@ def remove_client(client_id: int):
     success = deactivate_client(client_id)
     if not success:
         raise HTTPException(status_code=404, detail="Cliente não encontrado ou já desativado.")
-    return {"message": "Cliente removido com sucesso."}
+    return {"message": "Cliente removido com sucesso.", "client": None}
 
 # Purchase related routes
 @router.get("/{client_id}/purchases", response_model=PurchaseListResponseSchema)
