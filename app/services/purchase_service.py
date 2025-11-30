@@ -88,6 +88,10 @@ def create_purchase(client_id: int, data: dict) -> Purchase:
     return purchase
 
 def update_purchase(purchase_id: int, data: dict) -> Purchase:
+    total_value = data.get("total_value")
+    if total_value is not None and total_value <= 0:
+        raise ValidationError(error_messages.PURCHASE_INVALID_TOTAL)
+
     purchase_exists = purchase_repository.get_purchase_by_id(purchase_id)
     if not purchase_exists:
         raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
