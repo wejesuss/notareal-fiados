@@ -3,15 +3,6 @@ from pydantic import field_validator
 from app.utils.helpers import is_valid_name
 from app.utils.exceptions import error_messages
 
-class AmountValidatorMixin:
-    @field_validator("amount", mode="after")
-    def validate_amount(cls, value):
-        if value is None:
-            return value
-        if value <= 0:
-            raise ValueError(error_messages.PAYMENT_INVALID_AMOUNT)
-        return value
-
 class NameValidatorMixin:
     @field_validator("name", mode="after")
     def validate_name(cls, v):

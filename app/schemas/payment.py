@@ -1,10 +1,9 @@
 from datetime import datetime
-from pydantic import BaseModel, Field, field_validator
-from app.schemas.mixins import AmountValidatorMixin
+from pydantic import BaseModel, Field
 from app.utils.exceptions import (ValidationError, error_messages)
 
 # ===== Base =====
-class PaymentBase(AmountValidatorMixin, BaseModel):
+class PaymentBase(BaseModel):
     amount: float = Field(..., example=60.00)
     payment_date: int | None = Field(None, example=1700000000)  # timestamp
     method: str = Field(..., example="pix")
@@ -18,7 +17,7 @@ class PaymentCreateSchema(PaymentBase):
 
 
 # ===== UPDATE =====
-class PaymentUpdateSchema(AmountValidatorMixin, BaseModel):
+class PaymentUpdateSchema(BaseModel):
     amount: float | None = None
     payment_date: int | None = None
     method: str | None = None
