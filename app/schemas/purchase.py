@@ -15,6 +15,7 @@ class PurchaseBase(BaseModel):
     payment_description: str | None = Field(None, example="Pagamento adiantado")
     receipt_number: str | None = Field(None, example="REC-0001")
 
+    model_config = dict(extra="ignore")
 
 # ===== CREATE =====
 class PurchaseCreateSchema(PurchaseBase):
