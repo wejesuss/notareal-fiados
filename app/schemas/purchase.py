@@ -12,7 +12,7 @@ class PurchaseBase(BaseModel):
     amount: float | None = Field(None, example=50.00)
     payment_date: int | None = Field(None, example=1700000000)  # timestamp
     method: str | None = Field(None, example="pix")
-    payment_description: str | None = Field(None)
+    payment_description: str | None = Field(None, example="Pagamento adiantado")
     receipt_number: str | None = Field(None, example="REC-0001")
 
 
