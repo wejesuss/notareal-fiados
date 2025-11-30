@@ -105,12 +105,13 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase:
         raise ValidationError(error_messages.DATA_FIELDS_EMPTY)
 
     purchase = purchase_repository.update_purchase(purchase_id, validated_data)
+
     # Recalculate totals if relevant fields changed
     relevant_fields_changed = "total_value" in data or "client_id" in data
     if relevant_fields_changed:
-        return recalculate_purchase_totals(purchase_id)
+        purchase = recalculate_purchase_totals(purchase_id)
 
-    return purchase
+    return purchase if purchase else purchase_exists
 
 def activate_purchase(purchase_id: int, data: dict) -> Purchase:
     purchase_exists = purchase_repository.get_purchase_by_id(purchase_id)
