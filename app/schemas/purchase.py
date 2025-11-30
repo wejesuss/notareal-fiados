@@ -43,6 +43,10 @@ class PurchaseResponseSchema(BaseModel):
 
     model_config = dict(from_attributes = True)
 
+class PurchaseWithMessageResponseSchema(BaseModel):
+    message: str
+    purchase: PurchaseResponseSchema
+
 class PurchaseListResponseSchema(BaseModel):
     message: str
     purchases: List[PurchaseResponseSchema]

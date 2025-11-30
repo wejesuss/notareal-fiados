@@ -14,6 +14,8 @@ from app.schemas.purchase import (
     PurchaseListResponseSchema,
     PurchaseListQuerySchema,
     PurchaseResponseSchema,
+    PurchaseWithMessageResponseSchema,
+    PurchaseCreateSchema,
 )
 
 router = APIRouter(prefix="/purchases", tags=["Purchases"])
@@ -43,18 +45,17 @@ def read_purchase_by_note(note_number: str):
     purchase = get_purchase_by_note_number(note_number)
     return purchase
 
-@router.post("/{client_id}")
+@router.post("/{client_id}", response_model=PurchaseWithMessageResponseSchema)
 @handle_service_exceptions
-def add_purchase(client_id: int, data: dict):
+def add_purchase(client_id: int, data: PurchaseCreateSchema):
     """Add new purchase."""
-    if not client_id:
+    data: dict = data.model_dump()
+
+    if not client_id or client_id < 1:
         raise HTTPException(status_code=400, detail="Não é possível criar uma compra sem um cliente associado (client_id).")
 
-    if data.get("status") or data.get("client_id"):
-        raise HTTPException(status_code=400, detail="Chamada inválida, campos (status ou client_id) não são esperados.")
-
     purchase = create_purchase(client_id, data)
-    return {"message": "Compra criada com sucesso.", "purchase": purchase.__dict__}
+    return {"message": "Compra criada com sucesso.", "purchase": purchase}
 
 @router.put("/{purchase_id}")
 @handle_service_exceptions
