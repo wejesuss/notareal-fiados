@@ -36,7 +36,7 @@ class PurchaseResponseSchema(BaseModel):
     total_value: float
     total_paid_value: float
     status: str
-    note_number: str
+    note_number: str | None
     is_active: int
     created_at: datetime
     updated_at: datetime
