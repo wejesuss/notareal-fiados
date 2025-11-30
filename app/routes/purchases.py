@@ -16,6 +16,7 @@ from app.schemas.purchase import (
     PurchaseResponseSchema,
     PurchaseWithMessageResponseSchema,
     PurchaseCreateSchema,
+    PurchaseUpdateSchema
 )
 
 router = APIRouter(prefix="/purchases", tags=["Purchases"])
@@ -57,12 +58,12 @@ def add_purchase(client_id: int, data: PurchaseCreateSchema):
     purchase = create_purchase(client_id, data)
     return {"message": "Compra criada com sucesso.", "purchase": purchase}
 
-@router.put("/{purchase_id}")
+@router.put("/{purchase_id}", response_model=PurchaseWithMessageResponseSchema)
 @handle_service_exceptions
-def edit_purchase(purchase_id: int, data: dict):
+def edit_purchase(purchase_id: int, data: PurchaseUpdateSchema):
     """Update purchase."""
-    purchase = update_purchase(purchase_id, data)
-    return {"message": "Compra atualizada.", "purchase": purchase.__dict__}
+    purchase = update_purchase(purchase_id, data.model_dump(exclude_none=True))
+    return {"message": "Compra atualizada.", "purchase": purchase}
 
 @router.put("/{purchase_id}/restore")
 @handle_service_exceptions

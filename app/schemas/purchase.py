@@ -24,9 +24,25 @@ class PurchaseCreateSchema(PurchaseBase):
 
 # ===== UPDATE =====
 class PurchaseUpdateSchema(BaseModel):
-    description: str | None = None
-    total_value: float | None = None
-    client_id: int | None = None
+    description: str | None = Field(
+        None,
+        example="Compra de produtos agrícolas",
+        description="Descrição da compra."
+    )
+    total_value: float | None = Field(
+        None,
+        example=150.75,
+        gt=0,
+        description="Valor total da compra. Deve ser maior que zero."
+    )
+    client_id: int | None = Field(
+        None,
+        ge=1,
+        strict=True,
+        description="ID do cliente associado. Deve ser um inteiro estrito."
+    )
+
+    model_config = dict(extra="ignore")
 
 
 # ===== RESPONSE =====
