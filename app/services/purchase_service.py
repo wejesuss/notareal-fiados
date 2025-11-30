@@ -1,10 +1,11 @@
+from builtins import isinstance
 from typing import List
 from datetime import datetime
 from app.models import (Purchase, Payment)
 from app.services import payment_service
 from app.repositories import (purchase_repository)
 from app.utils.exceptions import (
-    BusinessRuleError, NotFoundError, ValidationError,
+    BusinessRuleError, NotFoundError, ValidationError, BaseClassError,
     error_messages
 )
 
@@ -74,9 +75,15 @@ def create_purchase(client_id: int, data: dict) -> Purchase:
 
         try:
             payment_service.create_payment(payment_data)
-        except Exception:
+        except Exception as e:
             purchase_repository.deactivate_purchase(purchase.id)
-            raise BusinessRuleError(error_messages.PAYMENT_PURCHASE_CREATION_FAILED)
+            error = error_messages.PAYMENT_PURCHASE_CREATION_FAILED
+
+            if isinstance(e, BaseClassError):
+                merged_error = error + " " + str(e)
+                raise BusinessRuleError(merged_error) from e
+            else:
+                raise BusinessRuleError(error) from e
 
     return purchase
 
