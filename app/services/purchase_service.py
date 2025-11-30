@@ -88,10 +88,6 @@ def create_purchase(client_id: int, data: dict) -> Purchase:
     return purchase
 
 def update_purchase(purchase_id: int, data: dict) -> Purchase:
-    # validate is_active, only allowing deactivation from the correct route
-    if "is_active" in data:
-        raise ValidationError(error_messages.PURCHASE_INVALID_ACTIVATION_ROUTE)
-
     purchase_exists = purchase_repository.get_purchase_by_id(purchase_id)
     if not purchase_exists:
         raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
