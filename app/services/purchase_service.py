@@ -114,14 +114,16 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase:
     return purchase if purchase else purchase_exists
 
 def activate_purchase(purchase_id: int, data: dict) -> Purchase:
-    purchase_exists = purchase_repository.get_purchase_by_id(purchase_id)
-    if not purchase_exists:
+    original = purchase_repository.get_purchase_by_id(purchase_id)
+    if not original:
         raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
+    if original.is_active:
+        raise BusinessRuleError(error_messages.PURCHASE_INVALID_ACTIVATION)
 
     purchase_repository.update_purchase(purchase_id, data)
     purchase = recalculate_purchase_totals(purchase_id)
 
-    return purchase
+    return purchase or original
 
 def deactivate_purchase(purchase_id: int) -> bool:
     """Deactivate a purchase."""

@@ -65,12 +65,12 @@ def edit_purchase(purchase_id: int, data: PurchaseUpdateSchema):
     purchase = update_purchase(purchase_id, data.model_dump(exclude_none=True))
     return {"message": "Compra atualizada.", "purchase": purchase}
 
-@router.put("/{purchase_id}/restore")
+@router.put("/{purchase_id}/restore", response_model=PurchaseWithMessageResponseSchema)
 @handle_service_exceptions
 def restore_purchase(purchase_id: int):
     """Activate purchase changing is_active field. Related payments remain unchanged, but totals are recalculated."""
     purchase = activate_purchase(purchase_id, {"is_active": 1})
-    return {"message": "Compra atualizada.", "purchase": purchase.__dict__}
+    return {"message": "Compra atualizada.", "purchase": purchase}
 
 @router.delete("/{purchase_id}")
 @handle_service_exceptions
