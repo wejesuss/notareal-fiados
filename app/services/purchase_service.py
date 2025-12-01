@@ -88,6 +88,9 @@ def create_purchase(client_id: int, data: dict) -> Purchase:
     return purchase
 
 def update_purchase(purchase_id: int, data: dict) -> Purchase:
+    if "is_active" in data:
+        raise ValidationError(error_messages.PURCHASE_INVALID_ACTIVATION_ROUTE)
+
     total_value = data.get("total_value")
     if total_value is not None and total_value <= 0:
         raise ValidationError(error_messages.PURCHASE_INVALID_TOTAL)
