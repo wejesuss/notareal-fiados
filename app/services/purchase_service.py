@@ -125,7 +125,7 @@ def activate_purchase(purchase_id: int, data: dict) -> Purchase:
 
     return purchase or original
 
-def deactivate_purchase(purchase_id: int) -> bool:
+def deactivate_purchase(purchase_id: int) -> Purchase:
     """Deactivate a purchase."""
     purchase = purchase_repository.get_purchase_by_id(purchase_id)
     if not purchase:
@@ -136,9 +136,11 @@ def deactivate_purchase(purchase_id: int) -> bool:
     success = purchase_repository.deactivate_purchase(purchase_id)
     if success:
         payment_service.deactivate_payments_by_purchase(purchase_id)
-        recalculate_purchase_totals(purchase_id)
+        purchase = recalculate_purchase_totals(purchase_id)
+    else:
+        raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
     
-    return success
+    return purchase
 
 # Client related services (business logic)
 def get_purchases_by_client(client_id: int, only_active: bool = True) -> List[Purchase]:
