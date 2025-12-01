@@ -137,12 +137,12 @@ def deactivate_purchase(purchase_id: int) -> Purchase:
         raise BusinessRuleError(error_messages.PURCHASE_INVALID_DEACTIVATION)
 
     success = purchase_repository.deactivate_purchase(purchase_id)
-    if success:
-        payment_service.deactivate_payments_by_purchase(purchase_id)
-        purchase = recalculate_purchase_totals(purchase_id)
-    else:
+    if not success:
         raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
-    
+
+    payment_service.deactivate_payments_by_purchase(purchase_id)
+    purchase = recalculate_purchase_totals(purchase_id)
+
     return purchase
 
 # Client related services (business logic)
