@@ -114,7 +114,7 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase:
     if relevant_fields_changed:
         purchase = recalculate_purchase_totals(purchase_id)
 
-    return purchase or original
+    return purchase
 
 def activate_purchase(purchase_id: int, data: dict) -> Purchase:
     original = purchase_repository.get_purchase_by_id(purchase_id)
