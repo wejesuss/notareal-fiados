@@ -126,7 +126,7 @@ def activate_purchase(purchase_id: int, data: dict) -> Purchase:
     purchase_repository.update_purchase(purchase_id, data)
     purchase = recalculate_purchase_totals(purchase_id)
 
-    return purchase or original
+    return purchase
 
 def deactivate_purchase(purchase_id: int) -> Purchase:
     """Deactivate a purchase."""
@@ -253,13 +253,22 @@ def compute_purchase_totals(purchase: Purchase, payments: list[Payment]):
         "status": new_status
     }
 
-def recalculate_purchase_totals(purchase_id: int) -> Purchase | None:
-    """Recalculate purchase total_paid_value and status based on active payments."""
+def recalculate_purchase_totals(purchase_id: int) -> Purchase:
+    """
+    Recalculate purchase total_paid_value and status based on active payments.
+
+    Returns:
+        Purchase: The updated Puchase after recalculation
+
+    Raises:
+        NotFoundError: If Purchase is not found.
+    """
     purchase = purchase_repository.get_purchase_by_id(purchase_id)
-    if not purchase or not purchase.is_active:
-        return None
+    if not purchase:
+        raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
 
     payments = payment_service.get_payments(limit = None, offset = 0, purchase_id = purchase_id)
     updates = compute_purchase_totals(purchase, payments)
 
-    return purchase_repository.update_purchase(purchase_id, updates)
+    updated = purchase_repository.update_purchase(purchase_id, updates)
+    return updated or purchase
