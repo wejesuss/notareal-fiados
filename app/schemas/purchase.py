@@ -62,7 +62,7 @@ class PurchaseResponseSchema(BaseModel):
 
 class PurchaseWithMessageResponseSchema(BaseModel):
     message: str
-    purchase: PurchaseResponseSchema
+    purchase: PurchaseResponseSchema | None = None
 
 class PurchaseListResponseSchema(BaseModel):
     message: str

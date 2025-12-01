@@ -12,6 +12,7 @@ PURCHASE_INVALID_STATUS = "Status inválido. Use 'pending', 'partial' ou 'paid'.
 PURCHASE_CLIENT_NOT_FOUND = "Um cliente com esse id não existe."
 PURCHASE_INVALID_ACTIVATION_ROUTE = "Chamada inválida. Utilize a rota correta para a ativação ou desativação da compra."
 PURCHASE_INVALID_ACTIVATION = "Compra já está ativa."
+PURCHASE_INVALID_DEACTIVATION = "Compra já está desativada."
 
 # === Payments ===
 PAYMENT_NOT_FOUND = "Pagamento não encontrado."

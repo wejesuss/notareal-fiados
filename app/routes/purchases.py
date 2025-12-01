@@ -72,14 +72,14 @@ def restore_purchase(purchase_id: int):
     purchase = activate_purchase(purchase_id, {"is_active": 1})
     return {"message": "Compra atualizada.", "purchase": purchase}
 
-@router.delete("/{purchase_id}")
+@router.delete("/{purchase_id}", response_model=PurchaseWithMessageResponseSchema, response_model_exclude_none=True)
 @handle_service_exceptions
 def remove_purchase(purchase_id: int):
     """Delete purchase (soft delete)."""
     success = deactivate_purchase(purchase_id)
     if not success:
         raise HTTPException(status_code=404, detail="Compra não encontrada.")
-    return {"message": "Compra removida com sucesso."}
+    return {"message": "Compra removida com sucesso.", "purchase": None}
 
 # Include payment related routes
 router.include_router(payment_router)

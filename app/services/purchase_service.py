@@ -130,6 +130,8 @@ def deactivate_purchase(purchase_id: int) -> bool:
     purchase = purchase_repository.get_purchase_by_id(purchase_id)
     if not purchase:
         raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
+    if not purchase.is_active:
+        raise BusinessRuleError(error_messages.PURCHASE_INVALID_DEACTIVATION)
 
     success = purchase_repository.deactivate_purchase(purchase_id)
     if success:
