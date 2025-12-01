@@ -92,8 +92,8 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase:
     if total_value is not None and total_value <= 0:
         raise ValidationError(error_messages.PURCHASE_INVALID_TOTAL)
 
-    purchase_exists = purchase_repository.get_purchase_by_id(purchase_id)
-    if not purchase_exists:
+    original = purchase_repository.get_purchase_by_id(purchase_id)
+    if not original:
         raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
 
     # fields that are allowed to be updated
@@ -111,7 +111,7 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase:
     if relevant_fields_changed:
         purchase = recalculate_purchase_totals(purchase_id)
 
-    return purchase if purchase else purchase_exists
+    return purchase or original
 
 def activate_purchase(purchase_id: int, data: dict) -> Purchase:
     original = purchase_repository.get_purchase_by_id(purchase_id)
