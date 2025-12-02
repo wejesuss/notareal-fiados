@@ -10,7 +10,9 @@ from app.services.purchase_service import (
 from app.utils.exceptions import handle_service_exceptions
 from app.schemas.payment import (
     PaymentListResponseSchema,
-    PaymentListQuerySchema
+    PaymentListQuerySchema,
+    PaymentWithMessageResponseSchema,
+    PaymentCreateSchema,
 )
 
 router = APIRouter(prefix="/{purchase_id}/payments", tags=["Payments"])
@@ -25,12 +27,12 @@ def list_payments_for_purchase(purchase_id: int, params: PaymentListQuerySchema 
     payments = get_payments_for_purchase(purchase_id, limit, offset)
     return {"message": "Pagamentos encontrados.", "payments": payments}
 
-@router.post("/")
+@router.post("/", response_model=PaymentWithMessageResponseSchema)
 @handle_service_exceptions
-def add_payment(purchase_id: int, data: dict):
+def add_payment(purchase_id: int, data: PaymentCreateSchema):
     """Create a new payment for a specific purchase."""
-    payment = create_payment(purchase_id, data)
-    return {"message": "Pagamento criado com sucesso.", "payment": payment.__dict__}
+    payment = create_payment(purchase_id, data.model_dump())
+    return {"message": "Pagamento criado com sucesso.", "payment": payment}
 
 @router.put("/{payment_id}")
 @handle_service_exceptions

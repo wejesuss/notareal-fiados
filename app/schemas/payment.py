@@ -14,8 +14,7 @@ class PaymentBase(BaseModel):
 
 # ===== CREATE =====
 class PaymentCreateSchema(PaymentBase):
-    purchase_id: int | None = None  # filled by route/service
-
+    pass
 
 # ===== UPDATE =====
 class PaymentUpdateSchema(BaseModel):
@@ -39,6 +38,10 @@ class PaymentResponseSchema(BaseModel):
     updated_at: datetime | None
 
     model_config = dict(from_attributes = True)
+
+class PaymentWithMessageResponseSchema(BaseModel):
+    message: str
+    payment: PaymentResponseSchema
 
 class PaymentListResponseSchema(BaseModel):
     message: str
