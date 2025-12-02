@@ -20,10 +20,12 @@ def get_payment_by_id(payment_id: int) -> Payment | None:
 
 def create_payment(data: dict) -> Payment:
     """Create a new payment record."""
-    # Validate fields, method, note_number etc.
-    amount = data.get("amount")
-    if amount is None or float(amount) <= 0:
-        raise ValidationError(error_messages.PAYMENT_INVALID_AMOUNT)
+    try:
+        amount = data.get("amount")
+        if amount is None or float(amount) <= 0:
+            raise ValidationError(error_messages.PAYMENT_INVALID_AMOUNT)
+    except ValueError:
+        raise ValidationError(error_messages.RESOURCE_CREATION_VALUE_ERROR)
 
     return payment_repository.insert_payment(data)
 
