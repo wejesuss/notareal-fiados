@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from app.services.purchase_service import (
     get_payments_for_purchase,
     get_payment_by_id,
@@ -8,18 +8,22 @@ from app.services.purchase_service import (
     deactivate_payment
 )
 from app.utils.exceptions import handle_service_exceptions
+from app.schemas.payment import (
+    PaymentListResponseSchema,
+    PaymentListQuerySchema
+)
 
 router = APIRouter(prefix="/{purchase_id}/payments", tags=["Payments"])
 
-@router.get("/")
+@router.get("/", response_model=PaymentListResponseSchema)
 @handle_service_exceptions
-def list_payments_for_purchase(purchase_id: int, limit: int = None, offset: int = 0):
+def list_payments_for_purchase(purchase_id: int, params: PaymentListQuerySchema = Depends()):
     """List all payments for a specific purchase."""
-    payments = get_payments_for_purchase(purchase_id, limit, offset)
-    if not payments:
-        return {"message": "Nenhum pagamento encontrado para esta compra.", "payments": []}
+    limit = params.limit
+    offset = params.offset
 
-    return {"message": "Pagamentos encontrados.", "payments": [p.__dict__ for p in payments]}
+    payments = get_payments_for_purchase(purchase_id, limit, offset)
+    return {"message": "Pagamentos encontrados.", "payments": payments}
 
 @router.post("/")
 @handle_service_exceptions
