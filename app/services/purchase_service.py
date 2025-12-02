@@ -171,6 +171,17 @@ def deactivate_purchases_by_client(client_id: int) -> None:
 # Payment related services (business logic)
 def get_payments_for_purchase(purchase_id: int, limit: int = None, offset: int = 0) -> List[Payment]:
     """List payments for a specific purchase."""
+    # Special case: purchase_id = 0 -> returns all active payments
+    if purchase_id == 0:
+        return payment_service.get_payments(limit, offset, purchase_id=0)
+
+    if purchase_id < 0:
+        raise ValidationError(error_messages.FOREIGN_KEY_ERROR)
+
+    purchase = purchase_repository.get_purchase_by_id(purchase_id)
+    if not purchase:
+        raise NotFoundError(error_messages.PAYMENT_PURCHASE_NOT_FOUND)
+
     return payment_service.get_payments(limit, offset, purchase_id)
 
 def get_payment_by_id(payment_id: int) -> Payment | None:

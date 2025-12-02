@@ -26,6 +26,6 @@ PAYMENT_PURCHASE_CREATION_FAILED = "Não foi possível criar o pagamento junto c
 
 # === Database / Generic ===
 DATABASE_ERROR = "Erro inesperado no banco de dados."
-FOREIGN_KEY_ERROR = "Uma referência estrangeira não existe."
+FOREIGN_KEY_ERROR = "Uma referência estrangeira não existe. Utilize um ID correto."
 DATA_FIELDS_EMPTY = "Nenhum campo válido fornecido para a atualização do recurso."
 RESOURCE_CREATION_VALUE_ERROR = "Campos fornecidos para a criação ou atualização possuem valores inválidos ou do tipo incorreto."
