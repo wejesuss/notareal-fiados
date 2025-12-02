@@ -18,7 +18,7 @@ class ClientBase(NameValidatorMixin, NicknameValidatorMixin, PhoneValidatorMixin
 
 # ===== CREATE =====
 class ClientCreateSchema(ClientBase):
-    name: str # required for creation
+    name: str = Field(..., example="João da Silva", min_length=2, max_length=40) # required for creation
 
 
 # ===== UPDATE =====
