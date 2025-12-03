@@ -149,7 +149,7 @@ def deactivate_purchase(purchase_id: int) -> Purchase:
 def get_purchases_by_client(client_id: int, only_active: bool = True) -> List[Purchase]:
     return purchase_repository.get_purchases_by_client_id(client_id, only_active)
 
-def deactivate_purchases_by_client(client_id: int) -> None:
+def deactivate_purchases_by_client(client_id: int) -> bool:
     """Deactivate all purchases (and related payments) for a given client."""
     # get purchases ids related to that client
     purchases_ids = purchase_repository.get_purchases_ids_by_client_id(client_id)
