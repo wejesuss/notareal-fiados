@@ -31,6 +31,10 @@ def create_payment(data: dict) -> Payment:
 
 def update_payment(payment_id: int, data: dict) -> Payment | None:
     """Update payment for allowed payment fields (amount, payment_date, method, description)"""
+    # validate is_active, only allowing (de)activation from the correct route
+    if "is_active" in data:
+        raise ValidationError(error_messages.PAYMENT_INVALID_ACTIVATION_ROUTE)
+
     # fields that are allowed to be updated
     allowed_fields = ["amount", "payment_date", "method", "description"]
 
@@ -38,10 +42,6 @@ def update_payment(payment_id: int, data: dict) -> Payment | None:
     validated_data = {k: v for k, v in data.items() if k in allowed_fields}
     if not validated_data:
         raise ValidationError(error_messages.DATA_FIELDS_EMPTY)
-
-    # validate is_active, only allowing deactivation from the correct route
-    if validated_data.get("is_active") == 0:
-        raise ValidationError(error_messages.PAYMENT_INVALID_ACTIVATION_ROUTE)
 
     # Validate amount
     if "amount" in validated_data:
