@@ -13,6 +13,7 @@ from app.schemas.payment import (
     PaymentListQuerySchema,
     PaymentWithMessageResponseSchema,
     PaymentCreateSchema,
+    PaymentUpdateSchema
 )
 
 router = APIRouter(prefix="/{purchase_id}/payments", tags=["Payments"])
@@ -34,14 +35,12 @@ def add_payment(purchase_id: int, data: PaymentCreateSchema):
     payment = create_payment(purchase_id, data.model_dump())
     return {"message": "Pagamento criado com sucesso.", "payment": payment}
 
-@router.put("/{payment_id}")
+@router.put("/{payment_id}", response_model=PaymentWithMessageResponseSchema)
 @handle_service_exceptions
-def edit_payment(purchase_id: int, payment_id: int, data: dict):
+def edit_payment(purchase_id: int, payment_id: int, data: PaymentUpdateSchema):
     """Edit allowed fields of a payment (amount, method, description, payment_date)."""
-    updated = update_payment(purchase_id, payment_id, data)
-    if not updated:
-        raise HTTPException(status_code=400, detail="Nada foi atualizado.")
-    return {"message": "Pagamento atualizado com sucesso.", "payment": updated.__dict__}
+    updated = update_payment(purchase_id, payment_id, data.model_dump(exclude_none=True))
+    return {"message": "Pagamento atualizado com sucesso.", "payment": updated}
 
 @router.put("/{payment_id}/restore")
 @handle_service_exceptions
