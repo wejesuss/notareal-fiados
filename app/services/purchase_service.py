@@ -199,7 +199,7 @@ def create_payment(purchase_id: int, data: dict) -> Payment:
 
     return payment
 
-def update_payment(purchase_id: int, payment_id: int, data: dict) -> Payment | None:
+def update_payment(purchase_id: int, payment_id: int, data: dict) -> Payment:
     """Update a payment and recalculate the related purchase totals."""
     payment = payment_service.get_payment_by_id(payment_id)
     if not payment:
@@ -212,7 +212,7 @@ def update_payment(purchase_id: int, payment_id: int, data: dict) -> Payment | N
     if updated:
         recalculate_purchase_totals(purchase_id)
 
-    return updated
+    return updated or payment
 
 def activate_payment(purchase_id: int, payment_id: int, data: dict) -> Payment | None:
     """Activate a payment that belongs to the given purchase and update totals."""
