@@ -23,6 +23,7 @@ PAYMENT_NOT_LINKED = "Pagamento não pertence à compra especificada."
 PAYMENT_ALREADY_DISABLED = "Pagamento já desativado."
 PAYMENT_CREATION_FAILED = "Não é possível adicionar pagamento a uma compra desativada."
 PAYMENT_PURCHASE_CREATION_FAILED = "Não foi possível criar o pagamento junto com a compra."
+PAYMENT_INVALID_ACTIVATION_ROUTE = "Chamada inválida. Utilize a rota correta para a ativação ou desativação do pagamento."
 
 # === Database / Generic ===
 DATABASE_ERROR = "Erro inesperado no banco de dados."

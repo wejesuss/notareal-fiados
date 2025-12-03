@@ -41,7 +41,7 @@ def update_payment(payment_id: int, data: dict) -> Payment | None:
 
     # validate is_active, only allowing deactivation from the correct route
     if validated_data.get("is_active") == 0:
-        raise ValidationError(error_messages.PURCHASE_INVALID_ACTIVATION_ROUTE)
+        raise ValidationError(error_messages.PAYMENT_INVALID_ACTIVATION_ROUTE)
 
     # Validate amount
     if "amount" in validated_data:
