@@ -209,7 +209,7 @@ def update_payment(purchase_id: int, payment_id: int, data: dict) -> Payment:
         raise BusinessRuleError(error_messages.PAYMENT_NOT_LINKED)
 
     updated = payment_service.update_payment(payment_id, data)
-    if updated:
+    if updated and "amount" in data:
         recalculate_purchase_totals(purchase_id)
 
     return updated or payment
