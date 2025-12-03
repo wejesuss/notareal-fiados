@@ -6,9 +6,9 @@ from app.utils.exceptions import (ValidationError, error_messages)
 # ===== Base =====
 class PaymentBase(BaseModel):
     amount: float = Field(..., example=60.00)
-    payment_date: int | None = Field(None, example=1700000000)  # timestamp
+    payment_date: int | None = Field(None, example=1764793214)  # timestamp
     method: str = Field(..., example="pix")
-    description: str | None = Field(None)
+    description: str | None = Field(None, example="Pagamento adicional")
     receipt_number: str | None = Field(None, example="REC-0003")
 
 
@@ -18,10 +18,10 @@ class PaymentCreateSchema(PaymentBase):
 
 # ===== UPDATE =====
 class PaymentUpdateSchema(BaseModel):
-    amount: float | None = None
-    payment_date: int | None = None
-    method: str | None = None
-    description: str | None = None
+    amount: float | None = Field(None, example=30.00)
+    payment_date: int | None =  Field(None, example=1764793214)  # timestamp
+    method: str | None = Field(None, example="pix")
+    description: str | None = Field(None, example="Pagamento adicional")
 
 
 # ===== RESPONSE =====
