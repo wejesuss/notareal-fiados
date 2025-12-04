@@ -59,9 +59,13 @@ def activate_payment(payment_id: int, data: dict) -> Payment:
     """Activate payment for the given ID"""
     return payment_repository.update_payment(payment_id, data)
 
-def deactivate_payment(payment_id: int) -> bool:
+def deactivate_payment(payment_id: int) -> Payment | None:
     """Deactivate (soft delete) a payment."""
-    return payment_repository.deactivate_payment(payment_id)
+    success = payment_repository.deactivate_payment(payment_id)
+    if success:
+        return get_payment_by_id(payment_id)
+
+    return None
 
 def deactivate_payments_by_purchase(purchase_id: int):
     """Deactivate all payments for a given purchase."""

@@ -234,20 +234,19 @@ def activate_payment(purchase_id: int, payment_id: int, data: dict) -> Payment:
 
     return payment
 
-def deactivate_payment(purchase_id: int, payment_id: int) -> bool:
+def deactivate_payment(purchase_id: int, payment_id: int) -> Payment:
     """Deactivate a payment that belongs to the given purchase and update totals."""
     payment = payment_service.get_payment_by_id(payment_id)
-    
     if not payment:
-        return False
+        raise NotFoundError(error_messages.PAYMENT_NOT_FOUND)
     if payment.purchase_id != purchase_id:
-        raise ValueError("O identificador da compra é diferente do identificador do pagamento associado a ela.")
-    
-    success = payment_service.deactivate_payment(payment_id)
-    if success:
-        recalculate_purchase_totals(purchase_id)
-    
-    return success
+        raise BusinessRuleError(error_messages.PAYMENT_NOT_LINKED)
+    payment = payment_service.deactivate_payment(payment_id)
+    if not payment:
+        raise NotFoundError(error_messages.PAYMENT_NOT_FOUND)
+
+    recalculate_purchase_totals(purchase_id)
+    return payment
 
 def compute_purchase_totals(purchase: Purchase, payments: list[Payment]):
     """Pure function: given a purchase + payments, returns the recalculated fields."""
