@@ -121,7 +121,7 @@ def activate_purchase(purchase_id: int, data: dict) -> Purchase:
     if not original:
         raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
     if original.is_active:
-        raise BusinessRuleError(error_messages.PURCHASE_INVALID_ACTIVATION)
+        raise BusinessRuleError(error_messages.PURCHASE_ALREADY_ENABLED)
 
     purchase_repository.update_purchase(purchase_id, data)
     purchase = recalculate_purchase_totals(purchase_id)
@@ -134,7 +134,7 @@ def deactivate_purchase(purchase_id: int) -> Purchase:
     if not purchase:
         raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
     if not purchase.is_active:
-        raise BusinessRuleError(error_messages.PURCHASE_INVALID_DEACTIVATION)
+        raise BusinessRuleError(error_messages.PURCHASE_ALREADY_DISABLED)
 
     success = purchase_repository.deactivate_purchase(purchase_id)
     if not success:
