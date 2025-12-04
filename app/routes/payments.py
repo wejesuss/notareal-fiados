@@ -49,11 +49,9 @@ def restore_payment(purchase_id: int, payment_id: int):
     payment = activate_payment(purchase_id, payment_id, {"is_active": 1})
     return {"message": "Pagamento atualizado.", "payment": payment}
 
-@router.delete("/{payment_id}")
+@router.delete("/{payment_id}", response_model=PaymentWithMessageResponseSchema)
 @handle_service_exceptions
 def remove_payment(purchase_id: int, payment_id: int):
     """Deactivate (soft delete) a payment and update related purchase totals."""
-    success = deactivate_payment(purchase_id, payment_id)
-    if not success:
-        raise HTTPException(status_code=404, detail="Pagamento não encontrado ou já desativado.")
-    return {"message": "Pagamento desativado com sucesso."}
+    payment = deactivate_payment(purchase_id, payment_id)
+    return {"message": "Pagamento desativado com sucesso.", "payment": payment}
