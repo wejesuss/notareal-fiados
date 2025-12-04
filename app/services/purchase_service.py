@@ -214,7 +214,7 @@ def update_payment(purchase_id: int, payment_id: int, data: dict) -> Payment:
 
     return updated or payment
 
-def activate_payment(purchase_id: int, payment_id: int, data: dict) -> Payment | None:
+def activate_payment(purchase_id: int, payment_id: int, data: dict) -> Payment:
     """Activate a payment that belongs to the given purchase and update totals."""
     purchase_exists = purchase_repository.get_purchase_by_id(purchase_id)
     if not purchase_exists:
@@ -222,7 +222,7 @@ def activate_payment(purchase_id: int, payment_id: int, data: dict) -> Payment |
 
     payment = payment_service.get_payment_by_id(payment_id)
     if not payment:
-        return None
+        raise NotFoundError(error_messages.PAYMENT_NOT_FOUND)
     if payment.purchase_id != purchase_id:
         raise BusinessRuleError(error_messages.PAYMENT_NOT_LINKED)
 
