@@ -224,9 +224,11 @@ def activate_payment(purchase_id: int, payment_id: int, data: dict) -> Payment:
     if payment.purchase_id != purchase_id:
         raise BusinessRuleError(error_messages.PAYMENT_NOT_LINKED)
 
-    purchase_exists = purchase_repository.get_purchase_by_id(purchase_id)
-    if not purchase_exists:
+    purchase = purchase_repository.get_purchase_by_id(purchase_id)
+    if not purchase:
         raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
+    if not purchase.is_active:
+        raise BusinessRuleError(error_messages.PAYMENT_ACTIVATION_FAILED)
 
     payment = payment_service.activate_payment(payment_id, data)
     if payment:
