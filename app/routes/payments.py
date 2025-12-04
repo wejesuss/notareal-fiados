@@ -42,12 +42,12 @@ def edit_payment(purchase_id: int, payment_id: int, data: PaymentUpdateSchema):
     updated = update_payment(purchase_id, payment_id, data.model_dump(exclude_none=True))
     return {"message": "Pagamento atualizado com sucesso.", "payment": updated}
 
-@router.put("/{payment_id}/restore")
+@router.put("/{payment_id}/restore", response_model=PaymentWithMessageResponseSchema)
 @handle_service_exceptions
 def restore_payment(purchase_id: int, payment_id: int):
     """Activate payment changing is_active field if related purchase is active. Purchase totals are recalculated."""
     payment = activate_payment(purchase_id, payment_id, {"is_active": 1})
-    return {"message": "Pagamento atualizado.", "payment": payment.__dict__}
+    return {"message": "Pagamento atualizado.", "payment": payment}
 
 @router.delete("/{payment_id}")
 @handle_service_exceptions
