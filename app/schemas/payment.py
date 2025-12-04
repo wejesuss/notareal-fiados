@@ -5,23 +5,22 @@ from app.utils.exceptions import (ValidationError, error_messages)
 
 # ===== Base =====
 class PaymentBase(BaseModel):
-    amount: float = Field(..., example=60.00)
+    amount: float | None = Field(None, example=30.00)
     payment_date: int | None = Field(None, example=1764793214)  # timestamp
-    method: str = Field(..., example="pix")
+    method: str | None = Field(None, example="pix")
     description: str | None = Field(None, example="Pagamento adicional")
-    receipt_number: str | None = Field(None, example="REC-0003")
 
 
 # ===== CREATE =====
 class PaymentCreateSchema(PaymentBase):
-    pass
+    amount: float = Field(..., example=60.00)
+    method: str = Field(..., example="pix")
+    receipt_number: str | None = Field(None, example="REC-0003")
+
 
 # ===== UPDATE =====
-class PaymentUpdateSchema(BaseModel):
-    amount: float | None = Field(None, example=30.00)
-    payment_date: int | None =  Field(None, example=1764793214)  # timestamp
-    method: str | None = Field(None, example="pix")
-    description: str | None = Field(None, example="Pagamento adicional")
+class PaymentUpdateSchema(PaymentBase):
+   pass
 
 
 # ===== RESPONSE =====
