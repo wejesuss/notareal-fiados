@@ -219,6 +219,8 @@ def activate_payment(purchase_id: int, payment_id: int, data: dict) -> Payment:
     payment = payment_service.get_payment_by_id(payment_id)
     if not payment:
         raise NotFoundError(error_messages.PAYMENT_NOT_FOUND)
+    if payment.is_active:
+        raise BusinessRuleError(error_messages.PAYMENT_ALREADY_ENABLED)
     if payment.purchase_id != purchase_id:
         raise BusinessRuleError(error_messages.PAYMENT_NOT_LINKED)
 
