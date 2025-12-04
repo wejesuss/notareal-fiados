@@ -216,15 +216,15 @@ def update_payment(purchase_id: int, payment_id: int, data: dict) -> Payment:
 
 def activate_payment(purchase_id: int, payment_id: int, data: dict) -> Payment:
     """Activate a payment that belongs to the given purchase and update totals."""
-    purchase_exists = purchase_repository.get_purchase_by_id(purchase_id)
-    if not purchase_exists:
-        raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
-
     payment = payment_service.get_payment_by_id(payment_id)
     if not payment:
         raise NotFoundError(error_messages.PAYMENT_NOT_FOUND)
     if payment.purchase_id != purchase_id:
         raise BusinessRuleError(error_messages.PAYMENT_NOT_LINKED)
+
+    purchase_exists = purchase_repository.get_purchase_by_id(purchase_id)
+    if not purchase_exists:
+        raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
 
     payment = payment_service.activate_payment(payment_id, data)
     if payment:
