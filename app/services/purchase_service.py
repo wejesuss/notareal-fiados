@@ -243,6 +243,11 @@ def deactivate_payment(purchase_id: int, payment_id: int) -> Payment:
         raise BusinessRuleError(error_messages.PAYMENT_ALREADY_DISABLED)
     if payment.purchase_id != purchase_id:
         raise BusinessRuleError(error_messages.PAYMENT_NOT_LINKED)
+
+    purchase_exists = purchase_repository.get_purchase_by_id(purchase_id)
+    if not purchase_exists:
+        raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
+
     payment = payment_service.deactivate_payment(payment_id)
     if not payment:
         raise NotFoundError(error_messages.PAYMENT_NOT_FOUND)
