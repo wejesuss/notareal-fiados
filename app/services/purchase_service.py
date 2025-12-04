@@ -239,6 +239,8 @@ def deactivate_payment(purchase_id: int, payment_id: int) -> Payment:
     payment = payment_service.get_payment_by_id(payment_id)
     if not payment:
         raise NotFoundError(error_messages.PAYMENT_NOT_FOUND)
+    if not payment.is_active:
+        raise BusinessRuleError(error_messages.PAYMENT_ALREADY_DISABLED)
     if payment.purchase_id != purchase_id:
         raise BusinessRuleError(error_messages.PAYMENT_NOT_LINKED)
     payment = payment_service.deactivate_payment(payment_id)
