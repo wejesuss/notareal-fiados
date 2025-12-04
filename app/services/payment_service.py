@@ -73,6 +73,15 @@ def activate_payment(payment_id: int, data: dict) -> Payment:
 
 def deactivate_payment(payment_id: int) -> Payment | None:
     """Deactivate (soft delete) a payment."""
+    # fields that are allowed to be updated
+    allowed_fields = ["is_active"]
+    validated_data = {k: v for k, v in data.items() if k in allowed_fields}
+    if not validated_data:
+        raise ValidationError(error_messages.DATA_FIELDS_EMPTY)
+
+    if validated_data.get("is_active") != 0:
+        raise ValidationError(error_messages.PAYMENT_INVALID_ACTIVATION_ROUTE)
+
     success = payment_repository.deactivate_payment(payment_id)
     if success:
         return get_payment_by_id(payment_id)
