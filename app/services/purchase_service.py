@@ -224,7 +224,7 @@ def activate_payment(purchase_id: int, payment_id: int, data: dict) -> Payment |
     if not payment:
         return None
     if payment.purchase_id != purchase_id:
-        raise ValidationError(error_messages.PAYMENT_NOT_LINKED)
+        raise BusinessRuleError(error_messages.PAYMENT_NOT_LINKED)
 
     payment = payment_service.activate_payment(payment_id, data)
     if payment:
