@@ -214,7 +214,7 @@ def update_payment(purchase_id: int, payment_id: int, data: dict) -> Payment:
 
     return updated or payment
 
-def activate_payment(purchase_id: int, payment_id: int, data: dict) -> Payment:
+def activate_payment(purchase_id: int, payment_id: int) -> Payment:
     """Activate a payment that belongs to the given purchase and update totals."""
     payment = payment_service.get_payment_by_id(payment_id)
     if not payment:
@@ -230,7 +230,7 @@ def activate_payment(purchase_id: int, payment_id: int, data: dict) -> Payment:
     if not purchase.is_active:
         raise BusinessRuleError(error_messages.PAYMENT_ACTIVATION_FAILED)
 
-    payment = payment_service.activate_payment(payment_id, data)
+    payment = payment_service.activate_payment(payment_id)
     if payment:
         recalculate_purchase_totals(purchase_id)
 
