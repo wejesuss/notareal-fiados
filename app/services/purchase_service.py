@@ -4,10 +4,14 @@ from datetime import datetime
 from app.models import (Purchase, Payment)
 from app.services import payment_service
 from app.repositories import (purchase_repository)
+from app.utils.helpers import filter_allowed
 from app.utils.exceptions import (
     BusinessRuleError, NotFoundError, ValidationError, BaseClassError,
     error_messages
 )
+
+# fields that are allowed to be updated
+PURCHASE_ALLOWED_UPDATE_FIELDS = {"client_id", "description", "total_value"}
 
 def get_purchase_by_id(purchase_id: int) -> Purchase:
     purchase = purchase_repository.get_purchase_by_id(purchase_id)
@@ -98,12 +102,9 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase:
     original = purchase_repository.get_purchase_by_id(purchase_id)
     if not original:
         raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
-
-    # fields that are allowed to be updated
-    allowed_fields = ["client_id", "description", "total_value"]
-
+   
     # filter data fields
-    validated_data = {k: v for k, v in data.items() if k in allowed_fields}
+    validated_data = filter_allowed(data, PURCHASE_ALLOWED_UPDATE_FIELDS)
     if not validated_data:
         raise ValidationError(error_messages.DATA_FIELDS_EMPTY)
 

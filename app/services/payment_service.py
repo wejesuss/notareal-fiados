@@ -1,10 +1,14 @@
 from typing import List
 from app.models import Payment
 from app.repositories import payment_repository
+from app.utils.helpers import filter_allowed
 from app.utils.exceptions import (
     ValidationError, NotFoundError,
     error_messages
 )
+
+# fields that are allowed to be updated
+PAYMENT_ALLOWED_UPDATE_FIELDS = {"amount", "payment_date", "method", "description"}
 
 def get_payments(limit: int = None, offset: int = 0, purchase_id: int = None) -> List[Payment]:
     """Retrieve payments, optionally filtered by purchase."""
@@ -35,11 +39,8 @@ def update_payment(payment_id: int, data: dict) -> Payment | None:
     if "is_active" in data:
         raise ValidationError(error_messages.PAYMENT_INVALID_ACTIVATION_ROUTE)
 
-    # fields that are allowed to be updated
-    allowed_fields = ["amount", "payment_date", "method", "description"]
-
     # filter data fields
-    validated_data = {k: v for k, v in data.items() if k in allowed_fields}
+    validated_data = filter_allowed(data, PAYMENT_ALLOWED_UPDATE_FIELDS)
     if not validated_data:
         raise ValidationError(error_messages.DATA_FIELDS_EMPTY)
 
