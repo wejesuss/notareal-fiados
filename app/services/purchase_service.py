@@ -1,18 +1,31 @@
+from builtins import isinstance
 from typing import List
 from datetime import datetime
 from app.models import (Purchase, Payment)
 from app.services import payment_service
 from app.repositories import (purchase_repository)
+from app.utils.helpers import filter_allowed
 from app.utils.exceptions import (
-    BusinessRuleError, NotFoundError, ValidationError,
+    BusinessRuleError, NotFoundError, ValidationError, BaseClassError,
     error_messages
 )
 
-def get_purchase_by_id(purchase_id: int) -> Purchase | None:
-    return purchase_repository.get_purchase_by_id(purchase_id)
+# fields that are allowed to be updated
+PURCHASE_ALLOWED_UPDATE_FIELDS = {"client_id", "description", "total_value"}
 
-def get_purchase_by_note_number(note_number: str) -> Purchase | None:
-    return purchase_repository.get_purchase_by_note_number(note_number)
+def get_purchase_by_id(purchase_id: int) -> Purchase:
+    purchase = purchase_repository.get_purchase_by_id(purchase_id)
+    if not purchase:
+        raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
+
+    return purchase
+
+def get_purchase_by_note_number(note_number: str) -> Purchase:
+    purchase = purchase_repository.get_purchase_by_note_number(note_number)
+    if not purchase:
+        raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
+
+    return purchase
 
 def get_purchases(limit: int = None, offset: int = 0, only_pending: bool | None = None) -> List[Purchase]:
     purchases = purchase_repository.get_purchases(limit, offset, only_pending)
@@ -66,65 +79,78 @@ def create_purchase(client_id: int, data: dict) -> Purchase:
 
         try:
             payment_service.create_payment(payment_data)
-        except Exception:
+        except Exception as e:
             purchase_repository.deactivate_purchase(purchase.id)
-            raise BusinessRuleError(error_messages.PAYMENT_PURCHASE_CREATION_FAILED)
+            error = error_messages.PAYMENT_PURCHASE_CREATION_FAILED
+
+            if isinstance(e, BaseClassError):
+                merged_error = error + " " + str(e)
+                raise BusinessRuleError(merged_error) from e
+            else:
+                raise BusinessRuleError(error) from e
 
     return purchase
 
-def update_purchase(purchase_id: int, data: dict) -> Purchase | None:
-    # validate is_active, only allowing deactivation from the correct route
+def update_purchase(purchase_id: int, data: dict) -> Purchase:
     if "is_active" in data:
         raise ValidationError(error_messages.PURCHASE_INVALID_ACTIVATION_ROUTE)
 
-    purchase_exists = purchase_repository.get_purchase_by_id(purchase_id)
-    if not purchase_exists:
-        raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
-
-    # fields that are allowed to be updated
-    allowed_fields = ["client_id", "description", "total_value"]
+    total_value = data.get("total_value")
+    if total_value is not None and total_value <= 0:
+        raise ValidationError(error_messages.PURCHASE_INVALID_TOTAL)
 
     # filter data fields
-    validated_data = {k: v for k, v in data.items() if k in allowed_fields}
+    validated_data = filter_allowed(data, PURCHASE_ALLOWED_UPDATE_FIELDS)
     if not validated_data:
         raise ValidationError(error_messages.DATA_FIELDS_EMPTY)
 
+    original = purchase_repository.get_purchase_by_id(purchase_id)
+    if not original:
+        raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
+
     purchase = purchase_repository.update_purchase(purchase_id, validated_data)
+
     # Recalculate totals if relevant fields changed
     relevant_fields_changed = "total_value" in data or "client_id" in data
     if relevant_fields_changed:
-        return recalculate_purchase_totals(purchase_id)
+        purchase = recalculate_purchase_totals(purchase_id)
 
     return purchase
 
-def activate_purchase(purchase_id: int, data: dict) -> Purchase | None:
-    purchase_exists = purchase_repository.get_purchase_by_id(purchase_id)
-    if not purchase_exists:
+def activate_purchase(purchase_id: int) -> Purchase:
+    original = purchase_repository.get_purchase_by_id(purchase_id)
+    if not original:
         raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
+    if original.is_active:
+        raise BusinessRuleError(error_messages.PURCHASE_ALREADY_ENABLED)
 
-    purchase_repository.update_purchase(purchase_id, data)
+    purchase_repository.update_purchase(purchase_id, {"is_active": 1})
     purchase = recalculate_purchase_totals(purchase_id)
 
     return purchase
 
-def deactivate_purchase(purchase_id: int) -> bool:
+def deactivate_purchase(purchase_id: int) -> Purchase:
     """Deactivate a purchase."""
     purchase = purchase_repository.get_purchase_by_id(purchase_id)
     if not purchase:
         raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
+    if not purchase.is_active:
+        raise BusinessRuleError(error_messages.PURCHASE_ALREADY_DISABLED)
 
     success = purchase_repository.deactivate_purchase(purchase_id)
-    if success:
-        payment_service.deactivate_payments_by_purchase(purchase_id)
-        recalculate_purchase_totals(purchase_id)
-    
-    return success
+    if not success:
+        raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
+
+    payment_service.deactivate_payments_by_purchase(purchase_id)
+    purchase = recalculate_purchase_totals(purchase_id)
+
+    return purchase
 
 # Client related services (business logic)
 def get_purchases_by_client(client_id: int, only_active: bool = True) -> List[Purchase]:
     return purchase_repository.get_purchases_by_client_id(client_id, only_active)
 
-def deactivate_purchases_by_client(client_id: int) -> None:
+def deactivate_purchases_by_client(client_id: int) -> bool:
     """Deactivate all purchases (and related payments) for a given client."""
     # get purchases ids related to that client
     purchases_ids = purchase_repository.get_purchases_ids_by_client_id(client_id)
@@ -146,6 +172,17 @@ def deactivate_purchases_by_client(client_id: int) -> None:
 # Payment related services (business logic)
 def get_payments_for_purchase(purchase_id: int, limit: int = None, offset: int = 0) -> List[Payment]:
     """List payments for a specific purchase."""
+    # Special case: purchase_id = 0 -> returns all active payments
+    if purchase_id == 0:
+        return payment_service.get_payments(limit, offset, purchase_id=0)
+
+    if purchase_id < 0:
+        raise ValidationError(error_messages.FOREIGN_KEY_ERROR)
+
+    purchase = purchase_repository.get_purchase_by_id(purchase_id)
+    if not purchase:
+        raise NotFoundError(error_messages.PAYMENT_PURCHASE_NOT_FOUND)
+
     return payment_service.get_payments(limit, offset, purchase_id)
 
 def get_payment_by_id(payment_id: int) -> Payment | None:
@@ -163,7 +200,7 @@ def create_payment(purchase_id: int, data: dict) -> Payment:
 
     return payment
 
-def update_payment(purchase_id: int, payment_id: int, data: dict) -> Payment | None:
+def update_payment(purchase_id: int, payment_id: int, data: dict) -> Payment:
     """Update a payment and recalculate the related purchase totals."""
     payment = payment_service.get_payment_by_id(payment_id)
     if not payment:
@@ -173,43 +210,53 @@ def update_payment(purchase_id: int, payment_id: int, data: dict) -> Payment | N
         raise BusinessRuleError(error_messages.PAYMENT_NOT_LINKED)
 
     updated = payment_service.update_payment(payment_id, data)
-    if updated:
+    if updated and "amount" in data:
         recalculate_purchase_totals(purchase_id)
 
-    return updated
+    return updated or payment
 
-def activate_payment(purchase_id: int, payment_id: int, data: dict) -> Payment | None:
+def activate_payment(purchase_id: int, payment_id: int) -> Payment:
     """Activate a payment that belongs to the given purchase and update totals."""
-    purchase_exists = purchase_repository.get_purchase_by_id(purchase_id)
-    if not purchase_exists:
-        raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
-
     payment = payment_service.get_payment_by_id(payment_id)
     if not payment:
-        return None
+        raise NotFoundError(error_messages.PAYMENT_NOT_FOUND)
+    if payment.is_active:
+        raise BusinessRuleError(error_messages.PAYMENT_ALREADY_ENABLED)
     if payment.purchase_id != purchase_id:
-        raise ValidationError(error_messages.PAYMENT_NOT_LINKED)
+        raise BusinessRuleError(error_messages.PAYMENT_NOT_LINKED)
 
-    payment = payment_service.activate_payment(payment_id, data)
+    purchase = purchase_repository.get_purchase_by_id(purchase_id)
+    if not purchase:
+        raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
+    if not purchase.is_active:
+        raise BusinessRuleError(error_messages.PAYMENT_ACTIVATION_FAILED)
+
+    payment = payment_service.activate_payment(payment_id)
     if payment:
         recalculate_purchase_totals(purchase_id)
 
     return payment
 
-def deactivate_payment(purchase_id: int, payment_id: int) -> bool:
+def deactivate_payment(purchase_id: int, payment_id: int) -> Payment:
     """Deactivate a payment that belongs to the given purchase and update totals."""
     payment = payment_service.get_payment_by_id(payment_id)
-    
     if not payment:
-        return False
+        raise NotFoundError(error_messages.PAYMENT_NOT_FOUND)
+    if not payment.is_active:
+        raise BusinessRuleError(error_messages.PAYMENT_ALREADY_DISABLED)
     if payment.purchase_id != purchase_id:
-        raise ValueError("O identificador da compra é diferente do identificador do pagamento associado a ela.")
-    
-    success = payment_service.deactivate_payment(payment_id)
-    if success:
-        recalculate_purchase_totals(purchase_id)
-    
-    return success
+        raise BusinessRuleError(error_messages.PAYMENT_NOT_LINKED)
+
+    purchase_exists = purchase_repository.get_purchase_by_id(purchase_id)
+    if not purchase_exists:
+        raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
+
+    payment = payment_service.deactivate_payment(payment_id)
+    if not payment:
+        raise NotFoundError(error_messages.PAYMENT_NOT_FOUND)
+
+    recalculate_purchase_totals(purchase_id)
+    return payment
 
 def compute_purchase_totals(purchase: Purchase, payments: list[Payment]):
     """Pure function: given a purchase + payments, returns the recalculated fields."""
@@ -228,13 +275,22 @@ def compute_purchase_totals(purchase: Purchase, payments: list[Payment]):
         "status": new_status
     }
 
-def recalculate_purchase_totals(purchase_id: int) -> Purchase | None:
-    """Recalculate purchase total_paid_value and status based on active payments."""
+def recalculate_purchase_totals(purchase_id: int) -> Purchase:
+    """
+    Recalculate purchase total_paid_value and status based on active payments.
+
+    Returns:
+        Purchase: The updated Puchase after recalculation
+
+    Raises:
+        NotFoundError: If Purchase is not found.
+    """
     purchase = purchase_repository.get_purchase_by_id(purchase_id)
-    if not purchase or not purchase.is_active:
-        return None
+    if not purchase:
+        raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
 
     payments = payment_service.get_payments(limit = None, offset = 0, purchase_id = purchase_id)
     updates = compute_purchase_totals(purchase, payments)
 
-    return purchase_repository.update_purchase(purchase_id, updates)
+    updated = purchase_repository.update_purchase(purchase_id, updates)
+    return updated or purchase

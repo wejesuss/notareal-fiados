@@ -1,10 +1,14 @@
 from typing import List
 from app.models import Payment
 from app.repositories import payment_repository
+from app.utils.helpers import filter_allowed
 from app.utils.exceptions import (
     ValidationError, NotFoundError,
     error_messages
 )
+
+# fields that are allowed to be updated
+PAYMENT_ALLOWED_UPDATE_FIELDS = {"amount", "payment_date", "method", "description"}
 
 def get_payments(limit: int = None, offset: int = 0, purchase_id: int = None) -> List[Payment]:
     """Retrieve payments, optionally filtered by purchase."""
@@ -20,26 +24,25 @@ def get_payment_by_id(payment_id: int) -> Payment | None:
 
 def create_payment(data: dict) -> Payment:
     """Create a new payment record."""
-    # Validate fields, method, note_number etc.
-    amount = data.get("amount")
-    if amount is None or float(amount) <= 0:
-        raise ValidationError(error_messages.PAYMENT_INVALID_AMOUNT)
+    try:
+        amount = data.get("amount")
+        if amount is None or float(amount) <= 0:
+            raise ValidationError(error_messages.PAYMENT_INVALID_AMOUNT)
+    except ValueError:
+        raise ValidationError(error_messages.RESOURCE_CREATION_VALUE_ERROR)
 
     return payment_repository.insert_payment(data)
 
 def update_payment(payment_id: int, data: dict) -> Payment | None:
     """Update payment for allowed payment fields (amount, payment_date, method, description)"""
-    # fields that are allowed to be updated
-    allowed_fields = ["amount", "payment_date", "method", "description"]
+    # validate is_active, only allowing (de)activation from the correct route
+    if "is_active" in data:
+        raise ValidationError(error_messages.PAYMENT_INVALID_ACTIVATION_ROUTE)
 
     # filter data fields
-    validated_data = {k: v for k, v in data.items() if k in allowed_fields}
+    validated_data = filter_allowed(data, PAYMENT_ALLOWED_UPDATE_FIELDS)
     if not validated_data:
         raise ValidationError(error_messages.DATA_FIELDS_EMPTY)
-
-    # validate is_active, only allowing deactivation from the correct route
-    if validated_data.get("is_active") == 0:
-        raise ValidationError(error_messages.PURCHASE_INVALID_ACTIVATION_ROUTE)
 
     # Validate amount
     if "amount" in validated_data:
@@ -53,13 +56,17 @@ def update_payment(payment_id: int, data: dict) -> Payment | None:
     updated = payment_repository.update_payment(payment_id, validated_data)
     return updated
 
-def activate_payment(payment_id: int, data: dict) -> Payment:
+def activate_payment(payment_id: int) -> Payment:
     """Activate payment for the given ID"""
-    return payment_repository.update_payment(payment_id, data)
+    return payment_repository.update_payment(payment_id, {"is_active": 1})
 
-def deactivate_payment(payment_id: int) -> bool:
+def deactivate_payment(payment_id: int) -> Payment | None:
     """Deactivate (soft delete) a payment."""
-    return payment_repository.deactivate_payment(payment_id)
+    success = payment_repository.deactivate_payment(payment_id)
+    if success:
+        return get_payment_by_id(payment_id)
+
+    return None
 
 def deactivate_payments_by_purchase(purchase_id: int):
     """Deactivate all payments for a given purchase."""
