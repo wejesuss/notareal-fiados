@@ -99,14 +99,14 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase:
     if total_value is not None and total_value <= 0:
         raise ValidationError(error_messages.PURCHASE_INVALID_TOTAL)
 
-    original = purchase_repository.get_purchase_by_id(purchase_id)
-    if not original:
-        raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
-   
     # filter data fields
     validated_data = filter_allowed(data, PURCHASE_ALLOWED_UPDATE_FIELDS)
     if not validated_data:
         raise ValidationError(error_messages.DATA_FIELDS_EMPTY)
+
+    original = purchase_repository.get_purchase_by_id(purchase_id)
+    if not original:
+        raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
 
     purchase = purchase_repository.update_purchase(purchase_id, validated_data)
 
