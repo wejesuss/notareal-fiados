@@ -116,14 +116,14 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase:
 
     return purchase
 
-def activate_purchase(purchase_id: int, data: dict) -> Purchase:
+def activate_purchase(purchase_id: int) -> Purchase:
     original = purchase_repository.get_purchase_by_id(purchase_id)
     if not original:
         raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
     if original.is_active:
         raise BusinessRuleError(error_messages.PURCHASE_ALREADY_ENABLED)
 
-    purchase_repository.update_purchase(purchase_id, data)
+    purchase_repository.update_purchase(purchase_id, {"is_active": 1})
     purchase = recalculate_purchase_totals(purchase_id)
 
     return purchase
