@@ -60,24 +60,55 @@ notareal-fiados/
 
 1. **FastAPI (app/main.py e app/routes/)**
    - Apenas lida com rotas, requests e responses.
+   - Cada arquivo define um conjunto de endpoints REST.
+   - Recebem parâmetros, validam tipos via Pydantic e chamam apenas os services.
    - Não contém lógica de negócio nem SQL.
+   - Não conhecem detalhes do banco de dados.
 
 2. **Serviços (app/services/)**  
    - Contém a **lógica de negócio**, independente do FastAPI ou do SQLite.
-   - Exemplo: calcular desconto, validar regras de negócio.
+   - Controlam os modelos **clientes**, **compras** e **pagamentos**.
+   - Exemplo: validar regras de negócio, ativação/desativação, validações internas e recalculo automático.
+   - Podem ser usados tanto pela API quanto internamente sem FastAPI.
+   - Decidem quando chamar `recalculate_purchase_totals`.
 
 3. **Repositórios (app/repositories/)**  
-   - Apenas **operações de banco de dados** (SELECT, INSERT, UPDATE).
+   - Apenas **operações de banco de dados** (SELECT, INSERT, UPDATE) sem regras de negócio.
    - Abstrai a camada de persistência.
-   - Se amanhã você trocar SQLite por outro banco, só muda aqui.
+   - Permite trocar SQLite por outro banco, só muda aqui.
 
 4. **Modelos (app/models/)**  
    - Estruturas de dados internas (POPOs = Plain Old Python Objects).  
+   - Carregam dados vindos do banco e garantem consistência entre camadas.
    - Não dependem de ORM nem do FastAPI.
 
-5. **Database** → inicializa e mantém o banco SQLite, com configurações otimizadas.
+5. **Schemas (app/schemas/)**
+   - Validam entrada da API e padronizam saída com `response_model`.
+   - Garantem que a API sempre retorna formatos consistentes e seguros.
+   - Podem ter exemplos e descrições para melhorar a documentação automática.
 
-6. **Utils** → scripts auxiliares (backup, impressão, etc.).
+6. **Database (app/database.py)**  
+   - Inicializa e mantém o banco SQLite com configurações otimizadas.
+   - Garante que cada operação tenha a sua própria conexão controlada.
+
+7. **Utils (app/utils/)**  
+   - Funções auxiliares (backup, helpers, printer).
+   - Exceções customizadas que padronizam erros em toda aplicação (Ver **app/utils/exceptions/**).
+   - Não têm dependência direta das regras de negócio.
+
+8. **Main (app/main.py)**
+   - Monta o FastAPI, registra rotas e middlewares.
+   - Não contém lógica de domínio nem SQL.
+
+
+> Resultado: cada parte do sistema tem uma única responsabilidade.
+>  - As rotas chamam services;  
+>  - Services chamam repositories;  
+>  - Repositories falam com o banco;  
+>  - Schemas controlam entrada e saída;  
+>  - Models carregam dados internos;  
+>  - Utils ajudam tudo isso a funcionar de forma limpa.
+
 
 ## Exemplo rápido de implementação sem ORM
 
