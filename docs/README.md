@@ -87,13 +87,11 @@ O banco é **SQLite**, leve e portátil, ideal para operação em dispositivos m
 Esses são os arquivos de documentação
 
 1. `README.md` ← **este arquivo**
-2. `project_scope.md`
-3. `architecture_overview.md`
-4. `db_model_and_flow.md`
-5. `routes_documentation.md`
-6. `services_rules.md`
-7. `repository_notes.md`
-8. `examples_and_testing.md`
+2. `architecture_backend.md`
+3. `db_model_and_flow.md`
+4. `routes_documentation.md`
+
+[Ao final](#-documentos-relacionados) você verá links de navegação para cada um deles.
 
 ---
 
