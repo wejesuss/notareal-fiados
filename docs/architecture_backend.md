@@ -1,54 +1,59 @@
 # Organização de pastas para projeto Nota Real Fiados (Python + FastAPI + SQLite)
 
-Este documento descreve como estruturar o backend do projeto **Nota Real Fiados**, usando **FastAPI** com **SQLite**, sem dependência de ORM.
-A arquitetura busca **separar responsabilidades** — API, lógica de negócio e persistência de dados — permitindo fácil manutenção e testes isolados.
+Este documento descreve a organização atual do backend do projeto **NotaReal Fiados**, usando **FastAPI** com **SQLite**, sem dependência de ORM. A arquitetura busca **separar responsabilidades** em camadas claras: **router → service → repository → database** = API, lógica de negócio e persistência de dados — permitindo fácil manutenção e testes isolados com modelos simples (dataclasses) e validação/serialização via Pydantic.
 
 ## Estrutura atual do projeto
 
+Para gerar a listagem mais atualizada do projetos:
+```bash
+tree -I "__pycache__|__init__.py|.vscode|*.pyc|pythonvenv|.git|.gitignore|*.db|*.sql|exported_file.md|export_files_content.py"
+```
+
 ```
 notareal-fiados/
-│
-├── app/
-│ ├── main.py # Inicializa o FastAPI e registra rotas
-│ ├── database.py # Criação e conexão com banco SQLite
-│ │
-│ ├── routes/ # Rotas da API
-│ │ ├── clients.py
-│ │ ├── purchases.py
-│ │ └── payments.py
-│ │
-│ ├── models/ # Modelos de dados (sem ORM)
-│ │ ├── client.py
-│ │ ├── purchase.py
-│ │ └── payment.py
-│ │
-│ ├── repositories/ # Camada de acesso ao banco de dados
-│ │ ├── client_repository.py
-│ │ ├── purchase_repository.py
-│ │ └── payment_repository.py
-│ │
-│ └── services/ # Lógica de negócio
-│ ├── client_service.py
-│ ├── purchase_service.py
-│ └── payment_service.py
-│
-├── utils/ # Scripts utilitários
-│ ├── backup.py # Backup de dados SQLite
-│ ├── printer.py # Impressão de relatórios
-│ └── helpers.py # Funções auxiliares genéricas
-│
-├── data/ # Banco de dados local
-│ ├── notareal.db # Banco de dados SQLite
-│
-├── docs/ # Documentação e diagramas
-│ ├── db_model_and_flow.md # Queries e estrutura do banco
-│ ├── architecture_backend.md # Organização do código
-│ ├── README.md # Documentação principal do projeto
-│ └── ChatGPT-fluxograma.png # Lógica simples de fluxo dos dados do sistema
-│
-├── config.py # Configurações gerais
-├── test-db.session.sql # Script de teste de banco
-├── requirements.txt # Dependências Python
+├── app/                              ← Código-fonte principal do backend
+│   ├── database.py                   ← Inicializa conexão SQLite (WAL, pragmas, conexão única)
+│   ├── main.py                       ← Cria FastAPI, registra rotas e middlewares
+│   ├── models/                       ← Modelos internos (POPOs)
+│   │   ├── client.py                 ← Modelo Client (id, nome, contato)
+│   │   ├── payment.py                ← Modelo Payment (valor, método, data, ativo)
+│   │   └── purchase.py               ← Modelo Purchase (total, status, pagos)
+│   ├── repositories/                 ← Acesso ao banco (SQL puro)
+│   │   ├── client_repository.py      ← CRUD de clientes em SQLite
+│   │   ├── payment_repository.py     ← CRUD de pagamentos em SQLite
+│   │   └── purchase_repository.py    ← CRUD de compras em SQLite
+│   ├── routes/                       ← Endpoints FastAPI (sem lógica de negócio)
+│   │   ├── clients.py                ← Rotas /clients
+│   │   ├── payments.py               ← Rotas /purchases/{id}/payments
+│   │   └── purchases.py              ← Rotas /purchases
+│   ├── schemas/                      ← Schemas Pydantic (entrada/saída)
+│   │   ├── client.py                 ← Schemas de cliente
+│   │   ├── mixins.py                 ← Schemas compartilhados (ex.: validadores)
+│   │   ├── payment.py                ← Schemas de pagamento
+│   │   └── purchase.py               ← Schemas de compra
+│   ├── services/                     ← Regra de negócio (coração do sistema)
+│   │   ├── client_service.py         ← Lógica de clientes
+│   │   ├── payment_service.py        ← Lógica de pagamentos (ativar, desativar, validar)
+│   │   └── purchase_service.py       ← Lógica de compras (recalculo e vínculos)
+│   └── utils/                        ← Funções auxiliares
+│       ├── api_seed.py               ← Gera dados de exemplo para testes
+│       ├── backup.py                 ← Futuro Backup/restore do banco SQLite
+│       ├── helpers.py                ← Utilidades diversas
+│       ├── printer.py                ← Futuro módulo de geração/print de PDFs
+│       └── exceptions/               ← Sistema centralizado de erros
+│           ├── error_messages.py     ← Mensagens de erro padronizadas
+│           ├── exceptions.py         ← Exceções de validação e regra de negócio
+│           └── http_exceptions.py    ← Converte exceções para HTTPException
+├── config.py                         ← Configurações gerais (em construção como paths e flags)
+├── data/                             ← Banco SQLite e arquivos persistentes
+│   └── notareal.db                   ← Base de dados principal
+├── docs/                             ← Documentação completa do backend
+│   ├── architecture_backend.md       ← Arquitetura, camadas e responsabilidades
+│   ├── db_model_and_flow.md          ← Modelo do banco + fluxo de dados
+│   ├── README.md                     ← Documentação geral
+│   ├── routes_documentation.md       ← Manual de rotas (em construção)
+│   └── ChatGPT-fluxograma.png        ← Fluxograma simplificado do sistema
+└── requirements.txt                  ← Dependências Python
 ```
 
 ## Como o desacoplamento funciona
@@ -198,13 +203,17 @@ def read_client(client_id: int):
 
 ---
 
-### 🔗 Documentos relacionados
+## 🔗 Documentos Relacionados
 
-- 📘 **[Escopo e visão do projeto](./README.md)**  
+- 📘 **[Escopo e visão do projeto](./README.md)** → `README.md`
+
   Descreve o propósito, público-alvo e principais funcionalidades do sistema Nota Real Fiados.
+- 🗃️ **[Modelo de dados e fluxo de informações](./db_model_and_flow.md)** → `db_model_and_flow.md`
 
-- 🗃️ **[Modelo de dados e fluxo de informações](./db_model_and_flow.md)**  
   Mostra como clientes, notas e pagamentos se relacionam no banco de dados e no fluxo do app.
+- 🧱 **[Exemplo de arquitetura limpa](./architecture_backend.md)** → `architecture_backend.md`
 
-- 🧱 **[Exemplo de arquitetura limpa (FastAPI + SQLite)](./architecture_backend.md)**  
   Explica a organização de pastas e o desacoplamento entre API, serviços e repositórios, com código exemplo.
+- 📚 **[Documentação das rotas](./routes_documentation.md)** → `routes_documentation.md`
+  
+  Demonstra como funcionam as rotas da API do sistema, com exemplos reais de uso.
