@@ -42,7 +42,7 @@ notareal-fiados/
 │
 ├── docs/ # Documentação e diagramas
 │ ├── db_model_and_flow.md # Queries e estrutura do banco
-│ ├── project_clean-code_example.md # Organização do código
+│ ├── architecture_backend.md # Organização do código
 │ ├── README.md # Documentação principal do projeto
 │ └── ChatGPT-fluxograma.png # Lógica simples de fluxo dos dados do sistema
 │
@@ -206,5 +206,5 @@ def read_client(client_id: int):
 - 🗃️ **[Modelo de dados e fluxo de informações](./db_model_and_flow.md)**  
   Mostra como clientes, notas e pagamentos se relacionam no banco de dados e no fluxo do app.
 
-- 🧱 **[Exemplo de arquitetura limpa (FastAPI + SQLite)](./project_clean-code_example.md)**  
+- 🧱 **[Exemplo de arquitetura limpa (FastAPI + SQLite)](./architecture_backend.md)**  
   Explica a organização de pastas e o desacoplamento entre API, serviços e repositórios, com código exemplo.

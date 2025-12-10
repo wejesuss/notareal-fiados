@@ -157,7 +157,7 @@ Esses são os arquivos de documentação
 - 🗃️ **[Modelo de dados e fluxo de informações](./db_model_and_flow.md)** → `db_model_and_flow.md`
 
   Mostra como clientes, notas e pagamentos se relacionam no banco de dados e no fluxo do app.
-- 🧱 **[Exemplo de arquitetura limpa](./project_clean-code_example.md)** → `project_clean-code_example.md`
+- 🧱 **[Exemplo de arquitetura limpa](./architecture_backend.md)** → `architecture_backend.md`
 
   Explica a organização de pastas e o desacoplamento entre API, serviços e repositórios, com código exemplo.
 - 📚 **[Documentação das rotas](./routes_documentation.md)** → `routes_documentation.md`
