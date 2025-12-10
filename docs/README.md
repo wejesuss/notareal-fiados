@@ -1,11 +1,12 @@
-# NotaReal Fiados - Escopo e Objetivos
-
+# NotaReal Fiados – Visão Geral, Arquitetura e Objetivos
 
 ## 🧩 Visão Geral
 
-O **NotaReal Fiados** é um sistema local (para PC e dispositivos móveis) projetado para **gerenciar compras fiadas** em pequenas lojas, mercearias e comércios rurais. O objetivo é **substituir o registro manual em papel** por uma ferramenta **simples, segura e confiável**, mantendo a possibilidade de **impressão e assinatura física** como validação.
+O **NotaReal Fiados** é um sistema local (para PC, web e dispositivos móveis via PWA) projetado para **gerenciar compras fiadas** em pequenas lojas, mercearias e comércios rurais. O objetivo é **substituir o registro manual em papel** por uma ferramenta **simples, segura e confiável**, mantendo a possibilidade de **impressão e assinatura física** como validação.
 
-O sistema funciona **offline**, utilizando um **servidor local** (instalado no computador principal da loja) com possibilidade de **acesso via rede local** por celulares ou outros PCs autorizados. Todos os dados ficam armazenados em um banco **SQLite local**, com opção de **backup automático ou manual** para evitar perdas.
+O sistema roda em um **servidor local FastAPI** (instalado no computador principal da loja), podendo ser empacotado para desktop via **Tauri**, com interface feita em **Quasar Framework (Vue)**, e acessado no celular via **PWA** – sem necessidade de Internet.
+
+O banco é **SQLite**, leve e portátil, ideal para operação em dispositivos modestos, com opção de **backup automático ou manual** para evitar perdas.
 
 ---
 
@@ -18,113 +19,151 @@ O sistema funciona **offline**, utilizando um **servidor local** (instalado no c
 ## ⚙️ Funcionalidades-Chave
 
 | Categoria | Descrição |
-|------------|------------|
-| **Gerenciamento de Clientes** | Cadastro simples com nome, apelido, telefone/email e histórico de compras. Evita duplicidade e confusão de clientes. |
-| **Controle de Fiados** | Registrar novas compras, abater valores pagos e visualizar débitos pendentes. |
-| **Impressão de Comprovantes** | Gera comprovantes físicos em PDF ou impressora conectada para assinatura manual. |
-| **Histórico de Transações** | Armazena todas as movimentações (créditos e débitos) por cliente, com data e hora. |
-| **Banco de Dados Local (SQLite)** | Operação 100% offline, sem depender de internet. |
-| **Sincronização Local** | Rede local (Wi-Fi/LAN) entre PC e dispositivos para acesso e edição de dados. |
-| **Backup Seguro** | Exportação manual ou automática dos dados (arquivo local, e-mail ou drive). |
-| **Facilidade de Uso** | Campos autopreenchíveis e listas prontas de produtos frequentes da loja. |
+|----------|-----------|
+| **Gerenciamento de Clientes** | Cadastro simples, apelido único, telefone/email e listagem de compras. |
+| **Controle de Fiados** | Criar compras fiadas, lançar pagamentos, atualizar saldos e acompanhar status. |
+| **Cálculo automático** | Total pago, total devido e status da compra atualizados automaticamente. |
+| **Pagamentos com controle de ativação** | Pagamentos podem ser desativados/reativados com regras rígidas (soft delete). |
+| **Impressão de comprovantes** *(planejado)* | PDF gerado via servidor local; permite assinatura física. |
+| **Histórico completo** | Registra datas, valores e alterações. |
+| **Operação 100% offline** | Tudo funciona sem internet. |
+| **Backup local** | Exportação manual ou automática do banco de dados. |
+| **Facilidade de Uso** | Campos autopreenchíveis e listas prontas de produtos frequentes da loja para a descrição da compra. |
+
+> O backend foi projetado com validações redundantes e coerentes, garantindo consistência mesmo em chamadas internas ou não vindas da API.
 
 ---
 
-## Arquitetura Técnica
+## 🏗️ Arquitetura Técnica
 
-- Back-end desenvolvido em **Python 3** usando o framework **FastAPI**.  
-- Banco de dados local SQLite, sem uso de ORM, para máxima leveza e portabilidade.  
-- Aplicação desenhada para rodar em computador principal da loja, com possibilidade de acesso por outros dispositivos via rede local.  
-- Suporte para exportação e restauração de backups.  
+### 🔧 Back-end (Servidor)
+- **FastAPI (Python 3)** como framework web
+- Banco **SQLite** sem uso de ORM, para máxima leveza e portabilidade
+- Serviços com regras de negócio (purchase, payment, client)
+- Schemas Pydantic para validação e resposta
+- Recalculo automático de totais de compra via serviço de purchases
+- Identificadores únicos para clientes, compras e pagamentos
+- Acesso por outros dispositivos via rede local.
+- Suporte para exportação e restauração de backups.
+
+### 🎨 Front-end (Web + PWA)
+- **Quasar Framework (Vue)**
+- Build web + PWA
+- Interface moderna, simples e responsiva
+- Pode rodar em PCs antigos, celulares e tablets via navegador
+
+### 🖥️ Desktop
+- **Tauri**
+- Front-end Quasar empacotado como aplicativo leve
+- Comunicação local com servidor FastAPI
+
+### 📱 Mobile
+- **PWA** (instalável, offline, sem necessidade de compilar para iOS/Android)
+
+---
+
+## 🧠 Escopo Técnico Atual
+
+### Backend – Implementado
+- CRUD de Clientes
+- CRUD de Compras
+- CRUD de Pagamentos
+- Soft delete com ativação/restauração
+- Validações fortes nas regras de negócio
+- Recalculo automático de totais
+- Respostas tipadas via response_model
+- Logging básico de erros no backend
+- Estrutura limpa: router → service → repository → DB
+
+### Backend – Em Progresso / Próximos passos
+- Melhorias nos docs internos
+- Helper para detectar mudanças relevantes em updates
+- Funções auxiliares para reduzir repetição em validações
+
+---
+
+## 📘 Estrutura dos Arquivos de Documentação (em `/docs`)
+
+Esses são os arquivos de documentação
+
+1. `README.md` ← **este arquivo**
+2. `project_scope.md`
+3. `architecture_overview.md`
+4. `db_model_and_flow.md`
+5. `routes_documentation.md`
+6. `services_rules.md`
+7. `repository_notes.md`
+8. `examples_and_testing.md`
+
+---
+
+## 📦 Limites da Primeira Versão (MVP)
+
+- Sem login/autenticação no momento.
+- Apenas uso local (sem cloud).
+- Relatórios simples.
+- Configurações básicas.
+- Impressão local apenas (ainda dependente da atenção do vendedor).
+- Não há acesso do cliente (somente do comerciante). A aplicação não tem o objetivo de oferecer portal do cliente.
+
+---
+
+## 🧰 Extensões Planejadas (Futuro)
+
+- Login com PIN/senha
+- Relatórios gráficos
+- Painel de estatísticas
+- Sincronização via nuvem opcional
 - Impressão de notas e recibos em PDF ou por impressora conectada.
+- Assinatura digital
+- Modo multiusuário (papéis/permissões)
 
 ---
 
-## 🧠 Escopo Técnico (Planejado)
+## 🔧 Itens Técnicos Importantes a Implementar
 
-| Componente | Tecnologia sugerida | Observações |
-|-------------|--------------------|--------------|
-| **Servidor Central (PC)** | Python + FastAPI | Gerencia o banco de dados e comunicação entre dispositivos. |
-| **Banco de Dados** | SQLite | Local, leve e portátil, ideal para operação offline. |
-| **Interface Desktop** | Python + Toga ou PySide6 | Interface simples e nativa com aparência de aplicativo. |
-| **App Mobile** | Kivy/KivyMD | Mesmas funções do desktop, adaptadas para telas menores. |
-| **Impressão** | Endpoint FastAPI ou biblioteca OS | Envia comandos de impressão para o servidor. |
-| **Backup** | Exportação automática + envio opcional (Drive ou e-mail) | Evita perda de dados. |
+- [X] Aplicar `response_model` em todas as rotas
+- [X] Remover retornos diretos com `__dict__`
+- [ ] Documentação manual com exemplos de uso no **`/docs`**
+- [ ] Consolidar helpers para validações internas
+- [ ] Centralizar regras duplicadas nos services
+- [ ] Criar script CLI para backup/restore
 
 ---
 
-## 📢 Limites da Primeira Versão (MVP)
+## 🚀 Próximos Passos Recomendados
 
-- Sem acesso direto do cliente ao sistema.  
-- Assinatura física opcional (ainda dependente da atenção do vendedor).  
-- Sem autenticação de usuários por enquanto.  
-- Sem sincronização online (apenas backups locais e manuais).  
-- Interface simples, sem relatórios financeiros complexos ainda.  
-
----
-
-## 🧰 Extensões Planejadas (Futuras)
-
-- Autenticação de usuários (PIN ou senha).
-- Geração de relatórios semanais/mensais.
-- Assinatura digital opcional.
-- Sincronização via nuvem.
-- Notificações automáticas sobre débitos pendentes.
-- Interface web simplificada para administração remota.
+1. **Finalizar documentação `/docs`** (agora revisada).
+2. Criar páginas de **GUI** no Quasar (clientes, compras, pagamentos).
+3. Criar layout base (header, sidebar, tabelas simples).
+4. Implementar testes básicos nos endpoints principais.
+5. Criar fluxo completo visual de:
+   - criar cliente
+   - criar compra
+   - adicionar pagamento
+   - ver totais recalculados
+6. Integrar front + backend.
+7. Criar build desktop com Tauri.
+8. Implementar endpoints para impressão.
+9. Testar funções de backup e impressão.
 
 ---
 
-## 📦 Próximos Passos
+## 🔗 Documentos Relacionados
 
-1. Definir o design visual e identidade (cores, logo, estilo).
-2. Implementar endpoints para impressão.
-3. Desenvolver a interface desktop.
-4. Testar funções de backup e impressão.
-5. Planejar e iniciar o desenvolvimento da versão mobile.
+- 📘 **[Escopo e visão do projeto](./README.md)** → `README.md`
 
-[] Aplicar response_model em todas as rotas
-
-. Garantir que TODAS as rotas usem schemas de resposta (ClientResponseSchema, PurchaseResponseSchema, PaymentResponseSchema).
-
-. Remover retornos como return client.__dict__.
-
-. Garantir consistência entre serviços, repositórios e API.
-
-[] Documentar rotas (OpenAPI + exemplos)
-
-. Adicionar exemplos (example=) nos schemas.
-
-. Criar exemplos explícitos usando responses={} nas rotas, se necessário.
-
-. Adicionar docstrings claras, incluindo payload esperado.
-
-. Criar documentação separada com exemplos prontos de JSON (se quiser).
-
-[] Implementar autenticação (se seu projeto exigir)
-
-. Avaliar necessidade de login/autorização.
-
-. Caso necessário, usar:
-
-JWT (via fastapi.security)
-
-níveis de permissão (admin, user)
-
-middleware de autenticação
-
----
-
-> **Nota:** O NotaReal Fiados tem como prioridade a segurança e a simplicidade operacional, buscando oferecer uma experiência acessível para vendedores de pequeno porte sem exigir conexão constante com a internet.
-
----
-
-### 🔗 Documentos relacionados
-
-- 📘 **[Escopo e visão do projeto](./README.md)**  
   Descreve o propósito, público-alvo e principais funcionalidades do sistema Nota Real Fiados.
+- 🗃️ **[Modelo de dados e fluxo de informações](./db_model_and_flow.md)** → `db_model_and_flow.md`
 
-- 🗃️ **[Modelo de dados e fluxo de informações](./db_model_and_flow.md)**  
   Mostra como clientes, notas e pagamentos se relacionam no banco de dados e no fluxo do app.
+- 🧱 **[Exemplo de arquitetura limpa](./project_clean-code_example.md)** → `project_clean-code_example.md`
 
-- 🧱 **[Exemplo de arquitetura limpa (FastAPI + SQLite)](./project_clean-code_example.md)**  
   Explica a organização de pastas e o desacoplamento entre API, serviços e repositórios, com código exemplo.
+- 📚 **[Documentação das rotas](./routes_documentation.md)** → `routes_documentation.md`
+  
+  Demonstra como funcionam as rotas da API do sistema, com exemplos reais de uso.
+
+---
+
+> **Nota:** O NotaReal Fiados tem como prioridade a segurança e a simplicidade operacional, é feito para funcionar em qualquer loja pequena sem internet, oferecendo uma solução moderna para o tradicional “caderninho de fiado”.
