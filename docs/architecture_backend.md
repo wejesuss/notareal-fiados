@@ -112,6 +112,8 @@ notareal-fiados/
 
 ## Exemplo rápido de implementação sem ORM
 
+A seguir está um exemplo resumido mostrando como modelos, repositórios, serviços e rotas se conectam sem o uso de ORM, usando apenas objetos Python simples e SQL manual.
+
 **models/client.py**
 ```python
 from dataclasses import dataclass
@@ -134,10 +136,10 @@ class Client:
 ```python
 from typing import List
 from datetime import datetime
-from database import get_connection, sqlite3
-from models import Client
+from app.database import get_connection
+from app.models.client import Client
 
-def get_clients(limit: int = None, offset: int = 0) -> List[Client]:
+def get_clients(limit: int = None, offset: int = 0, only_active: bool = True) -> List[Client]:
     conn = None
     try:
         conn = get_connection()
@@ -145,9 +147,12 @@ def get_clients(limit: int = None, offset: int = 0) -> List[Client]:
 
         # Default limit if not provided (-1 means "no limit" in SQLite)
         search_limit = -1 if limit is None else limit
+        where_clause = ""
+        if only_active:
+            where_clause = "WHERE is_active = 1"
 
-        cursor.execute("""
-            SELECT * FROM clients WHERE is_active = 1 ORDER BY created_at DESC
+        cursor.execute(f"""
+            SELECT * FROM clients {where_clause} ORDER BY created_at DESC
             LIMIT ? OFFSET ?
         """, (search_limit, offset))
 
@@ -157,6 +162,8 @@ def get_clients(limit: int = None, offset: int = 0) -> List[Client]:
             return []
 
         return [Client.from_row(row) for row in rows]
+    except sqlite3.Error as e:
+        raise DatabaseError(error_messages.DATABASE_ERROR) from e
     finally:
         if conn:
             conn.close()
@@ -174,6 +181,8 @@ def get_client_by_id(client_id: int) -> Client | None:
             return None
 
         return Client.from_row(row)
+    except sqlite3.Error as e:
+        raise DatabaseError(error_messages.DATABASE_ERROR) from e
     finally:
         if conn:
             conn.close()
@@ -182,48 +191,62 @@ def get_client_by_id(client_id: int) -> Client | None:
 **services/client_service.py**
 ```python
 from typing import List
-from models import Client
-import repositories.client_repository as client_repository
+from app.models import Client
+import app.repositories.client_repository as client_repository
+from app.utils.exceptions import (
+    NotFoundError,
+    error_messages
+)
 
-def get_clients(limit: int = None, offset: int = 0) -> List[Client]:
-    clients = client_repository.get_clients(limit, offset)
+def get_clients(limit: int = None, offset: int = 0, only_active: bool = True) -> List[Client]:
+    clients = client_repository.get_clients(limit, offset, only_active)
     if not clients:
         return []
     
     return clients
 
 def get_client_by_id(client_id: int) -> Client | None:
-    return client_repository.get_client_by_id(client_id)
+    client = client_repository.get_client_by_id(client_id)
+    if not client:
+        raise NotFoundError(error_messages.CLIENT_NOT_FOUND)
+
+    return client
 ```
 
 **routes/clients.py**
 ```python
-from fastapi import APIRouter, HTTPException
-from services.client_service import (
+from fastapi import APIRouter, HTTPException, Depends
+from app.services.client_service import (
     get_client_by_id,
     get_clients
+)
+from app.utils.exceptions import handle_service_exceptions
+from app.schemas.client import (
+    ClientListResponseSchema,
+    ClientListQuerySchema,
+    ClientResponseSchema
 )
 
 router = APIRouter(prefix="/clients", tags=["Clients"])
 
-@router.get("/")
-def list_clients(limit: int = None, offset: int = 0):
+@router.get("/", response_model=ClientListResponseSchema)
+@handle_service_exceptions
+def list_clients(params: ClientListQuerySchema = Depends()):
     """List all clients."""
+
+    limit = params.limit
+    offset = params.offset
+    only_active = params.only_active
  
-    clients = get_clients(limit, offset)
-    if not clients:
-        return {"message": "Clientes não encontrado.", "clients": []}
+    clients = get_clients(limit, offset, only_active)
+    return {"message": "Clientes encontrados.", "clients": clients}
 
-    clients_data = [c.__dict__ for c in clients]
-    return {"message": "Clientes encontrados.", "clients": clients_data}
-
-@router.get("/{client_id}")
+@router.get("/{client_id}", response_model=ClientResponseSchema)
+@handle_service_exceptions
 def read_client(client_id: int):
     """Get client by ID."""
     client = get_client_by_id(client_id)
-    if not client:
-        raise HTTPException(status_code=404, detail="Cliente não encontrado.")
-    return client.__dict__
+    return client
 ```
 
 ## Vantagens dessa abordagem
