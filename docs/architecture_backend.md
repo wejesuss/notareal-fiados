@@ -250,10 +250,16 @@ def read_client(client_id: int):
 ```
 
 ## Vantagens dessa abordagem
-- Facilita manutenção e testes unitários isolados
-- Permite trocar o banco de dados facilmente
-- Mantém o código desacoplado do framework
-- Evita duplicação de lógica entre rotas e serviços
+- Facilita manutenção e testes isolados.
+- Permite trocar o banco de dados facilmente.
+- Mantém camadas bem separadas (rotas → serviços → repositórios → banco).
+- Evita duplicação de lógica e regras inconsistentes.
+- Centraliza regras de negócio nos serviços.
+- Repositórios continuam simples e previsíveis (SQL direto).
+- Modelos internos são independentes de frameworks.
+- Schemas Pydantic garantem API estável e validada.
+- Facilita evolução do projeto (PWA, desktop, mobile).
+- Reduz risco de erros silenciosos no backend.
 
 ---
 
