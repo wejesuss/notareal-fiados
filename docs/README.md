@@ -147,6 +147,49 @@ Esses são os arquivos de documentação
 
 ---
 
+## Mapa de Telas e Fluxo (MVP)
+> Este é um modelo planejado para o futuro.  
+
+O fluxo a seguir é otimizado para simplicidade e velocidade de uso pelo vendedor.
+
+```
+╔════════════════════════════════════════════════╗
+║                🏠 Tela Inicial                 ║
+╚════════════════════════════════════════════════╝
+      ↓
+ ┌───────────────────────────────────────────────┐
+ │ [1] Clientes                                  │
+ │ [2] Compras Fiadas                            │
+ │ [3] Pagamentos                                │
+ │ [4] Histórico                                 │
+ │ [5] Backup / Restauração                      │
+ │ [6] Sair                                      │
+ └───────────────────────────────────────────────┘
+```
+
+### 1. Clientes
+- Funções: adicionar, editar, excluir, buscar por nome/apelido.  
+- Campos visíveis: `Nome`, `Apelido`, `Telefone`, `Email`, `Criado em`, `Atualizado em`.
+
+### 2. Compras Fiadas
+- Funções: selecionar cliente, descrição, valor total, gerar `note_number`, salvar e imprimir nota.  
+- Impressão: nota com campos em português (cliente, descrição, valor, data, assinatura).
+
+### 3. Pagamentos
+- Funções: selecionar compra pendente, inserir valor, método, gerar `receipt_number`, salvar e imprimir recibo.  
+- Ao registrar pagamento, atualizar `total_paid_value` e `status` da compra.
+
+### 4. Histórico
+- Visualização consolidada por cliente com filtro por status (pendente/quitado) e por período.  
+- Possibilidade de reimprimir notas ou recibos.
+
+### 5. Backup / Restauração
+- Exportar arquivo `.db` ou `.zip` contendo o banco.  
+- Restaurar a partir de arquivo selecionado.  
+- Opção de enviar backup manualmente por e-mail ou copiar para pendrive.
+
+---
+
 ## 🔗 Documentos Relacionados
 
 - 📘 **[Escopo e visão do projeto](./README.md)** → `README.md`
