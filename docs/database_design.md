@@ -287,7 +287,7 @@ SELECT * FROM payments WHERE purchase_id = ? ORDER BY payment_date DESC;
 - 📘 **[Escopo e visão do projeto](./README.md)**  
   Descreve o propósito, público-alvo e principais funcionalidades do sistema Nota Real Fiados.
 
-- 🗃️ **[Modelo de dados e fluxo de informações](./db_model_and_flow.md)**  
+- 🗃️ **[Modelo de dados e fluxo de informações](./database_design.md)**  
   Mostra como clientes, notas e pagamentos se relacionam no banco de dados e no fluxo do app.
 
 - 🧱 **[Exemplo de arquitetura limpa (FastAPI + SQLite)](./project_clean-code_example.md)**  

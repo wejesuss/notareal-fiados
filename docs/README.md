@@ -88,7 +88,7 @@ Esses são os arquivos de documentação
 
 1. `README.md` ← **este arquivo**
 2. `architecture_backend.md`
-3. `db_model_and_flow.md`
+3. `database_design.md`
 4. `routes_documentation.md`
 
 [Ao final](#-documentos-relacionados) você verá links de navegação para cada um deles.
@@ -152,7 +152,7 @@ Esses são os arquivos de documentação
 - 📘 **[Escopo e visão do projeto](./README.md)** → `README.md`
 
   Descreve o propósito, público-alvo e principais funcionalidades do sistema Nota Real Fiados.
-- 🗃️ **[Modelo de dados e fluxo de informações](./db_model_and_flow.md)** → `db_model_and_flow.md`
+- 🗃️ **[Modelo de dados e fluxo de informações](./database_design.md)** → `database_design.md`
 
   Mostra como clientes, notas e pagamentos se relacionam no banco de dados e no fluxo do app.
 - 🧱 **[Exemplo de arquitetura limpa](./architecture_backend.md)** → `architecture_backend.md`

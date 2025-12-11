@@ -49,7 +49,7 @@ notareal-fiados/
 │   └── notareal.db                   ← Base de dados principal
 ├── docs/                             ← Documentação completa do backend
 │   ├── architecture_backend.md       ← Arquitetura, camadas e responsabilidades
-│   ├── db_model_and_flow.md          ← Modelo do banco + fluxo de dados
+│   ├── database_design.md          ← Modelo do banco + fluxo de dados
 │   ├── README.md                     ← Documentação geral
 │   ├── routes_documentation.md       ← Manual de rotas (em construção)
 │   └── ChatGPT-fluxograma.png        ← Fluxograma simplificado do sistema
@@ -268,7 +268,7 @@ def read_client(client_id: int):
 - 📘 **[Escopo e visão do projeto](./README.md)** → `README.md`
 
   Descreve o propósito, público-alvo e principais funcionalidades do sistema Nota Real Fiados.
-- 🗃️ **[Modelo de dados e fluxo de informações](./db_model_and_flow.md)** → `db_model_and_flow.md`
+- 🗃️ **[Modelo de dados e fluxo de informações](./database_design.md)** → `database_design.md`
 
   Mostra como clientes, notas e pagamentos se relacionam no banco de dados e no fluxo do app.
 - 🧱 **[Exemplo de arquitetura limpa](./architecture_backend.md)** → `architecture_backend.md`
