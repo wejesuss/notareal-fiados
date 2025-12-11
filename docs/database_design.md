@@ -1,7 +1,7 @@
 # Modelo do Banco de Dados e Mapa de Telas - NotaReal Fiados (MVP)
 
 ## Objetivo deste documento
-Este arquivo contém o **modelo de dados atualizado** (SQL `CREATE TABLE`) do banco SQLite do NotaReal Fiados, além do **mapa de telas e fluxo** do programa (MVP). Este documento é uma referência para implementar o banco e as telas iniciais.
+Este arquivo contém o **modelo de dados atualizado** (SQL `CREATE TABLE`) do banco SQLite do NotaReal Fiados. Também apresenta um **resumo do fluxo de informações** entre clientes, compras e pagamentos.
 
 ---
 
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS clients (
 );
 ```
 
-**Descrição dos campos (para o vendedor):**
+**Descrição dos campos:**
 - `name`: Nome completo do cliente.  
 - `nickname`: Apelido ou identificação curta (útil para distinguir nomes iguais).  
 - `phone`: Telefone de contato (opcional).  
@@ -116,7 +116,7 @@ CREATE TABLE IF NOT EXISTS payments (
 **Descrição dos campos (para o vendedor):**
 - `receipt_number`: Número do recibo de pagamento (ex: REC-001).  
 - `amount`: Valor pago nesta transação.  
-- `payment_date`: Data e hora do pagamento (pode ser desconhecido).
+- `payment_date`: Data e hora do pagamento (pode ser desconhecido para compras passadas).
 - `method`: Forma de pagamento (ex: dinheiro, pix, transferência).  
 - `description`: Observações adicionais (ex: "parcial com troco").
 - `created_at` e `updated_at`: Datas de criação e atualização em segundos.
@@ -137,7 +137,8 @@ CREATE TABLE IF NOT EXISTS payments (
 ---
 
 ### optional: purchase_items (opcional)
-Caso queira detalhar itens por compra.
+Caso queira detalhar itens por compra.  
+Esta tabela não está implementada atualmente no projeto.
 
 ```sql
 CREATE TABLE purchase_items (
@@ -190,7 +191,27 @@ Executadas a cada conexão via `get_connection()`:
 
 ---
 
-## Regras de consistência (lógica a implementar na aplicação)
+## Regras de consistência (lógica da aplicação)
+
+### Fluxo Relacional entre Entidades
+```ruby
+Cliente (clients)
+      │
+      └── 1:N
+             └── Compras (purchases)
+                       │
+                       └── 1:N
+                              └── Pagamentos (payments)
+```
+
+Resumo:
+ - Um cliente pode ter várias compras fiadas.
+ - Uma compra pode ter vários pagamentos.
+ - Total pago e status da compra são recalculados após cada pagamento, ativação ou desativação.
+
+### Regras de Negócio Baseadas no Banco
+Estas regras são implementadas no service de purchase/payment, não no banco:
+
 1. Ao registrar um pagamento:
    - Inserir linha em `payments`.  
    - Atualizar `purchases.total_paid_value += amount`.  
@@ -210,54 +231,16 @@ Executadas a cada conexão via `get_connection()`:
 
 ---
 
-## Mapa de Telas e Fluxo (MVP)
-
-O fluxo a seguir é otimizado para simplicidade e velocidade de uso pelo vendedor.
-
-```
-╔════════════════════════════════════════════════╗
-║                🏠 Tela Inicial                  ║
-╚════════════════════════════════════════════════╝
-      ↓
- ┌───────────────────────────────────────────────┐
- │ [1] Clientes                                  │
- │ [2] Compras Fiadas                            │
- │ [3] Pagamentos                                │
- │ [4] Histórico                                 │
- │ [5] Backup / Restauração                      │
- │ [6] Sair                                      │
- └───────────────────────────────────────────────┘
-```
-
-### 1. Clientes
-- Funções: adicionar, editar, excluir, buscar por nome/apelido.  
-- Campos visíveis: `Nome`, `Apelido`, `Telefone`, `Email`, `Criado em`, `Atualizado em`.
-
-### 2. Compras Fiadas
-- Funções: selecionar cliente, descrição, valor total, gerar `note_number`, salvar e imprimir nota.  
-- Impressão: nota com campos em português (cliente, descrição, valor, data, assinatura).
-
-### 3. Pagamentos
-- Funções: selecionar compra pendente, inserir valor, método, gerar `receipt_number`, salvar e imprimir recibo.  
-- Ao registrar pagamento, atualizar `total_paid_value` e `status` da compra.
-
-### 4. Histórico
-- Visualização consolidada por cliente com filtro por status (pendente/quitado) e por período.  
-- Possibilidade de reimprimir notas ou recibos.
-
-### 5. Backup / Restauração
-- Exportar arquivo `.db` ou `.zip` contendo o banco.  
-- Restaurar a partir de arquivo selecionado.  
-- Opção de enviar backup manualmente por e-mail ou copiar para pendrive.
-
----
-
 ## Exemplos de consultas úteis
 
 - Saldo pendente por cliente:
 ```sql
-SELECT c.id, c.name, SUM(p.total_value) AS total_purchases, SUM(p.total_paid_value) AS total_paid,
-       (SUM(p.total_value) - SUM(p.total_paid_value)) AS total_due
+SELECT
+    c.id,
+    c.name,
+    SUM(p.total_value) AS total_purchases,
+    SUM(p.total_paid_value) AS total_paid,
+    (SUM(p.total_value) - SUM(p.total_paid_value)) AS total_due
 FROM clients c
 LEFT JOIN purchases p ON p.client_id = c.id
 GROUP BY c.id, c.name
@@ -266,12 +249,16 @@ ORDER BY total_due DESC;
 
 - Lista de compras pendentes:
 ```sql
-SELECT * FROM purchases WHERE status IN ('pending', 'partial') ORDER BY created_at DESC;
+SELECT * FROM purchases
+WHERE status IN ('pending', 'partial')
+ORDER BY created_at DESC;
 ```
 
 - Pagamentos de uma compra:
 ```sql
-SELECT * FROM payments WHERE purchase_id = ? ORDER BY payment_date DESC;
+SELECT * FROM payments
+WHERE purchase_id = ?
+ORDER BY payment_date DESC;
 ```
 
 ---
@@ -284,11 +271,15 @@ SELECT * FROM payments WHERE purchase_id = ? ORDER BY payment_date DESC;
 
 ### 🔗 Documentos relacionados
 
-- 📘 **[Escopo e visão do projeto](./README.md)**  
+- 📘 **[Escopo e visão do projeto](./README.md)** → `README.md`
+
   Descreve o propósito, público-alvo e principais funcionalidades do sistema Nota Real Fiados.
+- 🗃️ **[Modelo de dados e fluxo de informações](./database_design.md)** → `database_design.md`
 
-- 🗃️ **[Modelo de dados e fluxo de informações](./database_design.md)**  
   Mostra como clientes, notas e pagamentos se relacionam no banco de dados e no fluxo do app.
+- 🧱 **[Exemplo de arquitetura limpa](./architecture_backend.md)** → `architecture_backend.md`
 
-- 🧱 **[Exemplo de arquitetura limpa (FastAPI + SQLite)](./project_clean-code_example.md)**  
   Explica a organização de pastas e o desacoplamento entre API, serviços e repositórios, com código exemplo.
+- 📚 **[Documentação das rotas](./routes_documentation.md)** → `routes_documentation.md`
+  
+  Demonstra como funcionam as rotas da API do sistema, com exemplos reais de uso.
