@@ -200,8 +200,102 @@ Retorno:
 
 ---
 
-## Observações Importantes
+## 10. Comportamento de Pesquisa
 
+### Compras
+- Local: tela de **Lista de Compras**
+- Campo único:
+  - Buscar por **ID** ou **Número da Nota**
+- Comportamento:
+  1. Tenta buscar por ID
+  2. Se não encontrado, tenta buscar por `note_number`
+  3. Se não encontrar, exibe mensagem clara
+
+### Pagamentos (futuro)
+- Local: tela de **Pagamentos**
+- Campo único:
+  - Buscar por **ID** ou **Número do Recibo**
+
+Busca sempre contextual (por recurso), não global.
+
+---
+
+## 11. Visualização de Compras e Pagamentos (Scroll)
+
+- Scroll **unificado da página**
+- **Nunca** usar scroll dentro de scroll
+
+### Tela de Detalhe da Compra
+Ordem vertical:
+1. Resumo da compra (totais, status)
+2. Lista de pagamentos relacionados
+3. Ações (novo pagamento, editar, desativar)
+
+Se a lista crescer:
+- Paginação
+- Lazy loading
+- Botão “ver mais”
+
+---
+
+## 12. Criação e Edição (Telas vs Modal)
+
+Regra:
+- **Criar** → Modal (Dialog)
+- **Editar** → Modal (Dialog)
+- **Visualizar** → Tela dedicada
+
+Benefícios:
+- Menos telas
+- Fluxo mais rápido
+- Melhor UX em mobile
+- Menos navegação
+
+Componentes Quasar:
+- `QDialog`
+- `QForm`
+
+---
+
+## 13. Estratégia de Dados e Requests
+
+### Princípios
+- Dados financeiros
+- Multi-dispositivo
+- Evitar cache permanente
+
+### Stores (Pinia)
+Stores separadas:
+- clients
+- purchases
+- payments
+
+Cada store mantém:
+- lista de itens
+- timestamp do último fetch
+
+### Fetch Strategy
+- Listas:
+  - Buscar se store vazia ou cache expirado (30–60s)
+- Detalhes:
+  - Sempre buscar ao entrar na tela
+- Mutação (create/update/delete):
+  - Atualiza store local ou invalida cache relacionado
+
+### Sincronia
+- Refetch ao entrar na tela
+- Pull-to-refresh (mobile)
+- Após ações críticas
+
+Sem WebSocket por enquanto.
+
+---
+
+## 14. Observações Importantes
+
+- Sem cache eterno
+- Sem LocalStorage para dados financeiros
+- Priorizar consistência sobre performance extrema
 - Pagamento sempre pertence a uma compra
 - Soft delete deve refletir visualmente (cinza / badge)
 - Estrutura única para Web, Desktop (Tauri) e PWA
