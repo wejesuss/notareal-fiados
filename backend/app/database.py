@@ -7,7 +7,6 @@ DB_PATH = DATA_DIR / "notareal.db"
 DB_PATH.parent.mkdir(exist_ok=True)
 
 def init_database():
-
     conn = get_connection()
     cursor = conn.cursor()
 
