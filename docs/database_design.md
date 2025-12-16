@@ -269,7 +269,7 @@ ORDER BY payment_date DESC;
 
 ---
 
-### 🔗 Documentos relacionados
+## 🔗 Documentos Relacionados
 
 - 📘 **[Escopo e visão do projeto](./README.md)** → `README.md`
 
@@ -283,3 +283,13 @@ ORDER BY payment_date DESC;
 - 📚 **[Documentação das rotas](./routes_documentation.md)** → `routes_documentation.md`
   
   Demonstra como funcionam as rotas da API do sistema, com exemplos reais de uso.
+
+- 🧭 **[Fluxo de telas e navegação](./screen_flow.md)** → `screen_flow.md`
+
+  Descreve o fluxo geral de telas do sistema, decisões de navegação, estratégias de busca (ID, nota, recibo),
+  e considerações sobre cache, sincronização de dados e experiência multi-dispositivo.
+
+- 🖼️ **[Wireframes iniciais da interface](./wireframe.md)** → `wireframe.md`
+
+  Apresenta wireframes textuais das principais telas (dashboard, clientes, compras e pagamentos),
+  incluindo modais de criação/edição, ações de ativação/desativação e organização visual dos dados.
