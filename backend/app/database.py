@@ -1,7 +1,9 @@
 import sqlite3
 from pathlib import Path
 
-DB_PATH = Path("data") / "notareal.db"
+BASE_DIR = Path(__file__).resolve().parents[1]  # backend/
+DATA_DIR = BASE_DIR / "data"
+DB_PATH = DATA_DIR / "notareal.db"
 DB_PATH.parent.mkdir(exist_ok=True)
 
 def init_database():
