@@ -148,24 +148,12 @@ Esses são os arquivos de documentação
 ---
 
 ## Mapa de Telas e Fluxo (MVP)
-> Este é um modelo planejado para o futuro.  
 
-O fluxo a seguir é otimizado para simplicidade e velocidade de uso pelo vendedor.
+Veja os arquivos **[Fluxo de telas e navegação](./screen_flow.md)** e **[Wireframes iniciais da interface](./wireframe.md)** para mais informações.  
 
-```
-╔════════════════════════════════════════════════╗
-║                🏠 Tela Inicial                 ║
-╚════════════════════════════════════════════════╝
-      ↓
- ┌───────────────────────────────────────────────┐
- │ [1] Clientes                                  │
- │ [2] Compras Fiadas                            │
- │ [3] Pagamentos                                │
- │ [4] Histórico                                 │
- │ [5] Backup / Restauração                      │
- │ [6] Sair                                      │
- └───────────────────────────────────────────────┘
-```
+> Este é um modelo planejado para o futuro.
+
+---
 
 ### 1. Clientes
 - Funções: adicionar, editar, excluir, buscar por nome/apelido.  
