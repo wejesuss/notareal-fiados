@@ -7,11 +7,29 @@
           dense 
           round 
           icon="menu" aria-label="Menu" 
-          @click="toggleDrawer" />
+          @click="toggleDrawer" 
+        />
 
         <q-space />
         <q-toolbar-title> NotaReal Fiados </q-toolbar-title>
         <q-space />
+
+        <!-- global search input -->
+        <q-input
+          dense
+          filled 
+          color="primary"
+          bg-color="white"
+          v-model.trim="searchInput"
+          placeholder="Buscar recurso"
+          style="width: 220px;"
+          input-class="input-text-darkblue"
+        >
+          <template #append>
+            <q-icon size="sm" name="manage_search"></q-icon>
+          </template>
+        </q-input>
+        
       </q-toolbar>
     </q-header>
 
@@ -57,7 +75,6 @@
               Pagamentos (Geral)
             </q-item-section>
           </q-item>
-
         </q-list>
      </q-drawer>
 
@@ -70,9 +87,16 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
+const searchInput = ref("")
 const leftDrawerOpen = ref(false)
 
 function toggleDrawer() {
   leftDrawerOpen.value = !leftDrawerOpen.value
 }
 </script>
+
+<style lang="css">
+  .input-text-darkblue {
+    color: #002f54;
+  }
+</style>
