@@ -48,6 +48,15 @@
               Compras
             </q-item-section>
           </q-item>
+          
+          <q-item clickable v-ripple to="/payments/all">
+            <q-item-section avatar>
+              <q-icon name="payments"></q-icon>
+            </q-item-section>
+            <q-item-section>
+              Pagamentos (Geral)
+            </q-item-section>
+          </q-item>
 
         </q-list>
      </q-drawer>
