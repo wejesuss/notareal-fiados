@@ -6,15 +6,9 @@
 
         <div class="row q-col-gutter-md">
             <div class="col-12 col-md-4">
-                <q-card>
-                    <q-card-section>
-                        <div class="text-subtitle1">Status</div>
-                        <div class="text-caption text-grey">
-                             Visão geral do sistema
-                        </div>
-                    </q-card-section>
-                </q-card>
+                <system-overview-card :is-healthy="systemHealthy" :last-updated="lastUpdated" />
             </div>
+
 
             <div class="col-12 col-md-4">
                 <q-card>
@@ -42,4 +36,8 @@
 </template>
 
 <script setup lang="ts">
+import SystemOverviewCard from 'src/components/SystemOverviewCard.vue';
+
+const systemHealthy = true
+const lastUpdated = "há poucos segundos"
 </script>
