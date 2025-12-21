@@ -6,9 +6,14 @@
 
         <div class="row q-col-gutter-md">
             <div class="col-12 col-md-4">
-                <system-overview-card :is-healthy="systemHealthy" :last-updated="lastUpdated" />
+        <system-overview-card
+          :is-healthy="systemHealthy"
+          :last-updated="lastUpdated"
+          :active-clients="activeClients"
+          :open-purchases="openPurchases"
+          :open-amount="openAmount"
+        />
             </div>
-
 
             <div class="col-12 col-md-4">
                 <q-card>
@@ -36,8 +41,11 @@
 </template>
 
 <script setup lang="ts">
-import SystemOverviewCard from 'src/components/SystemOverviewCard.vue';
+import SystemOverviewCard from "src/components/SystemOverviewCard.vue";
 
-const systemHealthy = true
-const lastUpdated = "há poucos segundos"
+const systemHealthy = true;
+const lastUpdated = "há poucos segundos";
+const activeClients = 50;
+const openPurchases = 30;
+const openAmount = 2367.9;
 </script>
