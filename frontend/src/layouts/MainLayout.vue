@@ -11,7 +11,7 @@
         />
 
         <q-space />
-        <q-toolbar-title> NotaReal Fiados </q-toolbar-title>
+        <q-toolbar-title style="min-width: fit-content;"> NotaReal Fiados </q-toolbar-title>
         <q-space />
 
         <!-- global search input -->
