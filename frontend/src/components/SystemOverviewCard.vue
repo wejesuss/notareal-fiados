@@ -23,21 +23,66 @@
     <q-card-section>
       <div class="row q-col-gutter-md text-center">
         <div class="col">
-          <div class="text-caption text-grey">Clientes ativos</div>
+          <div class="text-body2 text-grey-7 q-mb-xs">
+            Clientes ativos
+            <q-icon name="help_outline" size="xs" class="q-ml-xs">
+              <q-tooltip class="text-caption">
+                Total de clientes ativos no sistema
+              </q-tooltip>
+            </q-icon>
+          </div>
           <div class="text-h6" :class="clientsColor">
             {{ props.activeClients }}
+            <q-icon
+              name="open_in_new"
+              size="xs"
+              class="cursor-pointer q-ml-sm"
+              @click="navigateTo('/clients')"
+            >
+              <q-tooltip class="text-caption">Ver clientes ativos</q-tooltip>
+            </q-icon>
           </div>
         </div>
         <div class="col">
-          <div class="text-caption text-grey">Compras em aberto</div>
+          <div class="text-body2 text-grey-7 q-mb-xs">
+            Compras em aberto
+            <q-icon name="help_outline" size="xs" class="q-ml-xs">
+              <q-tooltip class="text-caption">
+                Compras que ainda não foram totalmente pagas
+              </q-tooltip>
+            </q-icon>
+          </div>
           <div class="text-h6" :class="purchasesColor">
             {{ props.openPurchases }}
+            <q-icon
+              name="open_in_new"
+              size="xs"
+              class="cursor-pointer q-ml-sm"
+              @click="navigateTo('/purchases?only_pending=true')"
+            >
+              <q-tooltip class="text-caption">Ver compras em aberto</q-tooltip>
+            </q-icon>
           </div>
         </div>
         <div class="col">
-          <div class="text-caption text-grey">R$ em aberto</div>
+          <div class="text-body2 text-grey-7 text-weight-bold q-mb-xs">
+            R$ em aberto
+            <q-icon name="help_outline" size="xs" class="q-ml-xs">
+              <q-tooltip class="text-caption">
+                Valor total considerando compras em aberto
+              </q-tooltip>
+            </q-icon>
+          </div>
           <div class="text-h6" :class="amountColor">
             {{ openAmount }}
+            <q-icon
+              name="open_in_new"
+              size="xs"
+              class="cursor-pointer q-ml-sm"
+              @click="navigateTo('/purchases?only_pending=true')"
+            >
+              <q-tooltip class="text-caption">Ver compras em aberto</q-tooltip>
+            </q-icon>
           </div>
         </div>
       </div>
@@ -47,6 +92,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
+import { useRouter } from "vue-router";
 
 interface Props {
   /**
@@ -72,6 +118,12 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const router = useRouter();
+
+// methods
+async function navigateTo(path: string) {
+  await router.push({ path });
+}
 
 // header
 const statusLabel = computed(() =>
