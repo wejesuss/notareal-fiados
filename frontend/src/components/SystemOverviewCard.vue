@@ -11,7 +11,7 @@
           </span>
         </div>
 
-        <div class="text-caption text-grey q-mt-xs">
+        <div class="text-caption text-grey-7 q-mt-xs">
           Última atualização: {{ lastUpdatedLabel }}
         </div>
       </div>
