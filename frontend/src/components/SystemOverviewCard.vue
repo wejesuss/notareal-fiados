@@ -24,19 +24,19 @@
       <div class="row q-col-gutter-md text-center">
         <div class="col">
           <div class="text-caption text-grey">Clientes ativos</div>
-          <div class="text-h6 text-primary">
+          <div class="text-h6" :class="clientsColor">
             {{ props.activeClients }}
           </div>
         </div>
         <div class="col">
           <div class="text-caption text-grey">Compras em aberto</div>
-          <div class="text-h6 text-yellow-10">
+          <div class="text-h6" :class="purchasesColor">
             {{ props.openPurchases }}
           </div>
         </div>
         <div class="col">
           <div class="text-caption text-grey">R$ em aberto</div>
-          <div class="text-h6 text-negative">
+          <div class="text-h6" :class="amountColor">
             {{ openAmount }}
           </div>
         </div>
@@ -94,5 +94,20 @@ const openAmount = computed(() => {
   }
 
   return amount;
+});
+
+const clientsColor = computed(() => {
+  if (props.activeClients === 0) return "text-grey";
+  return "text-primary";
+});
+const purchasesColor = computed(() => {
+  if (props.openPurchases === 0) return "text-positive";
+  if (props.openPurchases <= 20) return "text-yellow-10";
+  return "text-negative";
+});
+const amountColor = computed(() => {
+  if (props.openAmount < 1000) return "text-positive";
+  if (props.openAmount < 5000) return "text-yellow-10";
+  return "text-negative";
 });
 </script>
