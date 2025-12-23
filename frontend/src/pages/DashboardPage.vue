@@ -73,6 +73,41 @@ const registryCards = computed(() => [
     route: "/clients",
     actionLabel: "Ver todos",
   },
+  {
+    key: "purchases",
+    title: "Últimas compras",
+    recentRegistries: [
+      {
+        id: 1,
+        name: "Maria Costa",
+        value: "R$ 200 - pendente",
+      },
+      {
+        id: 2,
+        name: "João Silva",
+        value: "R$ 80 - parcial",
+      },
+    ],
+    subtitle: amountFormatted.value + " em aberto",
+    valueColor: openPurchases.value === 0 ? "text-positive" : "text-grey-7",
+    route: "/purchases",
+    actionLabel: "Ver compras",
+  },
+  {
+    key: "balance",
+    title: "Últimos pagamentos",
+    recentRegistries: [
+      {
+        id: 1,
+        name: "Maria Costa",
+        value: "R$ 50 - hoje",
+      },
+    ],
+    subtitle: "4 clientes pendentes",
+    valueColor: "text-negative",
+    route: "/payments",
+    actionLabel: "Ver pagamentos",
+  },
 ]);
 
 const systemHealthy = true;
@@ -80,4 +115,11 @@ const lastUpdated = "há poucos segundos";
 const activeClients = 50;
 const openPurchases = computed(() => 30);
 const openAmount = 2367.9;
+const amountFormatted = computed(() => {
+  return Intl.NumberFormat("pt-br", {
+    style: "currency",
+    currency: "BRL",
+    minimumFractionDigits: 2,
+  }).format(openAmount);
+});
 </script>
