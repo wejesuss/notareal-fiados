@@ -10,10 +10,10 @@
         :key="registry.id"
         class="row items-center justify-between text-body2 q-mt-md"
       >
-        <span :class="valueColor" class="text-weight-bold">{{
-          registry.name
-        }}</span>
-        <span class="text-caption text-h5" :class="valueColor ?? 'text-grey'">
+        <span class="text-weight-bold" :class="valueColor">
+          {{ registry.name }}
+        </span>
+        <span class="text-body2 text-weight-medium" :class="valueTextColor">
           {{ registry.value }}
         </span>
       </div>
@@ -40,6 +40,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
 import { useRouter } from "vue-router";
 
 interface Props {
@@ -61,6 +62,8 @@ const router = useRouter();
 async function navigateTo() {
   await router.push({ path: props.route });
 }
+
+const valueTextColor = computed(() => props.valueColor ?? "text-grey");
 </script>
 
 <style scoped>
