@@ -1,14 +1,27 @@
 <template>
-  <q-card class="registry-card">
+  <q-card flat bordered class="registry-card">
     <q-card-section>
       <!-- Title -->
       <div class="text-body2 text-grey-7">{{ title }}</div>
 
       <!-- Main value -->
-      <div class="text-h5 q-mt-xs" :class="valueColor">{{ value }}</div>
+      <div
+        v-for="registry in recentRegistries"
+        :key="registry.id"
+        class="row items-center justify-between text-body2 q-mt-md"
+      >
+        <span :class="valueColor" class="text-weight-bold">{{
+          registry.name
+        }}</span>
+        <span class="text-caption text-h5" :class="valueColor ?? 'text-grey'">
+          {{ registry.value }}
+        </span>
+      </div>
 
       <!-- Secondary info -->
-      <div class="text-caption text-grey q-mt-xs">{{ subtitle }}</div>
+      <div class="text-subtitle2 text-grey q-mt-lg" v-if="subtitle">
+        {{ subtitle }}
+      </div>
     </q-card-section>
 
     <q-separator />
@@ -31,11 +44,15 @@ import { useRouter } from "vue-router";
 
 interface Props {
   title: string;
-  value: string | number;
   subtitle?: string;
-  valueColor?: string;
   route: string;
   actionLabel: string;
+  valueColor?: string;
+  recentRegistries: Array<{
+    id: string | number | symbol;
+    name: string;
+    value: string | number;
+  }>;
 }
 
 const props = defineProps<Props>();

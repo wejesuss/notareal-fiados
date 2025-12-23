@@ -22,14 +22,12 @@
           </q-card-section>
 
           <q-card-section>
-            <div class="row q-col-gutter-md">
-              <div
-                class="col-12 col-md-4"
-                v-for="card in registryCards"
-                :key="card.key"
-              >
-                <RegistryCard v-bind="card"></RegistryCard>
-              </div>
+            <div v-for="(card, index) in registryCards" :key="card.key">
+              <RegistryCard v-bind="card"></RegistryCard>
+              <q-separator
+                v-if="index < registryCards.length - 1"
+                spaced="14px"
+              />
             </div>
           </q-card-section>
         </q-card>
@@ -57,30 +55,23 @@ import { computed } from "vue";
 const registryCards = computed(() => [
   {
     key: "clients",
-    title: "Clientes",
-    value: activeClients,
+    title: "Últimos clientes",
+    recentRegistries: [
+      {
+        id: 1,
+        name: "João Silva",
+        value: "Há 2h",
+      },
+      {
+        id: 2,
+        name: "Maria Costa",
+        value: "Ontem",
+      },
+    ],
     subtitle: "+3 esse mês",
     valueColor: "text-primary",
     route: "/clients",
-    actionLabel: "Ver",
-  },
-  {
-    key: "purchases",
-    title: "Compras em aberto",
-    value: openPurchases.value,
-    subtitle: amountFormatted + " em aberto",
-    valueColor: openPurchases.value === 0 ? "text-positive" : "text-negative",
-    route: "/purchases?only_pending=true",
-    actionLabel: "Ver",
-  },
-  {
-    key: "balance",
-    title: "Montante em aberto",
-    value: amountFormatted,
-    subtitle: "4 clientes pendentes",
-    valueColor: "text-negative",
-    route: "/payments",
-    actionLabel: "Novo pagamento",
+    actionLabel: "Ver todos",
   },
 ]);
 
@@ -89,9 +80,4 @@ const lastUpdated = "há poucos segundos";
 const activeClients = 50;
 const openPurchases = computed(() => 30);
 const openAmount = 2367.9;
-const amountFormatted = Intl.NumberFormat("pt-br", {
-  style: "currency",
-  currency: "BRL",
-  minimumFractionDigits: 2,
-}).format(openAmount);
 </script>
