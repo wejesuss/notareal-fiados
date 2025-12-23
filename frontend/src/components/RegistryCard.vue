@@ -31,6 +31,7 @@
       <q-btn
         flat
         dense
+        class="full-width"
         color="primary"
         :label="actionLabel"
         @click.stop="navigateTo"
