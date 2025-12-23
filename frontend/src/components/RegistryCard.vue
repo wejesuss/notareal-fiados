@@ -18,11 +18,19 @@
         :key="registry.id"
         class="row items-center justify-between text-body2 q-mt-md"
       >
-        <span class="text-weight-bold" :class="valueColor">
+        <span class="text-weight-bold" :class="nameTextColor">
           {{ registry.name }}
         </span>
-        <span class="text-body2 text-weight-medium" :class="valueTextColor">
+        <span class="row text-body2 text-weight-medium" :class="valueTextColor">
           {{ registry.value }}
+          <div v-if="registry.valueComplement" class="q-ml-sm">
+            <q-icon
+              :name="iconText"
+              :color="iconTextColor"
+              size="xs"
+              class="q-mr-sm"
+            />{{ registry.valueComplement }}
+          </div>
         </span>
       </div>
 
@@ -51,21 +59,9 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useRouter } from "vue-router";
+import type { RegistryCardProps } from "./models";
 
-interface Props {
-  title: string;
-  subtitle?: string;
-  route: string;
-  actionLabel: string;
-  valueColor?: string;
-  recentRegistries: Array<{
-    id: string | number | symbol;
-    name: string;
-    value: string | number;
-  }>;
-}
-
-const props = defineProps<Props>();
+const props = defineProps<RegistryCardProps>();
 const router = useRouter();
 
 async function navigateTo() {
@@ -73,6 +69,9 @@ async function navigateTo() {
 }
 
 const valueTextColor = computed(() => props.valueColor ?? "text-grey");
+const nameTextColor = computed(() => props.nameColor ?? "text-grey");
+const iconText = computed(() => props.icon ?? "circle");
+const iconTextColor = computed(() => props.iconColor ?? "amber");
 </script>
 
 <style scoped>

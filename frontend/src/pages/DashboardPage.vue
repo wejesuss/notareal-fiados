@@ -22,7 +22,7 @@
           </q-card-section>
 
           <q-card-section>
-            <div v-for="(card, index) in registryCards" :key="card.key">
+            <div v-for="(card, index) in registryCards" :key="card.id">
               <RegistryCard v-bind="card"></RegistryCard>
               <q-separator
                 v-if="index < registryCards.length - 1"
@@ -48,14 +48,20 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
 import SystemOverviewCard from "src/components/SystemOverviewCard.vue";
 import RegistryCard from "src/components/RegistryCard.vue";
-import { computed } from "vue";
+import type { RegistryCardProps } from "src/components/models";
 
-const registryCards = computed(() => [
+const registryCards = computed<RegistryCardProps[]>(() => [
   {
-    key: "clients",
+    id: "clients",
     title: "Últimos clientes",
+    subtitle: "+3 esse mês",
+    nameColor: "text-primary",
+    valueColor: "text-primary",
+    route: "/clients",
+    actionLabel: "Ver todos",
     recentRegistries: [
       {
         id: 1,
@@ -68,45 +74,53 @@ const registryCards = computed(() => [
         value: "Ontem",
       },
     ],
-    subtitle: "+3 esse mês",
-    valueColor: "text-primary",
-    route: "/clients",
-    actionLabel: "Ver todos",
   },
   {
-    key: "purchases",
+    id: "purchases",
     title: "Últimas compras",
+    subtitle: amountFormatted.value + " em aberto",
+    nameColor: "text-primary",
+    valueColor: openPurchases.value === 0 ? "text-positive" : "text-grey-7",
+    route: "/purchases",
+    actionLabel: "Ver compras",
     recentRegistries: [
       {
         id: 1,
         name: "Maria Costa",
-        value: "R$ 200 - pendente",
+        value: "R$ 200",
+        valueComplement: "pendente",
       },
       {
         id: 2,
         name: "João Silva",
-        value: "R$ 80 - parcial",
+        value: "R$ 80",
+        valueComplement: "parcial",
       },
     ],
-    subtitle: amountFormatted.value + " em aberto",
-    valueColor: openPurchases.value === 0 ? "text-positive" : "text-grey-7",
-    route: "/purchases",
-    actionLabel: "Ver compras",
   },
   {
-    key: "balance",
+    id: "balance",
     title: "Últimos pagamentos",
+    subtitle: "4 clientes pendentes",
+    nameColor: "text-primary",
+    valueColor: "text-negative",
+    route: "/payments",
+    actionLabel: "Ver pagamentos",
+    icon: "horizontal_rule",
+    iconColor: "red",
     recentRegistries: [
       {
         id: 1,
         name: "Maria Costa",
-        value: "R$ 50 - hoje",
+        value: "R$ 50",
+        valueComplement: "hoje",
+      },
+      {
+        id: 2,
+        name: "Maria Costa",
+        value: "R$ 20",
       },
     ],
-    subtitle: "4 clientes pendentes",
-    valueColor: "text-negative",
-    route: "/payments",
-    actionLabel: "Ver pagamentos",
   },
 ]);
 
