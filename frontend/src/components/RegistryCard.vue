@@ -6,6 +6,14 @@
 
       <!-- Main value -->
       <div
+        v-if="recentRegistries.length === 0"
+        class="text-caption text-grey q-mt-md text-weight-bold"
+      >
+        Nenhum registro recente
+      </div>
+
+      <div
+        v-else
         v-for="registry in recentRegistries"
         :key="registry.id"
         class="row items-center justify-between text-body2 q-mt-md"
