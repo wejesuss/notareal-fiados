@@ -136,16 +136,11 @@ const lastUpdatedLabel = computed(() => props.lastUpdated ?? "—");
 
 // metrics
 const openAmount = computed(() => {
-  const amount = props.openAmount;
-  if (typeof amount === "number") {
-    return Intl.NumberFormat("pt-br", {
-      style: "currency",
-      currency: "BRL",
-      minimumFractionDigits: 2,
-    }).format(amount);
-  }
-
-  return amount;
+  return Intl.NumberFormat("pt-br", {
+    style: "currency",
+    currency: "BRL",
+    minimumFractionDigits: 2,
+  }).format(props.openAmount);
 });
 
 const clientsColor = computed(() => {
