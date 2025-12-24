@@ -1,3 +1,5 @@
+import type { QIconProps } from "quasar";
+
 export interface RegistryCardProps {
   id: string | number;
   title: string;
@@ -7,7 +9,7 @@ export interface RegistryCardProps {
   valueColor?: string;
   nameColor?: string;
   icon?: string;
-  iconColor?: string;
+  iconColor?: QIconProps["color"];
   recentRegistries: Array<{
     id: string | number;
     name: string;
