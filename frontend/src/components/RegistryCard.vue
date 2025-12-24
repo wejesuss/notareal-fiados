@@ -21,8 +21,10 @@
         <span class="text-weight-bold" :class="nameTextColor">
           {{ registry.name }}
         </span>
-        <span
-          class="row text-body2 text-weight-medium"
+
+        <!-- Registry value -->
+        <div
+          class="row items-center text-body2 text-weight-medium"
           :class="resolveValueColor(registry.valueColor)"
         >
           {{ registry.value }}
@@ -34,7 +36,7 @@
               class="q-mr-sm"
             />{{ registry.valueComplement }}
           </div>
-        </span>
+        </div>
       </div>
 
       <!-- Secondary info -->
