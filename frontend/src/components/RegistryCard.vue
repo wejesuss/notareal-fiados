@@ -21,7 +21,10 @@
         <span class="text-weight-bold" :class="nameTextColor">
           {{ registry.name }}
         </span>
-        <span class="row text-body2 text-weight-medium" :class="valueTextColor">
+        <span
+          class="row text-body2 text-weight-medium"
+          :class="resolveValueColor(registry.valueColor)"
+        >
           {{ registry.value }}
           <div v-if="registry.valueComplement" class="q-ml-sm">
             <q-icon
@@ -68,10 +71,12 @@ async function navigateTo() {
   await router.push({ path: props.route });
 }
 
-const valueTextColor = computed(() => props.valueColor ?? "text-grey");
 const nameTextColor = computed(() => props.nameColor ?? "text-grey");
 const iconText = computed(() => props.icon ?? "circle");
 const iconTextColor = computed(() => props.iconColor ?? "amber");
+
+const resolveValueColor = (itemColor?: string) =>
+  itemColor ?? props.valueColor ?? "text-grey";
 </script>
 
 <style scoped>

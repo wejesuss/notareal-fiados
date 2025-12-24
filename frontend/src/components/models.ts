@@ -15,5 +15,6 @@ export interface RegistryCardProps {
     name: string;
     value: string | number;
     valueComplement?: string;
+    valueColor?: string;
   }>;
 }
