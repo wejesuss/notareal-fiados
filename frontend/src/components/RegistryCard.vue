@@ -51,15 +51,18 @@
     <q-separator />
 
     <!-- Action -->
-    <q-card-actions align="center">
-      <q-btn
-        flat
-        dense
-        class="full-width"
-        color="primary"
-        :label="actionLabel"
-        @click.stop="navigateTo"
-      />
+    <q-card-actions
+      class="registry-action"
+      align="center"
+      role="button"
+      tabindex="0"
+      @click="navigateTo"
+      @keydown.enter="navigateTo"
+      @keydown.space.prevent="navigateTo"
+    >
+      <span class="text-primary text-center text-body2 text-weight-medium">
+        {{ actionLabel }}
+      </span>
     </q-card-actions>
   </q-card>
 </template>
@@ -87,5 +90,17 @@ const resolveValueColor = (itemColor?: string) =>
 <style scoped>
 .registry-card {
   height: 100%;
+}
+
+.registry-action {
+  padding: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-transform: uppercase;
+}
+
+.registry-action:hover,
+.registry-action:focus-visible {
+  background-color: rgba(0, 0, 0, 0.06);
 }
 </style>
