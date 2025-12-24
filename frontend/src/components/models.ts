@@ -1,5 +1,5 @@
 export interface RegistryCardProps {
-  id: string;
+  id: string | number;
   title: string;
   subtitle?: string;
   route: string;
@@ -9,7 +9,7 @@ export interface RegistryCardProps {
   icon?: string;
   iconColor?: string;
   recentRegistries: Array<{
-    id: string | number | symbol;
+    id: string | number;
     name: string;
     value: string | number;
     valueComplement?: string;
