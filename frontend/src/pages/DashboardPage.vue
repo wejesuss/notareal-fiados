@@ -1,11 +1,9 @@
 <template>
-    <q-page padding>
-        <div class="text-h5 q-mb-md">
-            Painel
-        </div>
+  <q-page padding>
+    <div class="text-h5 q-mb-md">Painel</div>
 
-        <div class="row q-col-gutter-md">
-            <div class="col-12 col-md-4">
+    <div class="row q-col-gutter-md">
+      <div class="col-12 col-md-4">
         <system-overview-card
           :is-healthy="systemHealthy"
           :last-updated="lastUpdated"
