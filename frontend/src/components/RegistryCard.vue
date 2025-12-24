@@ -4,7 +4,7 @@
       <!-- Title -->
       <div class="text-body2 text-grey-7">{{ title }}</div>
 
-      <!-- Main value -->
+      <!-- Fallback -->
       <div
         v-if="recentRegistries.length === 0"
         class="text-caption text-grey q-mt-md text-weight-bold"
@@ -12,12 +12,14 @@
         Nenhum registro recente
       </div>
 
+      <!-- Main value -->
       <div
         v-else
         v-for="registry in recentRegistries"
         :key="registry.id"
         class="row items-center justify-between text-body2 q-mt-md"
       >
+        <!-- Registry name -->
         <span class="text-weight-bold" :class="nameTextColor">
           {{ registry.name }}
         </span>
@@ -28,6 +30,7 @@
           :class="resolveValueColor(registry.valueColor)"
         >
           {{ registry.value }}
+          <!-- Icon and complement text -->
           <div v-if="registry.valueComplement" class="q-ml-sm">
             <q-icon
               :name="iconText"
