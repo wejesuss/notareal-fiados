@@ -31,24 +31,18 @@
         </q-card>
       </div>
 
-            <div class="col-12 col-md-4">
-                <q-card>
-                    <q-card-section>
-                        <div class="text-subtitle1">Ações</div>
-                        <div class="text-caption text-grey">
-                            Atalhos rápidos
-                        </div>
-                    </q-card-section>
-                </q-card>
-            </div>
-        </div>
-    </q-page>
+      <div class="col-12 col-md-4">
+        <ActionsCard></ActionsCard>
+      </div>
+    </div>
+  </q-page>
 </template>
 
 <script setup lang="ts">
 import { computed } from "vue";
 import SystemOverviewCard from "src/components/SystemOverviewCard.vue";
 import RegistryCard from "src/components/RegistryCard.vue";
+import ActionsCard from "src/components/ActionsCard.vue";
 import type { RegistryCardProps } from "src/components/models";
 
 const registryCards = computed<RegistryCardProps[]>(() => [
