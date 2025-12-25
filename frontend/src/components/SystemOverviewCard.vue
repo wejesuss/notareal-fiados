@@ -92,7 +92,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { useRouter } from "vue-router";
+import { useNavigation } from "src/composables/useNavigation";
 import { formatCurrency } from "src/utils/formatters/currency";
 
 interface Props {
@@ -119,12 +119,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const router = useRouter();
-
-// methods
-async function navigateTo(path: string) {
-  await router.push({ path });
-}
+const { navigateTo } = useNavigation();
 
 // header
 const statusLabel = computed(() =>

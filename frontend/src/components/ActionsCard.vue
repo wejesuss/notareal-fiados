@@ -37,12 +37,9 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from "vue-router";
+import { useNavigation } from "src/composables/useNavigation";
 
-const router = useRouter();
-async function navigateTo(route: string) {
-  return await router.push(route);
-}
+const { navigateTo } = useNavigation();
 </script>
 
 <style lang="css" scoped>

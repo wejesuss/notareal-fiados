@@ -56,9 +56,9 @@
       align="center"
       role="button"
       tabindex="0"
-      @click="navigateTo"
-      @keydown.enter="navigateTo"
-      @keydown.space.prevent="navigateTo"
+      @click="navigateTo(route)"
+      @keydown.enter="navigateTo(route)"
+      @keydown.space.prevent="navigateTo(route)"
     >
       <span class="text-primary text-center text-body2 text-weight-medium">
         {{ actionLabel }}
@@ -69,15 +69,11 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { useRouter } from "vue-router";
+import { useNavigation } from "src/composables/useNavigation";
 import type { RegistryCardProps } from "./models";
 
 const props = defineProps<RegistryCardProps>();
-const router = useRouter();
-
-async function navigateTo() {
-  await router.push({ path: props.route });
-}
+const { navigateTo } = useNavigation();
 
 const nameTextColor = computed(() => props.nameColor ?? "text-grey");
 const iconText = computed(() => props.icon ?? "circle");
