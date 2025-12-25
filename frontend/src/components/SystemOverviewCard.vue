@@ -93,6 +93,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useRouter } from "vue-router";
+import { formatCurrency } from "src/utils/formatters/currency";
 
 interface Props {
   /**
@@ -135,13 +136,7 @@ const statusIcon = computed(() => (props.isHealthy ? "check_circle" : "error"));
 const lastUpdatedLabel = computed(() => props.lastUpdated ?? "—");
 
 // metrics
-const openAmount = computed(() => {
-  return Intl.NumberFormat("pt-br", {
-    style: "currency",
-    currency: "BRL",
-    minimumFractionDigits: 2,
-  }).format(props.openAmount);
-});
+const openAmount = computed(() => formatCurrency(props.openAmount));
 
 const clientsColor = computed(() => {
   if (props.activeClients === 0) return "text-grey";

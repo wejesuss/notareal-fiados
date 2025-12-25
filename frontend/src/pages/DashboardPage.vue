@@ -44,6 +44,7 @@ import SystemOverviewCard from "src/components/SystemOverviewCard.vue";
 import RegistryCard from "src/components/RegistryCard.vue";
 import ActionsCard from "src/components/ActionsCard.vue";
 import type { RegistryCardProps } from "src/components/models";
+import { formatCurrency } from "src/utils/formatters/currency";
 
 const registryCards = computed<RegistryCardProps[]>(() => [
   {
@@ -121,11 +122,5 @@ const lastUpdated = "há poucos segundos";
 const activeClients = 50;
 const openPurchases = computed(() => 30);
 const openAmount = 2367.9;
-const amountFormatted = computed(() => {
-  return Intl.NumberFormat("pt-br", {
-    style: "currency",
-    currency: "BRL",
-    minimumFractionDigits: 2,
-  }).format(openAmount);
-});
+const amountFormatted = computed(() => formatCurrency(openAmount));
 </script>
