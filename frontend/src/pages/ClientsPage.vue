@@ -20,7 +20,26 @@
 
       <q-separator />
 
-      <q-list bordered separator class="q-pb-sm">
+      <q-card-section v-if="clients.length === 0" class="text-center q-py-xl">
+        <q-icon name="people_outline" size="48px" color="grey-6"></q-icon>
+
+        <div class="text-subtitle1 q-mt-md">Nenhum cliente ainda</div>
+        <div
+          class="text-caption caption-medium letter-spaced text-grey-7 q-mt-xs"
+        >
+          Comece cadastrando seu primeiro cliente
+        </div>
+
+        <q-btn
+          class="q-mt-md"
+          color="primary"
+          icon="person_add"
+          label="Novo cliente"
+          @click="navigateTo('/clients/new')"
+        ></q-btn>
+      </q-card-section>
+
+      <q-list v-else bordered separator class="q-pb-sm">
         <q-item
           v-for="client in clients"
           :key="client.id"
@@ -75,6 +94,10 @@ const { navigateTo } = useNavigation();
 <style lang="css" scoped>
 .letter-spaced {
   letter-spacing: 0.06em;
+}
+
+.caption-medium {
+  font-size: 0.8rem;
 }
 
 .client-row {
