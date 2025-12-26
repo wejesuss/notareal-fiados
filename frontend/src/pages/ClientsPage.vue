@@ -39,7 +39,7 @@
         ></q-btn>
       </q-card-section>
 
-      <q-list v-else bordered separator class="q-pb-sm">
+      <q-list v-else class="q-pb-sm">
         <q-item
           v-for="client in clients"
           :key="client.id"
