@@ -98,7 +98,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { useNavigation } from "src/composables/useNavigation";
 import { getClients } from "src/services";
 
@@ -114,6 +114,12 @@ const paginatedClients = computed(() => {
   return clients.value.slice(start, start + rowsPerPage);
 });
 
+watch(
+  () => clients.value.length,
+  () => {
+    page.value = 1;
+  }
+);
 const { navigateTo } = useNavigation();
 </script>
 
