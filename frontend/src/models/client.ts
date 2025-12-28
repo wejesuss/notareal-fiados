@@ -8,3 +8,10 @@ export interface Client {
   createdAt: string; // ISO date
   updatedAt: string; // ISO date
 }
+
+export interface ClientCreate {
+  name: string;
+  nickname?: string | null;
+  phone?: string | null;
+  email?: string | null;
+}
