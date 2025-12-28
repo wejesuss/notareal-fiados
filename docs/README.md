@@ -122,7 +122,7 @@ Esses são os arquivos de documentação
 
 - [X] Aplicar `response_model` em todas as rotas
 - [X] Remover retornos diretos com `__dict__`
-- [ ] Documentação manual com exemplos de uso no **`/docs`**
+- [X] Documentação manual com exemplos de uso no **`/docs`**
 - [ ] Consolidar helpers para validações internas
 - [ ] Centralizar regras duplicadas nos services
 - [ ] Criar script CLI para backup/restore
