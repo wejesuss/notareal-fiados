@@ -87,6 +87,12 @@
         v-if="totalPages > 1"
       >
       </q-pagination>
+
+      <div v-else class="text-center q-pb-sm">
+        <span class="text-caption text-grey-7 letter-spaced"
+          >Todos os registros exibidos</span
+        >
+      </div>
     </q-card>
   </q-page>
 </template>
