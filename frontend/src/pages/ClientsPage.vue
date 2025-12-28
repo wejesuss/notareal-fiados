@@ -41,7 +41,7 @@
 
       <q-list v-else class="q-pb-sm">
         <q-item
-          v-for="client in clients"
+          v-for="client in paginatedClients"
           :key="client.id"
           clickable
           v-ripple
@@ -77,16 +77,36 @@
           </q-item-section>
         </q-item>
       </q-list>
+
+      <q-pagination
+        v-model="page"
+        :max="totalPages"
+        direction-links
+        boundary-links
+        class="q-mt-md q-pb-md justify-center"
+        v-if="totalPages > 1"
+      >
+      </q-pagination>
     </q-card>
   </q-page>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { useNavigation } from "src/composables/useNavigation";
 import { getClients } from "src/services";
 
+const page = ref(1);
+const rowsPerPage = 10;
+
 const clients = computed(() => getClients());
+const totalPages = computed(() =>
+  Math.ceil(clients.value.length / rowsPerPage)
+);
+const paginatedClients = computed(() => {
+  const start = (page.value - 1) * rowsPerPage;
+  return clients.value.slice(start, start + rowsPerPage);
+});
 
 const { navigateTo } = useNavigation();
 </script>
