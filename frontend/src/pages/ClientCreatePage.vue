@@ -25,8 +25,8 @@
               color="secondary"
               v-model="form.name"
               label="Nome *"
-              :rules="[(val) => !!val?.trim() || 'Nome é obrigatório']"
-              hide-bottom-space
+              lazy-rules
+              :rules="[required]"
             >
               <template #append>
                 <q-icon name="person" size="xs">
@@ -45,6 +45,8 @@
               color="secondary"
               v-model="form.nickname"
               label="Apelido"
+              lazy-rules
+              :rules="[nicknameRule]"
             >
               <template #append>
                 <q-icon name="person_search" size="xs">
@@ -53,7 +55,7 @@
                     self="bottom middle"
                     :delay="250"
                   >
-                    Cada cliente deve ter um apelido único para facilitar a
+                    Cada cliente pode ter um apelido único para facilitar a
                     busca
                   </q-tooltip>
                 </q-icon>
@@ -66,6 +68,11 @@
               v-model="form.phone"
               label="Telefone"
               type="tel"
+              lazy-rules
+              mask="####################"
+              unmasked-value
+              :rules="[phoneRule]"
+              hint="Opcional • BR ou EUA"
             >
               <template #append>
                 <q-icon name="phone" size="xs">
@@ -85,6 +92,8 @@
               v-model="form.email"
               label="Email"
               type="email"
+              lazy-rules
+              :rules="[emailRule]"
             >
               <template #append>
                 <q-icon name="mail" size="xs">
@@ -119,6 +128,28 @@ import type { ClientCreate } from "src/models";
 const form = ref<ClientCreate>({
   name: "",
 });
+
+const required = (val: string) => !!val?.trim() || "Nome é obrigatório";
+
+const nicknameRule = (val?: string) =>
+  !val ||
+  val.trim().length >= 3 ||
+  "Se fornecido, apelido deve ter ao menos 3 caracteres";
+
+const phoneRule = (val?: string) => {
+  if (!val) return true; // optional
+
+  const cleaned = val.replace(/\D/g, "");
+
+  if (cleaned.length < 8 || cleaned.length > 15) {
+    return "Telefone inválido";
+  }
+
+  return true;
+};
+
+const emailRule = (val?: string) =>
+  !val || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) || "Email inválido";
 
 function submit() {
   console.log(form.value);
