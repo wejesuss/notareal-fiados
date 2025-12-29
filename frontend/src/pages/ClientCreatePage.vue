@@ -23,7 +23,12 @@
             <q-input v-model="form.name" label="Nome">
               <template #append>
                 <q-icon name="person" size="xs">
-                  <q-tooltip>Como deseja identificar o cliente</q-tooltip>
+                  <q-tooltip
+                    anchor="top middle"
+                    self="bottom middle"
+                    :delay="250"
+                    >Como deseja identificar o cliente</q-tooltip
+                  >
                 </q-icon>
               </template>
             </q-input>
@@ -31,7 +36,11 @@
             <q-input v-model="form.nickname" label="Apelido">
               <template #append>
                 <q-icon name="person_search" size="xs">
-                  <q-tooltip>
+                  <q-tooltip
+                    anchor="top middle"
+                    self="bottom middle"
+                    :delay="250"
+                  >
                     Cada cliente deve ter um apelido único para facilitar a
                     busca
                   </q-tooltip>
@@ -42,7 +51,12 @@
             <q-input v-model="form.phone" label="Telefone" type="tel">
               <template #append>
                 <q-icon name="phone" size="xs">
-                  <q-tooltip>Número para contato rápido ou WhatsApp</q-tooltip>
+                  <q-tooltip
+                    anchor="top middle"
+                    self="bottom middle"
+                    :delay="250"
+                    >Número para contato rápido ou WhatsApp</q-tooltip
+                  >
                 </q-icon>
               </template>
             </q-input>
@@ -50,7 +64,12 @@
             <q-input v-model="form.email" label="Email" type="email">
               <template #append>
                 <q-icon name="mail" size="xs">
-                  <q-tooltip>Email para identificação do cliente</q-tooltip>
+                  <q-tooltip
+                    anchor="top middle"
+                    self="bottom middle"
+                    :delay="250"
+                    >Email para identificação do cliente</q-tooltip
+                  >
                 </q-icon>
               </template>
             </q-input>
