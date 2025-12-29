@@ -15,52 +15,55 @@
       <q-separator />
 
       <q-card-section class="text-center q-pa-lg">
-        <q-form
-          @submit.prevent="submit"
-          class="col q-gutter-xs q-col-gutter-md"
-        >
-          <q-input v-model="form.name" label="Nome">
-            <template #append>
-              <q-icon name="person" size="xs">
-                <q-tooltip>Nome do cliente</q-tooltip>
-              </q-icon>
-            </template>
-          </q-input>
+        <div class="form-container">
+          <q-form
+            @submit.prevent="submit"
+            class="col q-gutter-xs q-col-gutter-md"
+          >
+            <q-input v-model="form.name" label="Nome">
+              <template #append>
+                <q-icon name="person" size="xs">
+                  <q-tooltip>Nome do cliente</q-tooltip>
+                </q-icon>
+              </template>
+            </q-input>
 
-          <q-input v-model="form.nickname" label="Apelido">
-            <template #append>
-              <q-icon name="person_search" size="xs">
-                <q-tooltip>
-                  Cada cliente deve ter um apelido único para facilitar a busca
-                </q-tooltip>
-              </q-icon>
-            </template>
-          </q-input>
+            <q-input v-model="form.nickname" label="Apelido">
+              <template #append>
+                <q-icon name="person_search" size="xs">
+                  <q-tooltip>
+                    Cada cliente deve ter um apelido único para facilitar a
+                    busca
+                  </q-tooltip>
+                </q-icon>
+              </template>
+            </q-input>
 
-          <q-input v-model="form.email" label="Email" type="email">
-            <template #append>
-              <q-icon name="mail" size="xs">
-                <q-tooltip>Email de contato</q-tooltip>
-              </q-icon>
-            </template>
-          </q-input>
+            <q-input v-model="form.email" label="Email" type="email">
+              <template #append>
+                <q-icon name="mail" size="xs">
+                  <q-tooltip>Email de contato</q-tooltip>
+                </q-icon>
+              </template>
+            </q-input>
 
-          <q-input v-model="form.phone" label="Telefone" type="tel">
-            <template #append>
-              <q-icon name="phone" size="xs">
-                <q-tooltip>Telefone de contato</q-tooltip>
-              </q-icon>
-            </template>
-          </q-input>
+            <q-input v-model="form.phone" label="Telefone" type="tel">
+              <template #append>
+                <q-icon name="phone" size="xs">
+                  <q-tooltip>Telefone de contato</q-tooltip>
+                </q-icon>
+              </template>
+            </q-input>
 
-          <q-btn
-            class="q-my-md q-mt-lg q-py-sm"
-            color="secondary"
-            icon="person_add"
-            label="Salvar"
-            type="submit"
-          />
-        </q-form>
+            <q-btn
+              class="q-my-md q-mt-lg q-py-sm"
+              color="secondary"
+              icon="person_add"
+              label="Salvar"
+              type="submit"
+            />
+          </q-form>
+        </div>
       </q-card-section>
     </q-card>
   </q-page>
@@ -78,3 +81,11 @@ function submit() {
   console.log(form.value);
 }
 </script>
+
+<style scoped lang="css">
+.form-container {
+  max-width: 560px;
+  margin: 0 auto;
+  width: 100%;
+}
+</style>
