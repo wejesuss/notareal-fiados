@@ -126,7 +126,12 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import type { ClientCreate } from "src/models";
-import { QForm } from "quasar";
+import { QForm, useQuasar } from "quasar";
+import { createClient } from "src/services";
+import { useNavigation } from "src/composables/useNavigation";
+
+const { navigateTo } = useNavigation();
+const $q = useQuasar();
 
 const formRef = ref<QForm | null>(null);
 const isFormValid = computed(() => !!form.value.name);
@@ -163,7 +168,14 @@ async function submit() {
   const valid = await formRef.value.validate(false);
   if (!valid) return;
 
-  console.log(form.value);
+  createClient(form.value);
+
+  $q.notify({
+    type: "positive",
+    message: "Cliente criado com sucesso",
+  });
+
+  await navigateTo("/clients");
 }
 </script>
 
