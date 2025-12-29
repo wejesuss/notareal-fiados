@@ -24,7 +24,9 @@
               outlined
               color="secondary"
               v-model="form.name"
-              label="Nome"
+              label="Nome *"
+              :rules="[(val) => !!val?.trim() || 'Nome é obrigatório']"
+              hide-bottom-space
             >
               <template #append>
                 <q-icon name="person" size="xs">
