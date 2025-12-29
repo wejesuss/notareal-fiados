@@ -56,8 +56,8 @@
                     self="bottom middle"
                     :delay="250"
                   >
-                    Cada cliente pode ter um apelido único para facilitar a
-                    busca
+                    Cada cliente pode ter um apelido único, curto e sem espaços
+                    para facilitar a busca (ex: joaozinho).
                   </q-tooltip>
                 </q-icon>
               </template>
@@ -142,10 +142,21 @@ const form = ref<ClientCreate>({
 
 const required = (val: string) => !!val?.trim() || "Nome é obrigatório";
 
-const nicknameRule = (val?: string) =>
-  !val ||
-  val.trim().length >= 3 ||
-  "Se fornecido, apelido deve ter ao menos 3 caracteres";
+const nicknameRule = (val?: string) => {
+  if (!val) return true;
+
+  const trimmed = val.trim();
+
+  if (trimmed.length < 3) {
+    return "Se fornecido, apelido deve ter ao menos 3 caracteres";
+  }
+
+  if (/\s/.test(trimmed)) {
+    return "Apelido deve ser um identificador único, sem espaços.";
+  }
+
+  return true;
+};
 
 const phoneRule = (val?: string) => {
   if (!val) return true; // optional
