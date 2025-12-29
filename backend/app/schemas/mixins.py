@@ -32,8 +32,14 @@ class NicknameValidatorMixin:
         if v is None:
             return None
 
-        v = " ".join(v.split())  # Remove multiple spaces
-        v = v.casefold()         # Normalize
+        v = v.strip().casefold() # Normalize to case comparison and remove spaces
+        
+        if re.search(r"\s", v):
+            # Nickname must be a single-word value
+            raise ValueError("Apelido deve conter somente uma palavra.")
+
+        if len(v) < 3:
+            raise ValueError("Apelido deve conter pelo menos 3 caracteres.")
 
         return v
 
