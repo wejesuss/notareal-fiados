@@ -39,18 +39,18 @@
               </template>
             </q-input>
 
-            <q-input v-model="form.email" label="Email" type="email">
-              <template #append>
-                <q-icon name="mail" size="xs">
-                  <q-tooltip>Email para identificação do cliente</q-tooltip>
-                </q-icon>
-              </template>
-            </q-input>
-
             <q-input v-model="form.phone" label="Telefone" type="tel">
               <template #append>
                 <q-icon name="phone" size="xs">
                   <q-tooltip>Número para contato rápido ou WhatsApp</q-tooltip>
+                </q-icon>
+              </template>
+            </q-input>
+
+            <q-input v-model="form.email" label="Email" type="email">
+              <template #append>
+                <q-icon name="mail" size="xs">
+                  <q-tooltip>Email para identificação do cliente</q-tooltip>
                 </q-icon>
               </template>
             </q-input>
