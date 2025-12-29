@@ -20,7 +20,12 @@
             @submit.prevent="submit"
             class="col q-gutter-xs q-col-gutter-md"
           >
-            <q-input v-model="form.name" label="Nome">
+            <q-input
+              outlined
+              color="secondary"
+              v-model="form.name"
+              label="Nome"
+            >
               <template #append>
                 <q-icon name="person" size="xs">
                   <q-tooltip
@@ -33,7 +38,12 @@
               </template>
             </q-input>
 
-            <q-input v-model="form.nickname" label="Apelido">
+            <q-input
+              outlined
+              color="secondary"
+              v-model="form.nickname"
+              label="Apelido"
+            >
               <template #append>
                 <q-icon name="person_search" size="xs">
                   <q-tooltip
@@ -48,7 +58,13 @@
               </template>
             </q-input>
 
-            <q-input v-model="form.phone" label="Telefone" type="tel">
+            <q-input
+              outlined
+              color="secondary"
+              v-model="form.phone"
+              label="Telefone"
+              type="tel"
+            >
               <template #append>
                 <q-icon name="phone" size="xs">
                   <q-tooltip
@@ -61,7 +77,13 @@
               </template>
             </q-input>
 
-            <q-input v-model="form.email" label="Email" type="email">
+            <q-input
+              outlined
+              color="secondary"
+              v-model="form.email"
+              label="Email"
+              type="email"
+            >
               <template #append>
                 <q-icon name="mail" size="xs">
                   <q-tooltip
