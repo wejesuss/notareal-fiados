@@ -17,6 +17,7 @@
       <q-card-section class="text-center q-pa-lg">
         <div class="form-container">
           <q-form
+            ref="formRef"
             @submit.prevent="submit"
             class="col q-gutter-xs q-col-gutter-md"
           >
@@ -113,6 +114,7 @@
               icon="person_add"
               label="Salvar"
               type="submit"
+              :disable="!isFormValid"
             />
           </q-form>
         </div>
@@ -122,8 +124,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import type { ClientCreate } from "src/models";
+import { QForm } from "quasar";
+
+const formRef = ref<QForm | null>(null);
+const isFormValid = computed(() => !!form.value.name);
 
 const form = ref<ClientCreate>({
   name: "",
@@ -151,7 +157,12 @@ const phoneRule = (val?: string) => {
 const emailRule = (val?: string) =>
   !val || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) || "Email inválido";
 
-function submit() {
+async function submit() {
+  if (!formRef.value) return;
+
+  const valid = await formRef.value.validate(false);
+  if (!valid) return;
+
   console.log(form.value);
 }
 </script>
