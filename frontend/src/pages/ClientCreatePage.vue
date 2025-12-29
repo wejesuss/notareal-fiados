@@ -23,7 +23,7 @@
             <q-input v-model="form.name" label="Nome">
               <template #append>
                 <q-icon name="person" size="xs">
-                  <q-tooltip>Nome do cliente</q-tooltip>
+                  <q-tooltip>Como deseja identificar o cliente</q-tooltip>
                 </q-icon>
               </template>
             </q-input>
@@ -42,7 +42,7 @@
             <q-input v-model="form.email" label="Email" type="email">
               <template #append>
                 <q-icon name="mail" size="xs">
-                  <q-tooltip>Email de contato</q-tooltip>
+                  <q-tooltip>Email para identificação do cliente</q-tooltip>
                 </q-icon>
               </template>
             </q-input>
@@ -50,7 +50,7 @@
             <q-input v-model="form.phone" label="Telefone" type="tel">
               <template #append>
                 <q-icon name="phone" size="xs">
-                  <q-tooltip>Telefone de contato</q-tooltip>
+                  <q-tooltip>Número para contato rápido ou WhatsApp</q-tooltip>
                 </q-icon>
               </template>
             </q-input>
