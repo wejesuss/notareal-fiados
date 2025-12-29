@@ -168,7 +168,13 @@ async function submit() {
   const valid = await formRef.value.validate(false);
   if (!valid) return;
 
-  createClient(form.value);
+  const payload = {
+    ...form.value,
+    name: form.value.name.trim().replace(/\s+/g, " "),
+    nickname: form.value.nickname?.trim() ?? null,
+  };
+
+  createClient(payload);
 
   $q.notify({
     type: "positive",
