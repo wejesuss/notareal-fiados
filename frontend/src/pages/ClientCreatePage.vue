@@ -16,107 +16,7 @@
 
       <q-card-section class="text-center q-pa-lg">
         <div class="form-container">
-          <q-form
-            ref="formRef"
-            @submit.prevent="submit"
-            class="col q-gutter-xs q-col-gutter-md"
-          >
-            <q-input
-              outlined
-              color="secondary"
-              v-model="form.name"
-              label="Nome *"
-              lazy-rules
-              :rules="[required]"
-            >
-              <template #append>
-                <q-icon name="person" size="xs">
-                  <q-tooltip
-                    anchor="top middle"
-                    self="bottom middle"
-                    :delay="250"
-                    >Como deseja identificar o cliente</q-tooltip
-                  >
-                </q-icon>
-              </template>
-            </q-input>
-
-            <q-input
-              outlined
-              color="secondary"
-              v-model="form.nickname"
-              label="Apelido"
-              lazy-rules
-              :rules="[nicknameRule]"
-            >
-              <template #append>
-                <q-icon name="person_search" size="xs">
-                  <q-tooltip
-                    anchor="top middle"
-                    self="bottom middle"
-                    :delay="250"
-                  >
-                    Cada cliente pode ter um apelido único, curto e sem espaços
-                    para facilitar a busca (ex: joaozinho).
-                  </q-tooltip>
-                </q-icon>
-              </template>
-            </q-input>
-
-            <q-input
-              outlined
-              color="secondary"
-              v-model="form.phone"
-              label="Telefone"
-              type="tel"
-              lazy-rules
-              mask="####################"
-              unmasked-value
-              :rules="[phoneRule]"
-              hint="Opcional • BR ou EUA"
-            >
-              <template #append>
-                <q-icon name="phone" size="xs">
-                  <q-tooltip
-                    anchor="top middle"
-                    self="bottom middle"
-                    :delay="250"
-                    >Número para contato rápido ou WhatsApp</q-tooltip
-                  >
-                </q-icon>
-              </template>
-            </q-input>
-
-            <q-input
-              outlined
-              color="secondary"
-              v-model="form.email"
-              label="Email"
-              type="email"
-              lazy-rules
-              :rules="[emailRule]"
-            >
-              <template #append>
-                <q-icon name="mail" size="xs">
-                  <q-tooltip
-                    anchor="top middle"
-                    self="bottom middle"
-                    :delay="250"
-                    >Email para identificação do cliente</q-tooltip
-                  >
-                </q-icon>
-              </template>
-            </q-input>
-
-            <q-btn
-              class="q-my-md q-mt-lg q-py-sm"
-              color="secondary"
-              icon="person_add"
-              label="Salvar"
-              type="submit"
-              :disable="!isFormValid"
-            />
-          </q-form>
+          <ClientForm submit-label="Salvar" @submit="submit"></ClientForm>
         </div>
       </q-card-section>
     </q-card>
@@ -124,67 +24,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { useQuasar } from "quasar";
 import type { ClientCreate } from "src/models";
-import { QForm, useQuasar } from "quasar";
 import { createClient } from "src/services";
+import ClientForm from "src/components/ClientForm.vue";
 import { useNavigation } from "src/composables/useNavigation";
 
 const { navigateTo } = useNavigation();
 const $q = useQuasar();
 
-const formRef = ref<QForm | null>(null);
-const isFormValid = computed(() => !!form.value.name);
-
-const form = ref<ClientCreate>({
-  name: "",
-});
-
-const required = (val: string) => !!val?.trim() || "Nome é obrigatório";
-
-const nicknameRule = (val?: string) => {
-  if (!val) return true;
-
-  const trimmed = val.trim();
-
-  if (trimmed.length < 3) {
-    return "Se fornecido, apelido deve ter ao menos 3 caracteres";
-  }
-
-  if (/\s/.test(trimmed)) {
-    return "Apelido deve ser um identificador único, sem espaços.";
-  }
-
-  return true;
-};
-
-const phoneRule = (val?: string) => {
-  if (!val) return true; // optional
-
-  const cleaned = val.replace(/\D/g, "");
-
-  if (cleaned.length < 8 || cleaned.length > 15) {
-    return "Telefone inválido";
-  }
-
-  return true;
-};
-
-const emailRule = (val?: string) =>
-  !val || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) || "Email inválido";
-
-async function submit() {
-  if (!formRef.value) return;
-
-  const valid = await formRef.value.validate(false);
-  if (!valid) return;
-
-  const payload = {
-    ...form.value,
-    name: form.value.name.trim().replace(/\s+/g, " "),
-    nickname: form.value.nickname?.trim() ?? null,
-  };
-
+async function submit(payload: ClientCreate) {
+  console.log(payload);
   createClient(payload);
 
   $q.notify({
