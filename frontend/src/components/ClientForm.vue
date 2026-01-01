@@ -85,6 +85,7 @@
       :icon="submitIcon || 'person_add'"
       :label="submitLabel"
       :disable="!isFormValid"
+      :loading="submitting"
     />
   </q-form>
 </template>
@@ -103,6 +104,7 @@ interface ClientFormProps {
 const emit = defineEmits(["submit"]);
 const props = defineProps<ClientFormProps>();
 
+const submitting = ref(false);
 const formRef = ref<QForm | null>(null);
 const formData = ref<ClientPayload>({
   name: props.payload?.name || "",
@@ -147,17 +149,22 @@ const emailRule = (val?: string) =>
   !val || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) || "Email inválido";
 
 async function submit() {
-  if (!formRef.value) return;
+  submitting.value = true;
+  try {
+    if (!formRef.value) return;
 
-  const valid = await formRef.value.validate(false);
-  if (!valid) return;
+    const valid = await formRef.value.validate(false);
+    if (!valid) return;
 
-  const payload = {
-    ...formData.value,
-    name: formData.value.name.trim().replace(/\s+/g, " "),
-    nickname: formData.value.nickname?.trim() || null,
-  };
+    const payload = {
+      ...formData.value,
+      name: formData.value.name.trim().replace(/\s+/g, " "),
+      nickname: formData.value.nickname?.trim() || null,
+    };
 
-  emit("submit", payload);
+    emit("submit", payload);
+  } finally {
+    submitting.value = false;
+  }
 }
 </script>
