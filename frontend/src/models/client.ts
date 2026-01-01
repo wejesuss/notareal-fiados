@@ -21,4 +21,5 @@ export interface ClientUpdate {
   nickname?: string | null;
   phone?: string | null;
   email?: string | null;
+  isActive: boolean;
 }

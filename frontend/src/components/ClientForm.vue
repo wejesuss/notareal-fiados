@@ -4,6 +4,8 @@
     @submit.prevent="submit"
     class="col q-gutter-xs q-col-gutter-md"
   >
+    <slot></slot>
+
     <q-input
       outlined
       color="secondary"

@@ -22,7 +22,15 @@
             :payload="clientNormalized"
             submit-label="Salvar"
             @submit="submit"
-          ></ClientForm>
+          >
+            <q-toggle
+              v-model="isActive"
+              checked-icon="check"
+              color="blue"
+              :label="isActive ? 'Cliente Ativo' : 'Cliente Inativo'"
+              unchecked-icon="clear"
+            />
+          </ClientForm>
         </div>
       </q-card-section>
     </q-card>
@@ -43,9 +51,11 @@ const $route = useRoute();
 const { navigateTo } = useNavigation();
 const $q = useQuasar();
 
-const id = computed(() => Number($route.params.id));
 const client = ref<Client | null>(null);
 const loading = ref(true);
+const isActive = ref(false);
+
+const id = computed(() => Number($route.params.id));
 const clientNormalized = computed((): ClientPayload => {
   return {
     name: client.value?.name || "",
@@ -75,8 +85,8 @@ async function loadClient(id: number) {
 
   try {
     client.value = await fetchClient(id);
-  } catch (e) {
-    console.log(e);
+    isActive.value = client.value.isActive;
+  } catch {
     await clientNotFoundNotifyAndNavigate();
   } finally {
     loading.value = false;
@@ -93,7 +103,10 @@ watch(
 
 async function submit(payload: ClientPayload) {
   console.log(payload);
-  await updateClient(id.value, payload);
+  await updateClient(id.value, {
+    ...payload,
+    isActive: isActive.value,
+  });
 
   $q.notify({
     type: "positive",
