@@ -93,7 +93,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { QForm } from "quasar";
 import type { ClientPayload } from "./models";
 
@@ -114,6 +114,15 @@ const formData = ref<ClientPayload>({
   email: props.payload?.email || null,
   phone: props.payload?.phone || null,
 });
+
+watch(
+  () => props.payload,
+  (payload: ClientPayload | undefined) => {
+    if (!payload) return;
+    formData.value = { ...payload };
+  },
+  { immediate: true }
+);
 
 const isFormValid = computed(() => !!formData.value.name);
 
