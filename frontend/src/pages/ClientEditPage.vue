@@ -19,7 +19,7 @@
       <q-card-section class="text-center q-pa-lg">
         <div class="form-container">
           <ClientForm
-            :payload="clientNormalized"
+            :payload="clientFormPayload"
             submit-label="Salvar"
             @submit="submit"
           >
@@ -56,7 +56,7 @@ const loading = ref(true);
 const isActive = ref(false);
 
 const id = computed(() => Number($route.params.id));
-const clientNormalized = computed((): ClientPayload => {
+const clientFormPayload = computed((): ClientPayload => {
   return {
     name: client.value?.name || "",
     email: client.value?.email || null,
@@ -64,11 +64,6 @@ const clientNormalized = computed((): ClientPayload => {
     phone: client.value?.phone || null,
   };
 });
-
-async function fetchClient(id: number): Promise<Client> {
-  console.log("Fetching client from API...");
-  return await getClientById(id);
-}
 
 async function clientNotFoundNotifyAndNavigate() {
   $q.notify({ type: "negative", message: "Cliente não encontrado" });
@@ -84,7 +79,7 @@ async function loadClient(id: number) {
   }
 
   try {
-    client.value = await fetchClient(id);
+    client.value = await getClientById(id);
     isActive.value = client.value.isActive;
   } catch {
     await clientNotFoundNotifyAndNavigate();
