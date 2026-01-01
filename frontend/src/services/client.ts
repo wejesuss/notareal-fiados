@@ -1,4 +1,4 @@
-import type { Client, ClientCreate } from "src/models";
+import type { Client, ClientCreate, ClientUpdate } from "src/models";
 
 const clients: Client[] = [
   {
@@ -53,7 +53,7 @@ export function createClient(payload: ClientCreate) {
 
 export async function updateClient(
   id: number,
-  payload: ClientCreate
+  payload: ClientUpdate
 ): Promise<Client> {
   return new Promise((res, rej) => {
     const index = clients.findIndex((client) => client.id === id);
