@@ -160,10 +160,10 @@ const emailRule = (val?: string) =>
   !val || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) || "Email inválido";
 
 async function submit() {
-  submitting.value = true;
   try {
     if (!formRef.value) return;
 
+    submitting.value = true;
     const valid = await formRef.value.validate(false);
     if (!valid) return;
 
