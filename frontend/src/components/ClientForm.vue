@@ -155,7 +155,7 @@ async function submit() {
   const payload = {
     ...formData.value,
     name: formData.value.name.trim().replace(/\s+/g, " "),
-    nickname: formData.value.nickname?.trim() ?? null,
+    nickname: formData.value.nickname?.trim() || null,
   };
 
   emit("submit", payload);
