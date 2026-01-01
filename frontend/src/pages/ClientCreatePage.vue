@@ -25,15 +25,15 @@
 
 <script setup lang="ts">
 import { useQuasar } from "quasar";
-import type { ClientCreate } from "src/models";
 import { createClient } from "src/services";
 import ClientForm from "src/components/ClientForm.vue";
 import { useNavigation } from "src/composables/useNavigation";
+import type { ClientPayload } from "src/components/models";
 
 const { navigateTo } = useNavigation();
 const $q = useQuasar();
 
-async function submit(payload: ClientCreate) {
+async function submit(payload: ClientPayload) {
   console.log(payload);
   createClient(payload);
 

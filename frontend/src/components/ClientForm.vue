@@ -91,11 +91,11 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import type { ClientCreate } from "src/models";
 import { QForm } from "quasar";
+import type { ClientPayload } from "./models";
 
 interface ClientFormProps {
-  payload?: ClientCreate;
+  payload?: ClientPayload;
   submitLabel: string;
   submitIcon?: string;
 }
@@ -104,7 +104,12 @@ const emit = defineEmits(["submit"]);
 const props = defineProps<ClientFormProps>();
 
 const formRef = ref<QForm | null>(null);
-const formData = ref<ClientCreate>(props.payload || { name: "" });
+const formData = ref<ClientPayload>({
+  name: props.payload?.name || "",
+  nickname: props.payload?.nickname || null,
+  email: props.payload?.email || null,
+  phone: props.payload?.phone || null,
+});
 
 const isFormValid = computed(() => !!formData.value.name);
 

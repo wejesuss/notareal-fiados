@@ -33,10 +33,11 @@
 import { computed, ref, watch } from "vue";
 import { useQuasar } from "quasar";
 import { useRoute } from "vue-router";
-import type { Client, ClientCreate } from "src/models";
+import type { Client } from "src/models";
 import { updateClient, getClientById } from "src/services";
 import ClientForm from "src/components/ClientForm.vue";
 import { useNavigation } from "src/composables/useNavigation";
+import type { ClientPayload } from "src/components/models";
 
 const $route = useRoute();
 const { navigateTo } = useNavigation();
@@ -45,7 +46,7 @@ const $q = useQuasar();
 const id = computed(() => Number($route.params.id));
 const client = ref<Client | null>(null);
 const loading = ref(true);
-const clientNormalized = computed((): ClientCreate => {
+const clientNormalized = computed((): ClientPayload => {
   return {
     name: client.value?.name || "",
     email: client.value?.email || null,
@@ -90,7 +91,7 @@ watch(
   { immediate: true }
 );
 
-async function submit(payload: ClientCreate) {
+async function submit(payload: ClientPayload) {
   console.log(payload);
   await updateClient(id.value, payload);
 

@@ -41,3 +41,10 @@ export interface RegistryCardProps {
     valueColor?: string;
   }>;
 }
+
+export type ClientPayload = {
+  name: string;
+  nickname: string | null;
+  phone: string | null;
+  email: string | null;
+};
