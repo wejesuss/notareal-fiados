@@ -94,31 +94,9 @@
 import { computed } from "vue";
 import { useNavigation } from "src/composables/useNavigation";
 import { formatCurrency } from "src/utils/formatters/currency";
+import type { SystemOverviewCardProps } from "./models";
 
-interface Props {
-  /**
-   * If system status is up or down
-   */
-  isHealthy: boolean;
-  /**
-   * string representing the last update time
-   */
-  lastUpdated?: string | null;
-  /**
-   * Number of `clients` currently active
-   */
-  activeClients: number;
-  /**
-   * Number of `purchases` not entirely paid (`pending` or `partial`)
-   */
-  openPurchases: number;
-  /**
-   * Total amount to receive considering not paid `purchases`
-   */
-  openAmount: number;
-}
-
-const props = defineProps<Props>();
+const props = defineProps<SystemOverviewCardProps>();
 const { navigateTo } = useNavigation();
 
 // header

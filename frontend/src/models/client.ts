@@ -15,3 +15,11 @@ export interface ClientCreate {
   phone?: string | null;
   email?: string | null;
 }
+
+export interface ClientUpdate {
+  name?: string;
+  nickname?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  isActive: boolean;
+}
