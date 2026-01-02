@@ -1,4 +1,5 @@
 import type { RouteRecordRaw } from "vue-router";
+import { validateClientID } from "./guards";
 
 const routes: RouteRecordRaw[] = [
   {
@@ -20,12 +21,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: "/clients/:id/edit",
         component: () => import("pages/ClientEditPage.vue"),
-        beforeEnter: (to) => {
-          const id = Number(to.params.id);
-          if (!Number.isInteger(id) || id <= 0) {
-            return "/clients";
-          }
-        },
+        beforeEnter: validateClientID,
       },
     ],
   },
