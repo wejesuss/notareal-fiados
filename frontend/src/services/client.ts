@@ -7,8 +7,8 @@ const clients: Client[] = [
     nickname: null,
     email: "joseaugusto32@example.com",
     isActive: false,
-    createdAt: "2025-12-15T22:36:31",
-    updatedAt: "2025-12-15T22:36:31",
+    createdAt: "2025-12-15T22:36:31.000Z",
+    updatedAt: "2025-12-15T22:36:31.000Z",
   },
   {
     id: 2,
@@ -16,8 +16,8 @@ const clients: Client[] = [
     nickname: "joaocarlos",
     phone: "(99) 9900-9879",
     isActive: true,
-    createdAt: "2025-12-15T22:36:31",
-    updatedAt: "2025-12-15T22:36:31",
+    createdAt: "2025-12-15T22:36:31.000Z",
+    updatedAt: "2025-12-15T22:36:31.000Z",
   },
 ];
 
@@ -45,8 +45,8 @@ export function createClient(payload: ClientCreate) {
   clients.unshift({
     id: clients.length + 1,
     isActive: true,
-    createdAt: new Date().toISOString().slice(0, -5),
-    updatedAt: new Date().toISOString().slice(0, -5),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
     ...payload,
   });
 }
@@ -69,7 +69,7 @@ export async function updateClient(
     const updatedClient: Client = {
       ...client,
       ...payload,
-      updatedAt: new Date().toISOString().slice(0, -5),
+      updatedAt: new Date().toISOString(),
     };
 
     clients[index] = updatedClient;
