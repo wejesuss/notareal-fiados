@@ -52,27 +52,29 @@
               <span>{{ client.email ?? "Sem email" }}</span>
             </q-item-label>
 
-            <q-item-label caption class="label-spaced">
-              <span
-                >Criado em:
-                {{
-                  client.createdAt
-                    ? formatDate(client.createdAt)
-                    : "Sem data de criação"
-                }}</span
-              >
-            </q-item-label>
+            <div class="row items-center justify-between label-spaced">
+              <q-item-label caption>
+                <span
+                  >Criado em:
+                  {{
+                    client.createdAt
+                      ? formatDate(client.createdAt)
+                      : "Sem data de criação"
+                  }}</span
+                >
+              </q-item-label>
 
-            <q-item-label caption class="label-spaced">
-              <span
-                >Atualizado Em:
-                {{
-                  client.updatedAt
-                    ? formatDate(client.updatedAt)
-                    : "Sem data de atualização"
-                }}</span
-              >
-            </q-item-label>
+              <q-item-label caption>
+                <span
+                  >Atualizado Em:
+                  {{
+                    client.updatedAt
+                      ? formatDate(client.updatedAt)
+                      : "Sem data de atualização"
+                  }}</span
+                >
+              </q-item-label>
+            </div>
           </q-item-section>
         </q-item>
       </q-card-section>
