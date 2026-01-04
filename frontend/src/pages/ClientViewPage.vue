@@ -57,9 +57,7 @@
                 >Criado em:
                 {{
                   client.createdAt
-                    ? new Date(client.createdAt).toLocaleString("pt-br", {
-                        timeZone: "America/Sao_Paulo",
-                      })
+                    ? formatDate(client.createdAt)
                     : "Sem data de criação"
                 }}</span
               >
@@ -70,9 +68,7 @@
                 >Atualizado Em:
                 {{
                   client.updatedAt
-                    ? new Date(client.updatedAt).toLocaleString("pt-br", {
-                        timeZone: "America/Sao_Paulo",
-                      })
+                    ? formatDate(client.updatedAt)
                     : "Sem data de atualização"
                 }}</span
               >
@@ -102,6 +98,15 @@ const loading = ref(true);
 const submitting = ref(false);
 
 const id = computed(() => Number($route.params.id));
+
+function formatDate(value?: string, timeZone?: string) {
+  if (!value) return "—";
+  if (!timeZone) timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  return new Date(value).toLocaleString("pt-BR", {
+    timeZone,
+  });
+}
 
 async function clientNotFoundNotifyAndNavigate() {
   $q.notify({ type: "negative", message: "Cliente não encontrado" });
