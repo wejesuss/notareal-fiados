@@ -29,7 +29,7 @@
                 checked-icon="check"
                 color="blue"
                 unchecked-icon="clear"
-                @update:model-value="submit"
+                @update:model-value="submitDialog"
                 :disable="submitting"
                 ><q-chip
                   :color="isActive ? 'green-5' : 'grey-7'"
@@ -139,10 +139,48 @@ watch(
   { immediate: true }
 );
 
-async function submit() {
-  if (submitting.value || !client.value) return;
+function cancelSubmit(error?: Error) {
+  isActive.value = !isActive.value;
+  if (error) {
+    $q.notify({
+      type: "negative",
+      message: error.message,
+    });
+  }
+}
 
+async function submitDialog() {
+  if (submitting.value || !client.value) return;
   submitting.value = true;
+
+  try {
+    if (isActive.value === false) {
+      $q.dialog({
+        title: "Tem certeza que deseja desativar este cliente?",
+        message: `Este cliente não poderá ser usado para novas operações e todas as suas compras e pagamentos serão desativadas.`,
+        options: {
+          model: [""],
+          type: "checkbox",
+          isValid: (model) => model.includes("opt1"),
+          items: [
+            { label: "Entendo e desejo desativar o cliente", value: "opt1" },
+          ],
+        },
+        cancel: "Cancelar",
+        ok: "Desativar",
+        noBackdropDismiss: true,
+      })
+        .onCancel(cancelSubmit)
+        .onOk(() => void submit());
+    } else {
+      await submit();
+    }
+  } finally {
+    submitting.value = false;
+  }
+}
+
+async function submit() {
   try {
     const payload: ClientUpdate = {
       ...client.value,
@@ -156,9 +194,9 @@ async function submit() {
       type: "positive",
       message: "Cliente atualizado com sucesso",
     });
-    // await navigateTo("/clients/");
-  } finally {
-    submitting.value = false;
+  } catch (e) {
+    cancelSubmit(new Error("Erro ao desativar cliente"));
+    console.error(e);
   }
 }
 </script>
