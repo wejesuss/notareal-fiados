@@ -19,6 +19,11 @@ const routes: RouteRecordRaw[] = [
         component: () => import("pages/ClientCreatePage.vue"),
       },
       {
+        path: "/clients/:id",
+        component: () => import("pages/ClientViewPage.vue"),
+        beforeEnter: validateClientID,
+      },
+      {
         path: "/clients/:id/edit",
         component: () => import("pages/ClientEditPage.vue"),
         beforeEnter: validateClientID,
