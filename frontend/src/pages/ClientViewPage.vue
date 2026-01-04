@@ -25,6 +25,7 @@
               </q-item-label>
 
               <q-toggle
+                name="active-status"
                 v-model="isActive"
                 checked-icon="check"
                 color="blue"
