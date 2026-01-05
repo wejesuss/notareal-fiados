@@ -25,10 +25,11 @@
               }}</q-item-label>
 
               <q-toggle
+                size="38px"
                 name="active-status"
                 v-model="isActive"
                 checked-icon="check"
-                color="blue"
+                color="green"
                 unchecked-icon="clear"
                 @update:model-value="submitDialog"
                 :disable="submitting"
