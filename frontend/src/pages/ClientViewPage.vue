@@ -10,7 +10,7 @@
 
     <q-card v-else>
       <q-card-section class="row items-center q-gutter-md">
-        <div class="text-subtitle1">Dados do cliente</div>
+        <div class="text-subtitle1 text-grey-9">Detalhes do cliente</div>
         <q-icon name="person_outline" size="md" color="grey-6"></q-icon>
       </q-card-section>
 
@@ -20,9 +20,9 @@
         <q-item class="client-row q-py-md client-container" v-if="client">
           <q-item-section>
             <div class="row items-center justify-between">
-              <q-item-label class="text-body1 text-weight-medium text-grey-10">
-                {{ client.name }}
-              </q-item-label>
+              <q-item-label class="text-h6 text-weight-bold">{{
+                client.name
+              }}</q-item-label>
 
               <q-toggle
                 name="active-status"
@@ -41,22 +41,22 @@
             </div>
 
             <q-item-label
-              class="text-caption text-indigo-14 letter-spaced label-spaced"
+              class="text-caption text-indigo-14 letter-spaced label-spaced text-weight-medium"
               >{{ client.nickname ?? "Sem apelido" }}
             </q-item-label>
 
-            <q-item-label caption class="label-spaced">
+            <q-item-label caption class="text-weight-medium label-spaced">
               <span>{{ client.phone ?? "Sem telefone" }}</span>
             </q-item-label>
 
-            <q-item-label caption class="label-spaced">
+            <q-item-label caption class="text-weight-medium label-spaced">
               <span>{{ client.email ?? "Sem email" }}</span>
             </q-item-label>
 
             <div class="row items-center justify-between label-spaced">
               <q-item-label caption>
-                <span
-                  >Criado em:
+                <span class="text-caption">Criado Em: </span>
+                <span class="text-weight-bolder letter-spaced">
                   {{
                     client.createdAt
                       ? formatDate(client.createdAt)
@@ -66,14 +66,14 @@
               </q-item-label>
 
               <q-item-label caption>
-                <span
-                  >Atualizado Em:
+                <span class="text-caption">Atualizado Em: </span>
+                <span class="text-weight-bolder letter-spaced">
                   {{
                     client.updatedAt
                       ? formatDate(client.updatedAt)
                       : "Sem data de atualização"
-                  }}</span
-                >
+                  }}
+                </span>
               </q-item-label>
             </div>
           </q-item-section>
@@ -206,11 +206,11 @@ async function submit() {
 
 <style scoped>
 .label-spaced {
-  margin-top: 18px;
+  margin-top: 20px;
 }
 
 .row + .label-spaced {
-  margin-top: 12px;
+  margin-top: 16px;
 }
 
 .letter-spaced {
