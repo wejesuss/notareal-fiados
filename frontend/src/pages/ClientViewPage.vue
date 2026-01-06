@@ -34,6 +34,7 @@
                 @update:model-value="submitDialog"
                 :disable="submitting"
                 ><q-chip
+                  class="q-ml-sm"
                   :color="isActive ? 'green-5' : 'grey-7'"
                   text-color="white"
                   :label="isActive ? 'Cliente Ativo' : 'Cliente Inativo'"
@@ -43,21 +44,41 @@
 
             <q-item-label
               class="text-caption text-indigo-14 letter-spaced label-spaced text-weight-medium"
-              >{{ client.nickname ?? "Sem apelido" }}
+              :class="client.nickname ? '' : 'italic-light'"
+              >{{ client.nickname ? `(${client.nickname})` : "Sem apelido" }}
             </q-item-label>
 
-            <q-item-label caption class="text-weight-medium label-spaced">
-              <span>{{ client.phone ?? "Sem telefone" }}</span>
+            <q-item-label
+              caption
+              class="text-weight-medium label-spaced"
+              :class="client.phone ? '' : 'italic-light'"
+            >
+              <q-icon name="phone" color="grey-8" size="14px"></q-icon>
+              <span class="q-ml-sm contact-label">{{
+                client.phone ?? "Sem telefone"
+              }}</span>
             </q-item-label>
 
-            <q-item-label caption class="text-weight-medium label-spaced">
-              <span>{{ client.email ?? "Sem email" }}</span>
+            <q-item-label
+              caption
+              class="text-weight-medium label-spaced"
+              :class="client.email ? '' : 'italic-light'"
+            >
+              <q-icon name="mail" color="grey-8" size="14px"></q-icon>
+              <span class="q-ml-sm contact-label">{{
+                client.email ?? "Sem email"
+              }}</span>
             </q-item-label>
 
-            <div class="row items-center justify-between label-spaced">
+            <div
+              class="row items-center justify-between label-spaced meta-secondary"
+            >
               <q-item-label caption>
                 <span class="text-caption">Criado Em: </span>
-                <span class="text-weight-bolder letter-spaced">
+                <span
+                  class="text-weight-bolder letter-spaced"
+                  :class="client.createdAt ? '' : 'italic-light'"
+                >
                   {{
                     client.createdAt
                       ? formatDate(client.createdAt)
@@ -68,7 +89,10 @@
 
               <q-item-label caption>
                 <span class="text-caption">Atualizado Em: </span>
-                <span class="text-weight-bolder letter-spaced">
+                <span
+                  class="text-weight-bolder letter-spaced"
+                  :class="client.updatedAt ? '' : 'italic-light'"
+                >
                   {{
                     client.updatedAt
                       ? formatDate(client.updatedAt)
@@ -232,5 +256,18 @@ async function submit() {
 
 .client-row:active {
   background-color: #f0f0f0;
+}
+
+.meta-secondary {
+  opacity: 0.75;
+}
+
+.contact-label {
+  font-size: 0.8rem;
+}
+
+.italic-light {
+  font-style: italic;
+  font-weight: 400;
 }
 </style>
