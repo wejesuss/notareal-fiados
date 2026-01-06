@@ -1,4 +1,9 @@
-import type { Client, ClientCreate, ClientUpdate } from "src/models";
+import type {
+  Client,
+  ClientCreate,
+  ClientSummary,
+  ClientUpdate,
+} from "src/models";
 
 const clients: Client[] = [
   {
@@ -19,6 +24,11 @@ const clients: Client[] = [
     createdAt: "2025-12-15T22:36:31.000Z",
     updatedAt: "2025-12-15T22:36:31.000Z",
   },
+];
+
+const summaries: ClientSummary[] = [
+  { clientId: 1, totalPurchases: 15, totalPaid: 360, outstandingBalance: 450 },
+  { clientId: 2, totalPurchases: 7, totalPaid: 0, outstandingBalance: 130.7 },
 ];
 
 export function getClients(): Client[] {
@@ -75,5 +85,18 @@ export async function updateClient(
     clients[index] = updatedClient;
 
     res(updatedClient);
+  });
+}
+
+export async function getClientSummary(
+  clientId: number
+): Promise<ClientSummary> {
+  return new Promise((res, rej) => {
+    const found = summaries.find((summary) => summary.clientId === clientId);
+    if (found) {
+      res(found);
+    } else {
+      rej(new Error("Resumo do cliente não encontrado!"));
+    }
   });
 }

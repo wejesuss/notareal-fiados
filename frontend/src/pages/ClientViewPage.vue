@@ -105,6 +105,65 @@
         </q-item>
       </q-card-section>
     </q-card>
+
+    <q-card class="q-my-lg">
+      <q-card-section class="row items-center q-gutter-md">
+        <div class="text-subtitle1 text-grey-9">Resumo</div>
+        <q-icon name="segment" size="md" color="grey-6"></q-icon>
+      </q-card-section>
+
+      <q-separator />
+
+      <q-card-section class="q-pa-lg">
+        <q-item class="client-row q-py-md client-container" v-if="summary">
+          <q-item-section>
+            <q-item-label class="text-h6 text-weight-medium letter-spaced">
+              Resumo de compras
+            </q-item-label>
+
+            <q-item-label
+              class="text-caption letter-spaced label-y-spaced-less text-weight-medium"
+            >
+              <span>Total de compras: </span>
+              <span class="text-blue-10 summary-label">
+                {{ summary.totalPurchases }} compras
+              </span>
+            </q-item-label>
+
+            <q-item-label
+              class="text-caption text-weight-medium letter-spaced label-y-spaced-less"
+            >
+              <span>Total Pago: </span>
+              <span class="text-blue-10 summary-label">{{
+                formatCurrency(summary.totalPaid)
+              }}</span>
+            </q-item-label>
+
+            <q-item-label
+              class="text-caption text-weight-medium letter-spaced label-y-spaced-less"
+            >
+              <span>Saldo em aberto: </span>
+              <span class="text-blue-10 summary-label">
+                {{ formatCurrency(summary.outstandingBalance) }}
+              </span>
+            </q-item-label>
+          </q-item-section>
+        </q-item>
+
+        <div
+          v-else
+          class="text-body2 text-center text-weight-medium text-grey-8 q-pa-md"
+        >
+          Resumo indisponível
+          <q-icon
+            name="cloud_off"
+            size="md"
+            color="grey-6"
+            class="q-ml-sm"
+          ></q-icon>
+        </div>
+      </q-card-section>
+    </q-card>
   </q-page>
 </template>
 
@@ -112,15 +171,17 @@
 import { computed, ref, watch } from "vue";
 import { useQuasar } from "quasar";
 import { useRoute } from "vue-router";
-import type { Client, ClientUpdate } from "src/models";
-import { updateClient, getClientById } from "src/services";
+import type { Client, ClientSummary, ClientUpdate } from "src/models";
+import { updateClient, getClientById, getClientSummary } from "src/services";
 import { useNavigation } from "src/composables/useNavigation";
+import { formatCurrency } from "src/utils/formatters/currency";
 
 const $route = useRoute();
 const { navigateTo } = useNavigation();
 const $q = useQuasar();
 
 const client = ref<Client | null>(null);
+const summary = ref<ClientSummary | null>(null);
 const isActive = ref(false);
 const loading = ref(true);
 const submitting = ref(false);
@@ -152,10 +213,20 @@ async function loadClient(id: number) {
   try {
     client.value = await getClientById(id);
     isActive.value = client.value.isActive;
+    await loadClientSummary(id);
   } catch {
     await clientNotFoundNotifyAndNavigate();
   } finally {
     loading.value = false;
+  }
+}
+
+async function loadClientSummary(clientId: number) {
+  try {
+    summary.value = await getClientSummary(clientId);
+  } catch (e) {
+    console.error(e);
+    summary.value = null;
   }
 }
 
@@ -234,6 +305,14 @@ async function submit() {
   margin-top: 20px;
 }
 
+.label-y-spaced-less {
+  margin-top: 20px;
+}
+
+.label-y-spaced-less + .label-y-spaced-less {
+  margin-top: 16px;
+}
+
 .row + .label-spaced {
   margin-top: 16px;
 }
@@ -264,6 +343,10 @@ async function submit() {
 
 .contact-label {
   font-size: 0.8rem;
+}
+
+.summary-label {
+  font-size: 0.85rem;
 }
 
 .italic-light {

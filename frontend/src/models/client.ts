@@ -23,3 +23,10 @@ export interface ClientUpdate {
   email?: string | null;
   isActive: boolean;
 }
+
+export interface ClientSummary {
+  clientId: number;
+  totalPurchases: number;
+  totalPaid: number;
+  outstandingBalance: number;
+}
