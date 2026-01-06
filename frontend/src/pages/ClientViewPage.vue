@@ -289,9 +289,12 @@ async function submit() {
 
     await updateClient(id.value, payload);
 
+    const message = !isActive.value
+      ? "Cliente desativado com sucesso"
+      : "Cliente ativado. Compras e pagamentos não serão ativadas.";
     $q.notify({
       type: "positive",
-      message: "Cliente atualizado com sucesso",
+      message,
     });
   } catch (e) {
     cancelSubmit(new Error("Erro ao desativar cliente"));
