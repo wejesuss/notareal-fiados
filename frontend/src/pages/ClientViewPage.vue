@@ -17,7 +17,10 @@
       <q-separator />
 
       <q-card-section class="q-pa-lg">
-        <q-item class="client-row q-py-md client-container" v-if="client">
+        <q-item
+          class="client-container-border q-py-md client-container"
+          v-if="client"
+        >
           <q-item-section>
             <div class="row items-center justify-between">
               <q-item-label class="text-h6 text-weight-bold">{{
@@ -44,17 +47,17 @@
 
             <q-item-label
               class="text-caption text-indigo-14 letter-spaced label-spaced text-weight-medium"
-              :class="client.nickname ? '' : 'italic-light'"
+              :class="client.nickname ? '' : 'client-field-empty'"
               >{{ client.nickname ? `(${client.nickname})` : "Sem apelido" }}
             </q-item-label>
 
             <q-item-label
               caption
               class="text-weight-medium label-spaced"
-              :class="client.phone ? '' : 'italic-light'"
+              :class="client.phone ? '' : 'client-field-empty'"
             >
               <q-icon name="phone" color="grey-8" size="14px"></q-icon>
-              <span class="q-ml-sm contact-label">{{
+              <span class="q-ml-sm client-contact-label">{{
                 client.phone ?? "Sem telefone"
               }}</span>
             </q-item-label>
@@ -62,22 +65,22 @@
             <q-item-label
               caption
               class="text-weight-medium label-spaced"
-              :class="client.email ? '' : 'italic-light'"
+              :class="client.email ? '' : 'client-field-empty'"
             >
               <q-icon name="mail" color="grey-8" size="14px"></q-icon>
-              <span class="q-ml-sm contact-label">{{
+              <span class="q-ml-sm client-contact-label">{{
                 client.email ?? "Sem email"
               }}</span>
             </q-item-label>
 
             <div
-              class="row items-center justify-between label-spaced meta-secondary"
+              class="row items-center justify-between label-spaced client-meta-secondary"
             >
               <q-item-label caption>
                 <span class="text-caption">Criado Em: </span>
                 <span
                   class="text-weight-bolder letter-spaced"
-                  :class="client.createdAt ? '' : 'italic-light'"
+                  :class="client.createdAt ? '' : 'client-field-empty'"
                 >
                   {{
                     client.createdAt
@@ -91,7 +94,7 @@
                 <span class="text-caption">Atualizado Em: </span>
                 <span
                   class="text-weight-bolder letter-spaced"
-                  :class="client.updatedAt ? '' : 'italic-light'"
+                  :class="client.updatedAt ? '' : 'client-field-empty'"
                 >
                   {{
                     client.updatedAt
@@ -108,24 +111,27 @@
 
     <q-card class="q-my-lg">
       <q-card-section class="row items-center q-gutter-md">
-        <div class="text-subtitle1 text-grey-9">Resumo</div>
+        <div class="text-subtitle1 text-grey-9">Visão Geral</div>
         <q-icon name="segment" size="md" color="grey-6"></q-icon>
       </q-card-section>
 
       <q-separator />
 
       <q-card-section class="q-pa-lg">
-        <q-item class="client-row q-py-md client-container" v-if="summary">
+        <q-item
+          class="client-container-border q-py-md client-container"
+          v-if="summary"
+        >
           <q-item-section>
             <q-item-label class="text-h6 text-weight-medium letter-spaced">
-              Resumo de compras
+              Resumo financeiro
             </q-item-label>
 
             <q-item-label
               class="text-caption letter-spaced label-y-spaced-less text-weight-medium"
             >
               <span>Total de compras: </span>
-              <span class="text-blue-10 summary-label">
+              <span class="text-blue-10 client-summary-value">
                 {{ summary.totalPurchases }} compras
               </span>
             </q-item-label>
@@ -134,7 +140,7 @@
               class="text-caption text-weight-medium letter-spaced label-y-spaced-less"
             >
               <span>Total Pago: </span>
-              <span class="text-blue-10 summary-label">{{
+              <span class="text-blue-10 client-summary-value">{{
                 formatCurrency(summary.totalPaid)
               }}</span>
             </q-item-label>
@@ -143,7 +149,7 @@
               class="text-caption text-weight-medium letter-spaced label-y-spaced-less"
             >
               <span>Saldo em aberto: </span>
-              <span class="text-blue-10 summary-label">
+              <span class="text-blue-10 client-summary-value">
                 {{ formatCurrency(summary.outstandingBalance) }}
               </span>
             </q-item-label>
@@ -343,30 +349,30 @@ async function submit() {
   width: 100%;
 }
 
-.client-row {
+.client-container-border {
   border: 1px solid #e0e0e0;
   border-radius: 12px;
   background-color: #fafafa;
 }
 
-.client-row:active {
+.client-container-border:active {
   background-color: #f0f0f0;
 }
 
-.meta-secondary {
-  opacity: 0.75;
-}
-
-.contact-label {
+.client-contact-label {
   font-size: 0.8rem;
 }
 
-.summary-label {
-  font-size: 0.85rem;
-}
-
-.italic-light {
+.client-field-empty {
   font-style: italic;
   font-weight: 400;
+}
+
+.client-meta-secondary {
+  opacity: 0.75;
+}
+
+.client-summary-value {
+  font-size: 0.85rem;
 }
 </style>
