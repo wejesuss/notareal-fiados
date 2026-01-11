@@ -33,7 +33,7 @@
             </q-item-label>
 
             <q-item-label
-              class="text-caption letter-spaced label-y-spaced-less text-weight-medium"
+              class="text-caption letter-spaced secondary-label text-weight-medium"
             >
               <span>Total de compras: </span>
               <span class="text-blue-10 client-summary-value">
@@ -42,7 +42,7 @@
             </q-item-label>
 
             <q-item-label
-              class="text-caption text-weight-medium letter-spaced label-y-spaced-less"
+              class="text-caption text-weight-medium letter-spaced secondary-label"
             >
               <span>Total Pago: </span>
               <span class="text-blue-10 client-summary-value">{{
@@ -51,7 +51,7 @@
             </q-item-label>
 
             <q-item-label
-              class="text-caption text-weight-medium letter-spaced label-y-spaced-less"
+              class="text-caption text-weight-medium letter-spaced secondary-label"
             >
               <span>Saldo em aberto: </span>
               <span class="text-blue-10 client-summary-value">
@@ -65,7 +65,7 @@
           v-else
           class="text-body2 text-center text-weight-medium text-grey-8 q-pa-md"
         >
-          Resumo indisponível
+          Resumo financeiro indisponível
           <q-icon
             name="cloud_off"
             size="md"
@@ -151,32 +151,12 @@ watch(
 </script>
 
 <style scoped>
-.label-y-spaced-less {
+.secondary-label {
   margin-top: 20px;
 }
 
-.label-y-spaced-less + .label-y-spaced-less {
+.secondary-label + .secondary-label {
   margin-top: 16px;
-}
-
-.letter-spaced {
-  letter-spacing: 0.06em;
-}
-
-.client-container {
-  max-width: 560px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-.client-container-border {
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  background-color: #fafafa;
-}
-
-.client-container-border:active {
-  background-color: #f0f0f0;
 }
 
 .client-summary-value {

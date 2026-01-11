@@ -203,39 +203,11 @@ async function submit() {
 
 <style scoped>
 .label-spaced {
-  margin-top: 20px;
-}
-
-.label-y-spaced-less {
-  margin-top: 20px;
-}
-
-.label-y-spaced-less + .label-y-spaced-less {
   margin-top: 16px;
 }
 
-.row + .label-spaced {
-  margin-top: 16px;
-}
-
-.letter-spaced {
-  letter-spacing: 0.06em;
-}
-
-.client-container {
-  max-width: 560px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-.client-container-border {
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  background-color: #fafafa;
-}
-
-.client-container-border:active {
-  background-color: #f0f0f0;
+.label-spaced + .label-spaced {
+  margin-top: 20px;
 }
 
 .client-contact-label {
