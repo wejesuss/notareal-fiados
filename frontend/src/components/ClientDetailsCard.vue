@@ -117,6 +117,7 @@ interface ClientDetailsCardProps {
 const props = defineProps<ClientDetailsCardProps>();
 const emit = defineEmits(["exception"]);
 const client = ref<Client | null>(null);
+const previousActive = ref(false);
 const isActive = ref(false);
 const submitting = ref(false);
 
@@ -124,6 +125,7 @@ async function loadClient(id: number) {
   try {
     client.value = await getClientById(id);
     isActive.value = client.value.isActive;
+    previousActive.value = client.value.isActive;
   } catch (e) {
     emit("exception", e);
   }
@@ -138,7 +140,7 @@ watch(
 );
 
 function cancelSubmit(error?: Error) {
-  isActive.value = !isActive.value;
+  isActive.value = previousActive.value;
   if (error) {
     $q.notify({
       type: "negative",
