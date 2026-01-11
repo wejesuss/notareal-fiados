@@ -16,7 +16,7 @@
 
       <q-separator />
 
-      <q-card-section class="q-pa-lg">
+      <q-card-section class="q-py-lg q-px-sm">
         <q-item
           class="client-container-border q-py-md client-container"
           v-if="client"
@@ -40,7 +40,7 @@
                   class="q-ml-sm"
                   :color="isActive ? 'green-5' : 'grey-7'"
                   text-color="white"
-                  :label="isActive ? 'Cliente Ativo' : 'Cliente Inativo'"
+                  :label="isActive ? 'Ativo' : 'Inativo'"
                 ></q-chip>
               </q-toggle>
             </div>
