@@ -2,7 +2,7 @@
   <q-card flat bordered class="registry-card">
     <q-card-section>
       <!-- Title -->
-      <div class="text-body2 text-grey-7">{{ title }}</div>
+      <div :class="titleClass">{{ title }}</div>
 
       <!-- Fallback -->
       <div
@@ -13,31 +13,32 @@
       </div>
 
       <!-- Main value -->
-      <div
-        v-else
-        v-for="registry in recentRegistries"
-        :key="registry.id"
-        class="row items-center justify-between text-body2 q-mt-md"
-      >
-        <!-- Registry name -->
-        <span class="text-weight-bold" :class="nameTextColor">
-          {{ registry.name }}
-        </span>
-
-        <!-- Registry value -->
+      <div v-else>
         <div
-          class="row items-center text-body2 text-weight-medium"
-          :class="resolveValueColor(registry.valueColor)"
+          v-for="registry in recentRegistries"
+          :key="registry.id"
+          class="row items-center justify-between text-body2 q-mt-md"
         >
-          {{ registry.value }}
-          <!-- Icon and complement text -->
-          <div v-if="registry.valueComplement" class="q-ml-sm">
-            <q-icon
-              :name="iconText"
-              :color="iconTextColor"
-              size="xs"
-              class="q-mr-sm"
-            />{{ registry.valueComplement }}
+          <!-- Registry name -->
+          <span class="text-weight-bold" :class="nameTextColor">
+            {{ registry.name }}
+          </span>
+
+          <!-- Registry value -->
+          <div
+            class="row items-center text-body2 text-weight-medium"
+            :class="resolveValueColor(registry.valueColor)"
+          >
+            {{ registry.value }}
+            <!-- Icon and complement text -->
+            <div v-if="registry.valueComplement" class="q-ml-sm">
+              <q-icon
+                :name="registry.icon ?? iconText"
+                :color="registry.iconColor ?? iconTextColor"
+                size="xs"
+                class="q-mr-sm"
+              />{{ registry.valueComplement }}
+            </div>
           </div>
         </div>
       </div>
@@ -78,6 +79,18 @@ const { navigateTo } = useNavigation();
 const nameTextColor = computed(() => props.nameColor ?? "text-grey");
 const iconText = computed(() => props.icon ?? "circle");
 const iconTextColor = computed(() => props.iconColor ?? "amber");
+const titleClass = computed(() => {
+  switch (props.titleVariant) {
+    case "emphasis":
+      return "text-h6 text-weight-medium letter-spaced";
+
+    case "muted":
+      return "text-body2 text-grey-6";
+
+    default:
+      return "text-body2 text-grey-7";
+  }
+});
 
 const resolveValueColor = (itemColor?: string) =>
   itemColor ?? props.valueColor ?? "text-grey";

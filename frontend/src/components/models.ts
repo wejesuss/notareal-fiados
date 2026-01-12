@@ -26,6 +26,7 @@ export interface SystemOverviewCardProps {
 export interface RegistryCardProps {
   id: string | number;
   title: string;
+  titleVariant?: "default" | "emphasis" | "muted";
   subtitle?: string;
   route: string;
   actionLabel: string;
@@ -39,6 +40,8 @@ export interface RegistryCardProps {
     value: string | number;
     valueComplement?: string;
     valueColor?: string;
+    icon?: string;
+    iconColor?: QIconProps["color"];
   }>;
 }
 
