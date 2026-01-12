@@ -62,6 +62,18 @@
         ></q-icon>
       </div>
     </q-card-section>
+
+    <q-separator inset></q-separator>
+
+    <!-- Recent purchases -->
+    <q-card-section class="q-pa-lg">
+      <div>
+        <RegistryCard
+          class="client-container-border client-container"
+          v-bind="clientPurchases"
+        ></RegistryCard>
+      </div>
+    </q-card-section>
   </q-card>
 </template>
 
@@ -70,6 +82,8 @@ import { ref, watch } from "vue";
 import type { ClientSummary } from "src/models";
 import { getClientSummary } from "src/services";
 import { formatCurrency } from "src/utils/formatters/currency";
+import RegistryCard from "./RegistryCard.vue";
+import type { RegistryCardProps } from "./models";
 
 interface ClientSummaryCardProps {
   clientId: number;
@@ -78,6 +92,32 @@ interface ClientSummaryCardProps {
 const props = defineProps<ClientSummaryCardProps>();
 const loading = ref(true);
 const summary = ref<ClientSummary | null>(null);
+
+const clientPurchases: RegistryCardProps = {
+  id: "purchases",
+  title: "Últimas compras",
+  titleVariant: "emphasis",
+  subtitle: "Últimas 3 compras",
+  nameColor: "text-blue-8",
+  valueColor: "text-amber-10",
+  route: `/clients/purchases/${props.clientId}`,
+  actionLabel: "Ver compras",
+  recentRegistries: [
+    {
+      id: 1,
+      name: "Compra de produtos agrícolas",
+      value: formatCurrency(350),
+      valueComplement: "parcial",
+    },
+    {
+      id: 2,
+      name: "Compra de sementes",
+      value: formatCurrency(49.9),
+      valueComplement: "pago",
+      valueColor: "text-secondary",
+    },
+  ],
+};
 
 async function loadSummary(id: number) {
   loading.value = true;
