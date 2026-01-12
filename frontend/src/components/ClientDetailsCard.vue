@@ -1,5 +1,7 @@
 <template>
-  <q-card>
+  <q-card v-if="loading" class="q-my-xl">Loading...</q-card>
+
+  <q-card v-else>
     <q-card-section class="row items-center q-gutter-md">
       <div class="text-subtitle1 text-grey-9">Detalhes do cliente</div>
       <q-icon name="person_outline" size="md" color="grey-6"></q-icon>
@@ -116,18 +118,22 @@ interface ClientDetailsCardProps {
 
 const props = defineProps<ClientDetailsCardProps>();
 const emit = defineEmits(["exception"]);
-const client = ref<Client | null>(null);
-const previousActive = ref(false);
-const isActive = ref(false);
+const loading = ref(true);
 const submitting = ref(false);
+const client = ref<Client | null>(null);
+const isActive = ref(false);
+const previousActive = ref(false);
 
 async function loadClient(id: number) {
+  loading.value = true;
   try {
     client.value = await getClientById(id);
     isActive.value = client.value.isActive;
     previousActive.value = client.value.isActive;
   } catch (e) {
     emit("exception", e);
+  } finally {
+    loading.value = false;
   }
 }
 
