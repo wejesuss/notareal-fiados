@@ -23,10 +23,10 @@
             <q-toggle
               size="38px"
               name="active-status"
-              v-model="isActive"
               checked-icon="check"
               color="green"
               unchecked-icon="clear"
+              :model-value="isActive"
               @update:model-value="submitDialog"
               :disable="submitting"
               ><q-chip
@@ -122,14 +122,12 @@ const loading = ref(true);
 const submitting = ref(false);
 const client = ref<Client | null>(null);
 const isActive = ref(false);
-const previousActive = ref(false);
 
 async function loadClient(id: number) {
   loading.value = true;
   try {
     client.value = await getClientById(id);
     isActive.value = client.value.isActive;
-    previousActive.value = client.value.isActive;
   } catch (e) {
     emit("exception", e);
   } finally {
@@ -146,7 +144,6 @@ watch(
 );
 
 function cancelSubmit(error?: Error) {
-  isActive.value = previousActive.value;
   if (error) {
     $q.notify({
       type: "negative",
@@ -155,12 +152,12 @@ function cancelSubmit(error?: Error) {
   }
 }
 
-async function submitDialog() {
+async function submitDialog(nextValue: boolean) {
   if (submitting.value || !client.value) return;
   submitting.value = true;
 
   try {
-    if (isActive.value === false) {
+    if (nextValue === false) {
       $q.dialog({
         title: "Tem certeza que deseja desativar este cliente?",
         message: `Este cliente não poderá ser usado para novas operações e todas as suas compras e pagamentos serão desativadas.`,
@@ -177,8 +174,12 @@ async function submitDialog() {
         noBackdropDismiss: true,
       })
         .onCancel(cancelSubmit)
-        .onOk(() => void submit());
+        .onOk(() => {
+          isActive.value = nextValue;
+          void submit();
+        });
     } else {
+      isActive.value = nextValue;
       await submit();
     }
   } finally {
