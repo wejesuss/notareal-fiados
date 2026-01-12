@@ -143,70 +143,69 @@ watch(
   { immediate: true }
 );
 
-function cancelSubmit(error?: Error) {
-  if (error) {
-    $q.notify({
-      type: "negative",
-      message: error.message,
-    });
-  }
+async function confirmClientDisable(): Promise<boolean> {
+  return new Promise((resolve) => {
+    $q.dialog({
+      title: "Tem certeza que deseja desativar este cliente?",
+      message: `Este cliente não poderá ser usado para novas operações e todas as suas compras e pagamentos serão desativadas.`,
+      options: {
+        model: [""],
+        type: "checkbox",
+        isValid: (model) => model.includes("opt1"),
+        items: [
+          { label: "Entendo e desejo desativar o cliente", value: "opt1" },
+        ],
+      },
+      cancel: "Cancelar",
+      ok: "Desativar",
+      noBackdropDismiss: true,
+    })
+      .onCancel(() => resolve(false))
+      .onDismiss(() => resolve(false))
+      .onOk(() => resolve(true));
+  });
 }
 
 async function submitDialog(nextValue: boolean) {
   if (submitting.value || !client.value) return;
-  submitting.value = true;
+  const previousIsActive = isActive.value;
 
+  if (nextValue === false) {
+    const confirmed = await confirmClientDisable();
+    if (!confirmed) return;
+  }
+
+  submitting.value = true;
+  isActive.value = nextValue;
   try {
-    if (nextValue === false) {
-      $q.dialog({
-        title: "Tem certeza que deseja desativar este cliente?",
-        message: `Este cliente não poderá ser usado para novas operações e todas as suas compras e pagamentos serão desativadas.`,
-        options: {
-          model: [""],
-          type: "checkbox",
-          isValid: (model) => model.includes("opt1"),
-          items: [
-            { label: "Entendo e desejo desativar o cliente", value: "opt1" },
-          ],
-        },
-        cancel: "Cancelar",
-        ok: "Desativar",
-        noBackdropDismiss: true,
-      })
-        .onCancel(cancelSubmit)
-        .onOk(() => {
-          isActive.value = nextValue;
-          void submit();
-        });
-    } else {
-      isActive.value = nextValue;
-      await submit();
-    }
+    await submit(nextValue);
+
+    $q.notify({
+      type: "positive",
+      message: nextValue
+        ? "Cliente desativado com sucesso"
+        : "Cliente ativado. Compras e pagamentos não serão ativadas.",
+    });
+  } catch (e) {
+    console.error(e, typeof e);
+    isActive.value = previousIsActive;
+
+    $q.notify({
+      type: "negative",
+      message: "Erro ao atualizar status do cliente",
+    });
   } finally {
     submitting.value = false;
   }
 }
 
-async function submit() {
-  try {
-    const payload: ClientUpdate = {
-      ...client.value,
-      isActive: isActive.value,
-    };
+async function submit(nextValue: boolean) {
+  const payload: ClientUpdate = {
+    ...client.value,
+    isActive: nextValue,
+  };
 
-    await updateClient(props.clientId, payload);
-
-    const message = !isActive.value
-      ? "Cliente desativado com sucesso"
-      : "Cliente ativado. Compras e pagamentos não serão ativadas.";
-    $q.notify({
-      type: "positive",
-      message,
-    });
-  } catch (e) {
-    cancelSubmit(new Error("Erro ao desativar cliente"));
-    console.error(e);
-  }
+  await updateClient(props.clientId, payload);
 }
 </script>
 
