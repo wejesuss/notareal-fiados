@@ -9,12 +9,13 @@
 
     <q-separator />
 
+    <!-- Financial summary -->
     <q-card-section class="q-pa-lg">
-      <q-item
-        class="client-container-border q-py-md client-container"
+      <div
+        class="client-container-border q-pa-md client-container"
         v-if="summary"
       >
-        <q-item-section>
+        <div>
           <q-item-label class="text-h6 text-weight-medium letter-spaced">
             Resumo financeiro
           </q-item-label>
@@ -45,8 +46,8 @@
               {{ formatCurrency(summary.outstandingBalance) }}
             </span>
           </q-item-label>
-        </q-item-section>
-      </q-item>
+        </div>
+      </div>
 
       <div
         v-else
