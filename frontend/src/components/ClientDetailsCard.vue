@@ -113,7 +113,7 @@ import { formatDate } from "src/utils/formatters/date";
 const $q = useQuasar();
 
 interface ClientDetailsCardProps {
-  id: number;
+  clientId: number;
 }
 
 const props = defineProps<ClientDetailsCardProps>();
@@ -138,7 +138,7 @@ async function loadClient(id: number) {
 }
 
 watch(
-  () => props.id,
+  () => props.clientId,
   async (newId) => {
     await loadClient(newId);
   },
@@ -193,7 +193,7 @@ async function submit() {
       isActive: isActive.value,
     };
 
-    await updateClient(props.id, payload);
+    await updateClient(props.clientId, payload);
 
     const message = !isActive.value
       ? "Cliente desativado com sucesso"

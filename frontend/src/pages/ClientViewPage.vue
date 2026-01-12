@@ -9,8 +9,7 @@
     <q-card v-if="loading">Loading...</q-card>
 
     <ClientDetailsCard
-      v-else
-      :id="id"
+      :client-id="id"
       @exception="clientNotFoundNotifyAndNavigate"
     ></ClientDetailsCard>
 
