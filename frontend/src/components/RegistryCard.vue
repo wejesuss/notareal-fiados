@@ -49,33 +49,44 @@
       </div>
     </q-card-section>
 
-    <q-separator />
+    <q-separator v-if="hasActions" />
 
     <!-- Action -->
     <q-card-actions
-      class="registry-action"
+      v-if="$slots.actions || actionLabel"
       align="center"
-      role="button"
-      tabindex="0"
-      @click="navigateTo(route)"
-      @keydown.enter="navigateTo(route)"
-      @keydown.space.prevent="navigateTo(route)"
+      class="registry-action"
     >
-      <span class="text-primary text-center text-body2 text-weight-medium">
-        {{ actionLabel }}
-      </span>
+      <slot name="actions">
+        <!-- default behavior (backward compatible) -->
+        <div
+          role="button"
+          tabindex="0"
+          @click="navigateTo(route)"
+          @keydown.enter="navigateTo(route)"
+          @keydown.space.prevent="navigateTo(route)"
+        >
+          <span class="text-primary text-body2 text-weight-medium">
+            {{ actionLabel }}
+          </span>
+        </div>
+      </slot>
     </q-card-actions>
   </q-card>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, useSlots } from "vue";
 import { useNavigation } from "src/composables/useNavigation";
 import type { RegistryCardProps } from "./models";
 
 const props = defineProps<RegistryCardProps>();
+const slots = useSlots();
 const { navigateTo } = useNavigation();
 
+const hasActions = computed(() => {
+  return !!slots.actions || !!props.actionLabel;
+});
 const nameTextColor = computed(() => props.nameColor ?? "text-grey");
 const iconText = computed(() => props.icon ?? "circle");
 const iconTextColor = computed(() => props.iconColor ?? "amber");
