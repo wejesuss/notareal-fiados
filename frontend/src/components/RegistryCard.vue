@@ -54,7 +54,7 @@
     <!-- Action -->
     <q-card-actions
       v-if="$slots.actions || actionLabel"
-      align="center"
+      :align="actionsAlign"
       class="registry-action"
     >
       <slot name="actions">
@@ -102,6 +102,7 @@ const titleClass = computed(() => {
       return "text-body2 text-grey-7";
   }
 });
+const actionsAlign = computed(() => props.actionsAlign ?? "center");
 
 const resolveValueColor = (itemColor?: string) =>
   itemColor ?? props.valueColor ?? "text-grey";

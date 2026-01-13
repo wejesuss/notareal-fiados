@@ -71,7 +71,23 @@
         <RegistryCard
           class="client-container-border client-container"
           v-bind="clientPurchases"
-        ></RegistryCard>
+          actions-align="around"
+        >
+          <template #actions>
+            <q-btn
+              flat
+              color="primary"
+              label="Ver compras"
+              @click="navigateTo(clientPurchases.route)"
+            ></q-btn>
+            <q-btn
+              flat
+              color="primary"
+              label="Nova compra"
+              @click="navigateTo(newPurchaseRoute)"
+            ></q-btn>
+          </template>
+        </RegistryCard>
       </div>
     </q-card-section>
   </q-card>
@@ -84,15 +100,19 @@ import { getClientSummary } from "src/services";
 import { formatCurrency } from "src/utils/formatters/currency";
 import RegistryCard from "./RegistryCard.vue";
 import type { RegistryCardProps } from "./models";
+import { useNavigation } from "src/composables/useNavigation";
 
 interface ClientSummaryCardProps {
   clientId: number;
 }
 
+const { navigateTo } = useNavigation();
+
 const props = defineProps<ClientSummaryCardProps>();
 const loading = ref(true);
 const summary = ref<ClientSummary | null>(null);
 
+const newPurchaseRoute = `/clients/${props.clientId}/purchases/new`;
 const clientPurchases: RegistryCardProps = {
   id: "purchases",
   title: "Últimas compras",
@@ -100,7 +120,7 @@ const clientPurchases: RegistryCardProps = {
   subtitle: "Últimas 3 compras",
   nameColor: "text-blue-8",
   valueColor: "text-amber-10",
-  route: `/clients/purchases/${props.clientId}`,
+  route: `/clients/${props.clientId}/purchases`,
   actionLabel: "Ver compras",
   recentRegistries: [
     {

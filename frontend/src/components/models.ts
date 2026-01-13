@@ -1,4 +1,4 @@
-import type { QIconProps } from "quasar";
+import type { QCardActionsProps, QIconProps } from "quasar";
 
 export interface SystemOverviewCardProps {
   /**
@@ -30,6 +30,7 @@ export interface RegistryCardProps {
   subtitle?: string;
   route: string;
   actionLabel: string;
+  actionsAlign?: QCardActionsProps["align"];
   valueColor?: string;
   nameColor?: string;
   icon?: string;
