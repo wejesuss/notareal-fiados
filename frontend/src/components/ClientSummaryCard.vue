@@ -76,12 +76,14 @@
           <template #actions>
             <q-btn
               flat
+              padding="4px md"
               color="primary"
               label="Ver compras"
               @click="navigateTo(clientPurchases.route)"
             ></q-btn>
             <q-btn
               flat
+              padding="4px md"
               color="primary"
               label="Nova compra"
               @click="navigateTo(newPurchaseRoute)"

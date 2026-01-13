@@ -114,7 +114,7 @@ const resolveValueColor = (itemColor?: string) =>
 }
 
 .registry-action {
-  padding: 12px;
+  padding: 10px 12px;
   cursor: pointer;
   transition: background-color 0.3s ease;
   text-transform: uppercase;
