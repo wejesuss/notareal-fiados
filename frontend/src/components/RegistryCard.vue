@@ -20,9 +20,9 @@
           class="row items-center justify-between text-body2 q-mt-md registry-card"
         >
           <!-- Registry name -->
-          <div class="registry-name">
+          <div class="registry-name registry-scroll">
             <span
-              class="text-weight-bold registry-name-text"
+              class="text-weight-bold registry-name-text registry-scroll-inner"
               :class="nameTextColor"
             >
               {{ registry.name }}
@@ -137,9 +137,41 @@ const resolveValueColor = (itemColor?: string) =>
 .registry-name-text {
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: clip;
+  text-overflow: ellipsis;
   display: block;
   transition: all 0.3s ease-in;
+}
+
+.registry-scroll {
+  overflow: hidden;
+  position: relative;
+}
+
+.registry-scroll-inner {
+  align-items: center;
+  gap: 4px;
+}
+
+@keyframes led-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+.registry-scroll:hover .registry-scroll-inner,
+.registry-scroll:focus-within .registry-scroll-inner {
+  display: inline-flex;
+  animation: led-scroll 6s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .registry-value:hover .registry-scroll-inner {
+    animation: none;
+  }
 }
 
 .registry-action {
