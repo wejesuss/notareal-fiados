@@ -194,8 +194,8 @@ const resolveValueColor = (itemColor?: string) =>
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .registry-value:hover .registry-scroll-inner {
-    animation: none;
+  .registry-scroll .registry-scroll-inner {
+    animation: none !important;
   }
 }
 
