@@ -77,17 +77,26 @@
             <q-btn
               flat
               padding="4px md"
+              class="q-mb-xs"
               color="primary"
-              label="Ver compras"
               @click="navigateTo(clientPurchases.route)"
-            ></q-btn>
+            >
+              <q-icon name="shopping_cart" size="18px" class="q-mr-sm"></q-icon>
+              <span class="text-body2 text-weight-medium">Ver compras</span>
+            </q-btn>
             <q-btn
               flat
               padding="4px md"
               color="primary"
-              label="Nova compra"
               @click="navigateTo(newPurchaseRoute)"
-            ></q-btn>
+            >
+              <q-icon
+                name="add_shopping_cart"
+                size="18px"
+                class="q-mr-sm"
+              ></q-icon>
+              <span class="text-body2 text-weight-medium">Nova compra</span>
+            </q-btn>
           </template>
         </RegistryCard>
       </div>
