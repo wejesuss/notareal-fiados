@@ -12,19 +12,6 @@
     ></ClientDetailsCard>
 
     <ClientSummaryCard :client-id="id"></ClientSummaryCard>
-
-    <q-card class="q-my-md q-py-sm">
-      <q-card-section class="row justify-around q-gutter-sm">
-        <q-btn
-          outline
-          rounded
-          color="primary"
-          icon="shopping_cart"
-          label="Ver compras"
-          @click="navigateTo(`/clients/${id}/purchases`)"
-        ></q-btn>
-      </q-card-section>
-    </q-card>
   </q-page>
 </template>
 

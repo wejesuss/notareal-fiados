@@ -11,7 +11,7 @@
 
     <q-card-section class="q-py-lg q-px-sm">
       <q-item
-        class="client-container-border q-py-md client-container"
+        class="client-container-border q-pt-md client-container"
         v-if="client"
       >
         <q-item-section>
@@ -97,6 +97,24 @@
               </span>
             </q-item-label>
           </div>
+
+          <q-separator class="q-mt-md" />
+
+          <q-card-actions align="center" class="client-action">
+            <q-btn
+              flat
+              role="button"
+              tabindex="0"
+              color="primary"
+              class="full-width"
+              @click="navigateTo(clientEditRoute)"
+              @keydown.enter="navigateTo(clientEditRoute)"
+              @keydown.space.prevent="navigateTo(clientEditRoute)"
+            >
+              <q-icon name="edit" class="q-mr-sm" size="xs" />
+              <span class="text-body2 text-weight-medium">Editar cliente</span>
+            </q-btn>
+          </q-card-actions>
         </q-item-section>
       </q-item>
     </q-card-section>
@@ -109,7 +127,9 @@ import { useQuasar } from "quasar";
 import type { Client, ClientUpdate } from "src/models";
 import { updateClient, getClientById } from "src/services";
 import { formatDate } from "src/utils/formatters/date";
+import { useNavigation } from "src/composables/useNavigation";
 
+const { navigateTo } = useNavigation();
 const $q = useQuasar();
 
 interface ClientDetailsCardProps {
@@ -122,6 +142,7 @@ const loading = ref(true);
 const submitting = ref(false);
 const client = ref<Client | null>(null);
 const isActive = ref(false);
+const clientEditRoute = `/clients/${props.clientId}/edit`;
 
 async function loadClient(id: number) {
   loading.value = true;
@@ -229,5 +250,9 @@ async function submit(nextValue: boolean) {
 
 .client-meta-secondary {
   opacity: 0.75;
+}
+
+.client-action {
+  padding: 2px 0;
 }
 </style>
