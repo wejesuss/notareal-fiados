@@ -17,28 +17,35 @@
         <div
           v-for="registry in recentRegistries"
           :key="registry.id"
-          class="row items-center justify-between text-body2 q-mt-md"
+          class="row items-center justify-between text-body2 q-mt-md registry-card"
         >
           <!-- Registry name -->
-          <span class="text-weight-bold" :class="nameTextColor">
-            {{ registry.name }}
-          </span>
+          <div class="registry-name">
+            <span
+              class="text-weight-bold registry-name-text"
+              :class="nameTextColor"
+            >
+              {{ registry.name }}
+            </span>
+          </div>
 
           <!-- Registry value -->
           <div
-            class="row items-center text-body2 text-weight-medium"
+            class="row items-center text-body2 text-weight-medium q-ml-sm registry-value"
             :class="resolveValueColor(registry.valueColor)"
           >
-            {{ registry.value }}
+            <span>
+              {{ registry.value }}
+            </span>
             <!-- Icon and complement text -->
-            <div v-if="registry.valueComplement" class="q-ml-sm">
+            <span v-if="registry.valueComplement" class="q-ml-xs">
               <q-icon
                 :name="registry.icon ?? iconText"
                 :color="registry.iconColor ?? iconTextColor"
                 size="xs"
-                class="q-mr-sm"
-              />{{ registry.valueComplement }}
-            </div>
+              />
+              {{ registry.valueComplement }}
+            </span>
           </div>
         </div>
       </div>
@@ -111,6 +118,28 @@ const resolveValueColor = (itemColor?: string) =>
 <style scoped>
 .registry-card {
   height: 100%;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+}
+
+.registry-name {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.registry-value {
+  justify-content: flex-end;
+  min-width: fit-content;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.registry-name-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+  display: block;
+  transition: all 0.3s ease-in;
 }
 
 .registry-action {
