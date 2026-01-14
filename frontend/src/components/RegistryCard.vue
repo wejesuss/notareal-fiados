@@ -20,7 +20,12 @@
           class="row items-center justify-between text-body2 q-mt-md registry-card"
         >
           <!-- Registry name -->
-          <div class="registry-name registry-scroll">
+          <div
+            class="registry-name registry-scroll"
+            :class="{ 'is-scrollable': hasTextOverflow(String(registry.id)) }"
+            ref="nameElements"
+            :data-id="registry.id"
+          >
             <span
               class="text-weight-bold registry-name-text registry-scroll-inner"
               :class="nameTextColor"
@@ -83,9 +88,35 @@
 </template>
 
 <script setup lang="ts">
-import { computed, useSlots } from "vue";
+import { computed, nextTick, onMounted, ref, useSlots } from "vue";
 import { useNavigation } from "src/composables/useNavigation";
 import type { RegistryCardProps } from "./models";
+
+const nameElements = ref<HTMLElement[]>([]);
+const hasOverflow = ref<Record<string, boolean>>({});
+
+const hasTextOverflow = (id: string) => !!hasOverflow.value[id];
+
+function measureOverflow(el: HTMLElement, id: string) {
+  const overflow = el.scrollWidth - el.clientWidth;
+
+  if (overflow <= 0) return;
+
+  const extraPadding = 20;
+  el.style.setProperty("--scroll-distance", `${overflow + extraPadding}px`);
+  hasOverflow.value[id] = true;
+}
+
+onMounted(async () => {
+  await nextTick();
+
+  nameElements.value.forEach((el) => {
+    const id = el.dataset.id;
+    if (!id) return;
+
+    measureOverflow(el, id);
+  });
+});
 
 const props = defineProps<RegistryCardProps>();
 const slots = useSlots();
@@ -134,16 +165,10 @@ const resolveValueColor = (itemColor?: string) =>
   letter-spacing: 0.02em;
 }
 
-.registry-name-text {
+.registry-scroll {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  display: block;
-  transition: all 0.3s ease-in;
-}
-
-.registry-scroll {
-  overflow: hidden;
   position: relative;
 }
 
@@ -158,14 +183,14 @@ const resolveValueColor = (itemColor?: string) =>
   }
 
   to {
-    transform: translateX(-100%);
+    transform: translateX(calc(-1 * var(--scroll-distance)));
   }
 }
 
-.registry-scroll:hover .registry-scroll-inner,
-.registry-scroll:focus-within .registry-scroll-inner {
+.registry-scroll.is-scrollable:hover .registry-scroll-inner,
+.registry-scroll.is-scrollable:focus-within .registry-scroll-inner {
   display: inline-flex;
-  animation: led-scroll 6s linear infinite;
+  animation: led-scroll 5s 0.2s linear infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
