@@ -122,7 +122,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { useQuasar } from "quasar";
 import type { Client, ClientUpdate } from "src/models";
 import { updateClient, getClientById } from "src/services";
@@ -142,7 +142,7 @@ const loading = ref(true);
 const submitting = ref(false);
 const client = ref<Client | null>(null);
 const isActive = ref(false);
-const clientEditRoute = `/clients/${props.clientId}/edit`;
+const clientEditRoute = computed(() => `/clients/${props.clientId}/edit`);
 
 async function loadClient(id: number) {
   loading.value = true;

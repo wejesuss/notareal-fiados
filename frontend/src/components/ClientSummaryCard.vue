@@ -105,7 +105,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import type { ClientSummary } from "src/models";
 import { getClientSummary } from "src/services";
 import { formatCurrency } from "src/utils/formatters/currency";
@@ -123,7 +123,9 @@ const props = defineProps<ClientSummaryCardProps>();
 const loading = ref(true);
 const summary = ref<ClientSummary | null>(null);
 
-const newPurchaseRoute = `/clients/${props.clientId}/purchases/new`;
+const newPurchaseRoute = computed(
+  () => `/clients/${props.clientId}/purchases/new`
+);
 const clientPurchases: RegistryCardProps = {
   id: "purchases",
   title: "Últimas compras",
