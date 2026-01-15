@@ -8,7 +8,7 @@
 
   <q-card v-else-if="error" class="q-my-xl q-pa-md">
     <ContentState
-      :message="error?.message"
+      :message="errorMessage"
       message-color="text-amber-8"
       icon-name="error_outline"
       icon-color="amber-10"
@@ -166,6 +166,9 @@ const client = ref<Client | null>(null);
 const isActive = ref(false);
 
 const clientEditRoute = computed(() => `/clients/${props.clientId}/edit`);
+const errorMessage = computed(() => {
+  return error.value?.message || "Erro inesperado ao carregar cliente";
+});
 
 async function loadClient(id: number) {
   loading.value = true;
