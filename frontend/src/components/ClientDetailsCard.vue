@@ -172,7 +172,7 @@ async function loadClient(id: number) {
   error.value = null;
   try {
     client.value = await getClientById(id);
-    isActive.value = client.value.isActive;
+    isActive.value = !!client.value?.isActive;
   } catch (e) {
     console.error(e);
     error.value = e as Error;
