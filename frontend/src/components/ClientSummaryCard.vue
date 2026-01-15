@@ -49,18 +49,7 @@
         </div>
       </div>
 
-      <div
-        v-else
-        class="text-body2 text-center text-weight-medium text-grey-8 q-pa-md"
-      >
-        Resumo financeiro indisponível
-        <q-icon
-          name="cloud_off"
-          size="md"
-          color="grey-6"
-          class="q-ml-sm"
-        ></q-icon>
-      </div>
+      <EmptyState v-else message="Resumo financeiro indisponível"></EmptyState>
     </q-card-section>
 
     <q-separator inset></q-separator>
@@ -111,6 +100,7 @@ import { getClientSummary } from "src/services";
 import { formatCurrency } from "src/utils/formatters/currency";
 import RegistryCard from "./RegistryCard.vue";
 import type { RegistryCardProps } from "./models";
+import EmptyState from "./EmptyState.vue";
 import { useNavigation } from "src/composables/useNavigation";
 
 interface ClientSummaryCardProps {
