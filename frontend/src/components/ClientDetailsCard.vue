@@ -182,7 +182,6 @@ async function confirmClientDisable(): Promise<boolean> {
       noBackdropDismiss: true,
     })
       .onCancel(() => resolve(false))
-      .onDismiss(() => resolve(false))
       .onOk(() => resolve(true));
   });
 }
@@ -203,7 +202,7 @@ async function submitDialog(nextValue: boolean) {
 
     $q.notify({
       type: "positive",
-      message: nextValue
+      message: !nextValue
         ? "Cliente desativado com sucesso"
         : "Cliente ativado. Compras e pagamentos não serão ativadas.",
     });
