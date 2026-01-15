@@ -7,11 +7,12 @@
 
     <!-- Content -->
     <ClientDetailsCard
+      v-if="id"
       :client-id="id"
       @exception="clientNotFoundNotifyAndNavigate"
     ></ClientDetailsCard>
 
-    <ClientSummaryCard :client-id="id"></ClientSummaryCard>
+    <ClientSummaryCard v-if="id" :client-id="id"></ClientSummaryCard>
   </q-page>
 </template>
 
