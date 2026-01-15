@@ -1,12 +1,12 @@
 <template>
-  <q-card v-if="loading" class="q-my-xl q-pa-md">
+  <q-card v-if="loadState === 'loading'" class="q-my-xl q-pa-md">
     <ContentState
       message="Carregando cliente..."
       icon-name="person_search"
     ></ContentState>
   </q-card>
 
-  <q-card v-else-if="error" class="q-my-xl q-pa-md">
+  <q-card v-else-if="loadState === 'error'" class="q-my-xl q-pa-md">
     <ContentState
       :message="errorMessage"
       message-color="text-amber-8"
@@ -15,11 +15,12 @@
     ></ContentState>
   </q-card>
 
-  <q-card v-else-if="!client" class="q-my-xl q-pa-md">
+  <q-card v-else-if="loadState === 'empty'" class="q-my-xl q-pa-md">
     <ContentState message="Cliente indisponível"></ContentState>
   </q-card>
 
   <q-card v-else>
+    <!-- Happy Path -->
     <q-card-section class="row items-center q-gutter-md">
       <div class="text-subtitle1 text-grey-9">Detalhes do cliente</div>
       <q-icon name="person_outline" size="md" color="grey-6"></q-icon>
@@ -152,6 +153,7 @@ import ContentState from "./ContentState.vue";
 const { navigateTo } = useNavigation();
 const $q = useQuasar();
 
+type LoadState = "loading" | "error" | "empty" | "ready";
 interface ClientDetailsCardProps {
   clientId: number;
 }
@@ -168,6 +170,13 @@ const isActive = ref(false);
 const clientEditRoute = computed(() => `/clients/${props.clientId}/edit`);
 const errorMessage = computed(() => {
   return error.value?.message || "Erro inesperado ao carregar cliente";
+});
+const loadState = computed<LoadState>(() => {
+  if (loading.value) return "loading";
+  if (error.value) return "error";
+  if (!client.value) return "empty";
+
+  return "ready";
 });
 
 async function loadClient(id: number) {
