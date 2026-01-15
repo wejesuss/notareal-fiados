@@ -159,7 +159,9 @@ interface ClientDetailsCardProps {
 }
 
 const props = defineProps<ClientDetailsCardProps>();
-const emit = defineEmits(["exception"]);
+const emit = defineEmits<{
+  (e: "load-error", error: Error): void;
+}>();
 
 const loading = ref(true);
 const error = ref<Error | null>(null);
@@ -191,7 +193,7 @@ async function loadClient(id: number) {
     client.value = null;
     isActive.value = false;
 
-    emit("exception", e);
+    emit("load-error", e as Error);
   } finally {
     loading.value = false;
   }
