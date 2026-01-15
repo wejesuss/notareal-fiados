@@ -90,6 +90,9 @@ Esses são os arquivos de documentação
 2. `architecture_backend.md`
 3. `database_design.md`
 4. `routes_documentation.md`
+5. `screen_flow.md`
+6. `wireframe.md`
+7. `/frontend/README.md`
 
 [Ao final](#-documentos-relacionados) você verá links de navegação para cada um deles.
 
