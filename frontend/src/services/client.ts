@@ -4,6 +4,7 @@ import type {
   ClientSummary,
   ClientUpdate,
 } from "src/models";
+import { sleep } from "src/utils/timing/sleep";
 
 const clients: Client[] = [
   {
@@ -65,6 +66,8 @@ export async function updateClient(
   id: number,
   payload: ClientUpdate
 ): Promise<Client> {
+  await sleep(300);
+
   return new Promise((res, rej) => {
     const index = clients.findIndex((client) => client.id === id);
     if (index === -1) {
