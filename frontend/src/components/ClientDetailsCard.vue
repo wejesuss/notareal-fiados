@@ -144,14 +144,12 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { useQuasar } from "quasar";
-import type { Client, ClientUpdate } from "src/models";
-import { updateClient, getClientById } from "src/services";
+import type { ClientUpdate } from "src/models";
+import { updateClient } from "src/services";
 import { formatDate } from "src/utils/formatters/date";
 import { useNavigation } from "src/composables/useNavigation";
 import ContentState from "./ContentState.vue";
-
-const { navigateTo } = useNavigation();
-const $q = useQuasar();
+import { useClientDetails } from "src/composables/useClientDetails";
 
 type LoadState = "loading" | "error" | "empty" | "ready";
 interface ClientDetailsCardProps {
@@ -159,15 +157,17 @@ interface ClientDetailsCardProps {
 }
 
 const props = defineProps<ClientDetailsCardProps>();
+const clientId = ref(props.clientId);
+
+const $q = useQuasar();
+const { navigateTo } = useNavigation();
+const { loading, error, client, isActive, reload } = useClientDetails(clientId);
+
 const emit = defineEmits<{
   (e: "load-error", error: Error): void;
 }>();
 
-const loading = ref(true);
-const error = ref<Error | null>(null);
 const submitting = ref(false);
-const client = ref<Client | null>(null);
-const isActive = ref(false);
 
 const clientEditRoute = computed(() => `/clients/${props.clientId}/edit`);
 const errorMessage = computed(() => {
@@ -181,28 +181,15 @@ const loadState = computed<LoadState>(() => {
   return "ready";
 });
 
-async function loadClient(id: number) {
-  loading.value = true;
-  error.value = null;
-  try {
-    client.value = await getClientById(id);
-    isActive.value = !!client.value?.isActive;
-  } catch (e) {
-    console.error(e);
-    error.value = e as Error;
-    client.value = null;
-    isActive.value = false;
-
-    emit("load-error", e as Error);
-  } finally {
-    loading.value = false;
-  }
-}
-
 watch(
   () => props.clientId,
-  async (newId) => {
-    await loadClient(newId);
+  async () => {
+    clientId.value = props.clientId;
+    await reload();
+
+    if (loadState.value === "error" && error.value) {
+      emit("load-error", error.value);
+    }
   },
   { immediate: true }
 );
