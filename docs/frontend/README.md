@@ -2,7 +2,7 @@
 
 ## Ainda em desenvolvimento
 
-Esta documentação é um esboço, verifique os arquivos de docs em `/[docs/backend`](../backend/), lá você encontrará arquivos de tela e fluxo de dados, incluindo wireframes de telas a serem desenvolvidas no frontend (`Quasar`).
+Esta documentação é um esboço, verifique os arquivos de docs em [`/docs/backend`](../backend/), lá você encontrará arquivos de tela e fluxo de dados, incluindo wireframes de telas a serem desenvolvidas no frontend (`Quasar`).
 
 
 ## Lógica de Erros frontend
