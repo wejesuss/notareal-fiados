@@ -107,6 +107,7 @@
               tabindex="0"
               color="primary"
               class="full-width"
+              :disable="submitting"
               @click="navigateTo(clientEditRoute)"
               @keydown.enter="navigateTo(clientEditRoute)"
               @keydown.space.prevent="navigateTo(clientEditRoute)"
