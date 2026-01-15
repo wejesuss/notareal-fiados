@@ -138,7 +138,7 @@ const clientPurchases: RegistryCardProps = {
   recentRegistries: [
     {
       id: 1,
-      name: "Compra de produtos agrícolas",
+      name: "Compra de produtos agrícolas e vitaminas",
       value: formatCurrency(350),
       valueComplement: "parcial",
     },
