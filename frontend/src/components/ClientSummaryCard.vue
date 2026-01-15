@@ -49,7 +49,10 @@
         </div>
       </div>
 
-      <EmptyState v-else message="Resumo financeiro indisponível"></EmptyState>
+      <ContentState
+        v-else
+        message="Resumo financeiro indisponível"
+      ></ContentState>
     </q-card-section>
 
     <q-separator inset></q-separator>
@@ -100,7 +103,7 @@ import { getClientSummary } from "src/services";
 import { formatCurrency } from "src/utils/formatters/currency";
 import RegistryCard from "./RegistryCard.vue";
 import type { RegistryCardProps } from "./models";
-import EmptyState from "./EmptyState.vue";
+import ContentState from "./ContentState.vue";
 import { useNavigation } from "src/composables/useNavigation";
 
 interface ClientSummaryCardProps {

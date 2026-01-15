@@ -17,14 +17,14 @@
 import type { NamedColor } from "quasar";
 
 type TextColorClass = `text-${string}`;
-interface EmptyStateProps {
+interface ContentStateProps {
   message: string;
   messageColor?: TextColorClass;
   iconName?: string;
   iconColor?: NamedColor;
 }
 
-withDefaults(defineProps<EmptyStateProps>(), {
+withDefaults(defineProps<ContentStateProps>(), {
   messageColor: "text-grey-8",
   iconName: "cloud_off",
   iconColor: "grey-6",

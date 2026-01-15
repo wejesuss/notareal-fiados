@@ -1,5 +1,23 @@
 <template>
-  <q-card v-if="loading" class="q-my-xl">Loading...</q-card>
+  <q-card v-if="loading" class="q-my-xl q-pa-md">
+    <ContentState
+      message="Carregando cliente..."
+      icon-name="person_search"
+    ></ContentState>
+  </q-card>
+
+  <q-card v-else-if="error" class="q-my-xl q-pa-md">
+    <ContentState
+      :message="error?.message"
+      message-color="text-amber-8"
+      icon-name="error_outline"
+      icon-color="amber-10"
+    ></ContentState>
+  </q-card>
+
+  <q-card v-else-if="!client" class="q-my-xl q-pa-md">
+    <ContentState message="Cliente indisponível"></ContentState>
+  </q-card>
 
   <q-card v-else>
     <q-card-section class="row items-center q-gutter-md">
@@ -129,6 +147,7 @@ import type { Client, ClientUpdate } from "src/models";
 import { updateClient, getClientById } from "src/services";
 import { formatDate } from "src/utils/formatters/date";
 import { useNavigation } from "src/composables/useNavigation";
+import ContentState from "./ContentState.vue";
 
 const { navigateTo } = useNavigation();
 const $q = useQuasar();
@@ -139,18 +158,27 @@ interface ClientDetailsCardProps {
 
 const props = defineProps<ClientDetailsCardProps>();
 const emit = defineEmits(["exception"]);
+
 const loading = ref(true);
+const error = ref<Error | null>(null);
 const submitting = ref(false);
 const client = ref<Client | null>(null);
 const isActive = ref(false);
+
 const clientEditRoute = computed(() => `/clients/${props.clientId}/edit`);
 
 async function loadClient(id: number) {
   loading.value = true;
+  error.value = null;
   try {
     client.value = await getClientById(id);
     isActive.value = client.value.isActive;
   } catch (e) {
+    console.error(e);
+    error.value = e as Error;
+    client.value = null;
+    isActive.value = false;
+
     emit("exception", e);
   } finally {
     loading.value = false;
