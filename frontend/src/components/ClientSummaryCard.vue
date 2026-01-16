@@ -1,7 +1,26 @@
 <template>
-  <q-card v-if="loading" class="q-my-lg">Loading...</q-card>
+  <q-card v-if="loadState === 'loading'" class="q-my-lg q-pa-md">
+    <ContentState
+      message="Carregando Resumo..."
+      icon-name="manage_search"
+    ></ContentState>
+  </q-card>
+
+  <q-card v-else-if="loadState === 'error'" class="q-my-lg q-pa-md">
+    <ContentState
+      :message="errorMessage"
+      message-color="text-amber-8"
+      icon-name="error_outline"
+      icon-color="amber-10"
+    ></ContentState>
+  </q-card>
+
+  <q-card v-else-if="loadState === 'empty'" class="q-my-lg q-pa-md">
+    <ContentState message="Resumo financeiro indisponível"></ContentState>
+  </q-card>
 
   <q-card v-else class="q-my-lg">
+    <!-- Happy Path -->
     <q-card-section class="row items-center q-gutter-md">
       <div class="text-subtitle1 text-grey-9">Visão Geral</div>
       <q-icon name="segment" size="md" color="grey-6"></q-icon>
@@ -48,11 +67,6 @@
           </q-item-label>
         </div>
       </div>
-
-      <ContentState
-        v-else
-        message="Resumo financeiro indisponível"
-      ></ContentState>
     </q-card-section>
 
     <q-separator inset></q-separator>
@@ -97,28 +111,37 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
-import type { ClientSummary } from "src/models";
-import { getClientSummary } from "src/services";
+import { computed, toRef } from "vue";
 import { formatCurrency } from "src/utils/formatters/currency";
-import RegistryCard from "./RegistryCard.vue";
 import type { RegistryCardProps } from "./models";
+import RegistryCard from "./RegistryCard.vue";
 import ContentState from "./ContentState.vue";
 import { useNavigation } from "src/composables/useNavigation";
+import { useClientSummary } from "src/composables/useClientSummary";
 
 interface ClientSummaryCardProps {
   clientId: number;
 }
-
-const { navigateTo } = useNavigation();
+type LoadState = "loading" | "error" | "empty" | "ready";
 
 const props = defineProps<ClientSummaryCardProps>();
-const loading = ref(true);
-const summary = ref<ClientSummary | null>(null);
+const { navigateTo } = useNavigation();
+const { loading, error, summary } = useClientSummary(toRef(props, "clientId"));
 
+const loadState = computed<LoadState>(() => {
+  if (loading.value) return "loading";
+  if (error.value) return "error";
+  if (!summary.value) return "empty";
+
+  return "ready";
+});
+const errorMessage = computed(() => {
+  return error.value?.message || "Erro inesperado ao carregar resumo!";
+});
 const newPurchaseRoute = computed(
-  () => `/clients/${props.clientId}/purchases/new`
+  () => `/clients/${props.clientId}/purchases/new`,
 );
+
 const clientPurchases: RegistryCardProps = {
   id: "purchases",
   title: "Últimas compras",
@@ -144,27 +167,6 @@ const clientPurchases: RegistryCardProps = {
     },
   ],
 };
-
-async function loadSummary(id: number) {
-  loading.value = true;
-
-  try {
-    summary.value = await getClientSummary(id);
-  } catch (e) {
-    console.error(e);
-    summary.value = null;
-  } finally {
-    loading.value = false;
-  }
-}
-
-watch(
-  () => props.clientId,
-  async (newId) => {
-    await loadSummary(newId);
-  },
-  { immediate: true }
-);
 </script>
 
 <style scoped>
