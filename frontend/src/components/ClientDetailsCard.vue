@@ -142,7 +142,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, ref, toRef, watch } from "vue";
 import { useQuasar } from "quasar";
 import type { ClientUpdate } from "src/models";
 import { updateClient } from "src/services";
@@ -151,23 +151,23 @@ import { useNavigation } from "src/composables/useNavigation";
 import ContentState from "./ContentState.vue";
 import { useClientDetails } from "src/composables/useClientDetails";
 
-type LoadState = "loading" | "error" | "empty" | "ready";
 interface ClientDetailsCardProps {
   clientId: number;
 }
+type LoadState = "loading" | "error" | "empty" | "ready";
 
 const props = defineProps<ClientDetailsCardProps>();
-const clientId = ref(props.clientId);
 
 const $q = useQuasar();
 const { navigateTo } = useNavigation();
-const { loading, error, client, isActive, reload } = useClientDetails(clientId);
+const { loading, error, client } = useClientDetails(toRef(props, "clientId"));
 
 const emit = defineEmits<{
   (e: "load-error", error: Error): void;
 }>();
 
 const submitting = ref(false);
+const isActive = ref(false);
 
 const clientEditRoute = computed(() => `/clients/${props.clientId}/edit`);
 const errorMessage = computed(() => {
@@ -182,17 +182,15 @@ const loadState = computed<LoadState>(() => {
 });
 
 watch(
-  () => props.clientId,
-  async () => {
-    clientId.value = props.clientId;
-    await reload();
-
-    if (loadState.value === "error" && error.value) {
-      emit("load-error", error.value);
-    }
+  client,
+  (c) => {
+    isActive.value = !!c?.isActive;
   },
   { immediate: true }
 );
+watch(error, (err) => {
+  if (err) emit("load-error", err);
+});
 
 async function confirmClientDisable(): Promise<boolean> {
   return new Promise((resolve) => {
@@ -256,6 +254,9 @@ async function submit(nextValue: boolean) {
   };
 
   await updateClient(props.clientId, payload);
+
+  // Keep local client snapshot in sync after successful update
+  if (client.value) client.value.isActive = nextValue;
 }
 </script>
 
