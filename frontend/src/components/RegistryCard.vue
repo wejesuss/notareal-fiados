@@ -65,7 +65,7 @@
 
     <!-- Action -->
     <q-card-actions
-      v-if="$slots.actions || actionLabel"
+      v-if="hasActions"
       :align="actionsAlign"
       class="registry-action"
     >
