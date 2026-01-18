@@ -73,39 +73,10 @@
 
     <!-- Recent purchases -->
     <q-card-section class="q-pa-lg">
-      <div>
-        <RegistryCard
-          class="client-container-border client-container"
-          v-bind="clientPurchases"
-          actions-align="around"
-        >
-          <template #actions>
-            <q-btn
-              flat
-              padding="4px md"
-              class="q-mb-xs"
-              color="primary"
-              @click="navigateTo(clientPurchases.route)"
-            >
-              <q-icon name="shopping_cart" size="18px" class="q-mr-sm"></q-icon>
-              <span class="text-body2 text-weight-medium">Ver compras</span>
-            </q-btn>
-            <q-btn
-              flat
-              padding="4px md"
-              color="primary"
-              @click="navigateTo(newPurchaseRoute)"
-            >
-              <q-icon
-                name="add_shopping_cart"
-                size="18px"
-                class="q-mr-sm"
-              ></q-icon>
-              <span class="text-body2 text-weight-medium">Nova compra</span>
-            </q-btn>
-          </template>
-        </RegistryCard>
-      </div>
+      <ClientRecentPurchases
+        :purchases-route="purchasesRoute"
+        :new-purchase-route="newPurchaseRoute"
+      ></ClientRecentPurchases>
     </q-card-section>
   </q-card>
 </template>
@@ -113,11 +84,9 @@
 <script setup lang="ts">
 import { computed, toRef } from "vue";
 import { formatCurrency } from "src/utils/formatters/currency";
-import type { RegistryCardProps } from "./models";
-import RegistryCard from "./RegistryCard.vue";
-import ContentState from "./ContentState.vue";
-import { useNavigation } from "src/composables/useNavigation";
 import { useClientSummary } from "src/composables/useClientSummary";
+import ContentState from "./ContentState.vue";
+import ClientRecentPurchases from "./ClientRecentPurchases.vue";
 
 interface ClientSummaryCardProps {
   clientId: number;
@@ -125,7 +94,7 @@ interface ClientSummaryCardProps {
 type LoadState = "loading" | "error" | "empty" | "ready";
 
 const props = defineProps<ClientSummaryCardProps>();
-const { navigateTo } = useNavigation();
+
 const { loading, error, summary } = useClientSummary(toRef(props, "clientId"));
 
 const loadState = computed<LoadState>(() => {
@@ -138,35 +107,11 @@ const loadState = computed<LoadState>(() => {
 const errorMessage = computed(() => {
   return error.value?.message || "Erro inesperado ao carregar resumo!";
 });
+
+const purchasesRoute = computed(() => `/clients/${props.clientId}/purchases`);
 const newPurchaseRoute = computed(
   () => `/clients/${props.clientId}/purchases/new`,
 );
-
-const clientPurchases: RegistryCardProps = {
-  id: "purchases",
-  title: "Últimas compras",
-  titleVariant: "emphasis",
-  subtitle: "Últimas 3 compras",
-  nameColor: "text-blue-8",
-  valueColor: "text-amber-10",
-  route: `/clients/${props.clientId}/purchases`,
-  actionLabel: "Ver compras",
-  recentRegistries: [
-    {
-      id: 1,
-      name: "Compra de produtos agrícolas e vitaminas",
-      value: formatCurrency(350),
-      valueComplement: "parcial",
-    },
-    {
-      id: 2,
-      name: "Compra de sementes",
-      value: formatCurrency(49.9),
-      valueComplement: "pago",
-      valueColor: "text-secondary",
-    },
-  ],
-};
 </script>
 
 <style scoped>
