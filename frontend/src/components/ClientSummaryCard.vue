@@ -73,10 +73,7 @@
 
     <!-- Recent purchases -->
     <q-card-section class="q-pa-lg">
-      <ClientRecentPurchases
-        :purchases-route="purchasesRoute"
-        :new-purchase-route="newPurchaseRoute"
-      ></ClientRecentPurchases>
+      <ClientRecentPurchases :client-id="clientId"></ClientRecentPurchases>
     </q-card-section>
   </q-card>
 </template>
@@ -107,11 +104,6 @@ const loadState = computed<LoadState>(() => {
 const errorMessage = computed(() => {
   return error.value?.message || "Erro inesperado ao carregar resumo!";
 });
-
-const purchasesRoute = computed(() => `/clients/${props.clientId}/purchases`);
-const newPurchaseRoute = computed(
-  () => `/clients/${props.clientId}/purchases/new`,
-);
 </script>
 
 <style scoped>

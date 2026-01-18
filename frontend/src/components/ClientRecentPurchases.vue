@@ -31,42 +31,55 @@
 </template>
 
 <script setup lang="ts">
+import { computed, ref, watch } from "vue";
+import type { Purchase } from "src/models";
 import type { RegistryCardProps } from "./models";
 import { formatCurrency } from "src/utils/formatters/currency";
 import { useNavigation } from "src/composables/useNavigation";
 import RegistryCard from "./RegistryCard.vue";
+import { getClientRecentPurchases } from "src/services/purchase";
 
 interface ClientRecentPurchasesProps {
-  newPurchaseRoute: string;
-  purchasesRoute: string;
+  clientId: number;
 }
 
 const props = defineProps<ClientRecentPurchasesProps>();
 const { navigateTo } = useNavigation();
 
-const clientPurchases: RegistryCardProps = {
+const recentPurchases = ref<Purchase[]>([]);
+const purchasesRoute = computed(() => `/clients/${props.clientId}/purchases`);
+const newPurchaseRoute = computed(
+  () => `/clients/${props.clientId}/purchases/new`,
+);
+const recentRegistries = computed(() => {
+  return recentPurchases.value.map((p) => {
+    return {
+      id: p.id,
+      name: p.description,
+      value: formatCurrency(p.totalValue),
+      valueComplement: p.status,
+    };
+  });
+});
+
+watch(
+  () => props.clientId,
+  async (newId: number) => {
+    recentPurchases.value = await getClientRecentPurchases(newId);
+    console.log(recentPurchases.value);
+  },
+  { immediate: true },
+);
+
+const clientPurchases = computed<RegistryCardProps>(() => ({
   id: "purchases",
   title: "Últimas compras",
   titleVariant: "emphasis",
   subtitle: "Últimas 3 compras",
   nameColor: "text-blue-8",
   valueColor: "text-amber-10",
-  route: props.purchasesRoute,
+  route: purchasesRoute.value,
   actionLabel: "Ver compras",
-  recentRegistries: [
-    {
-      id: 1,
-      name: "Compra de produtos agrícolas e vitaminas",
-      value: formatCurrency(350),
-      valueComplement: "parcial",
-    },
-    {
-      id: 2,
-      name: "Compra de sementes",
-      value: formatCurrency(49.9),
-      valueComplement: "pago",
-      valueColor: "text-secondary",
-    },
-  ],
-};
+  recentRegistries: recentRegistries.value,
+}));
 </script>
