@@ -64,7 +64,7 @@ export function createClient(payload: ClientCreate) {
 
 export async function updateClient(
   id: number,
-  payload: ClientUpdate,
+  payload: ClientUpdate
 ): Promise<Client> {
   await sleep(300);
 
@@ -92,7 +92,7 @@ export async function updateClient(
 }
 
 export async function getClientSummary(
-  clientId: number,
+  clientId: number
 ): Promise<ClientSummary> {
   return new Promise((res, rej) => {
     const found = summaries.find((summary) => summary.clientId === clientId);
