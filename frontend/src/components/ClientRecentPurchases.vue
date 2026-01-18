@@ -33,7 +33,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import type { Purchase } from "src/models";
-import type { RegistryCardProps } from "./models";
+import type { RecentRegistry, RegistryCardProps } from "./models";
 import { formatCurrency } from "src/utils/formatters/currency";
 import { useNavigation } from "src/composables/useNavigation";
 import RegistryCard from "./RegistryCard.vue";
@@ -51,16 +51,22 @@ const purchasesRoute = computed(() => `/clients/${props.clientId}/purchases`);
 const newPurchaseRoute = computed(
   () => `/clients/${props.clientId}/purchases/new`,
 );
-const recentRegistries = computed(() => {
-  return recentPurchases.value.map((p) => {
+const recentRegistries = computed<RecentRegistry[]>(() =>
+  recentPurchases.value.map((p) => {
+    const paid = p.status === "pago" || p.status === "paid";
+
     return {
       id: p.id,
       name: p.description,
       value: formatCurrency(p.totalValue),
       valueComplement: p.status,
+      ...(paid && {
+        iconColor: "green",
+        valueColor: "text-green",
+      }),
     };
-  });
-});
+  }),
+);
 
 watch(
   () => props.clientId,
@@ -75,7 +81,7 @@ const clientPurchases = computed<RegistryCardProps>(() => ({
   id: "purchases",
   title: "Últimas compras",
   titleVariant: "emphasis",
-  subtitle: "Últimas 3 compras",
+  subtitle: recentPurchases.value.length === 0 ? "" : "Últimas 3 compras",
   nameColor: "text-blue-8",
   valueColor: "text-amber-10",
   route: purchasesRoute.value,

@@ -23,6 +23,16 @@ export interface SystemOverviewCardProps {
   openAmount: number;
 }
 
+export interface RecentRegistry {
+  id: string | number;
+  name: string;
+  value: string | number;
+  valueComplement?: string;
+  valueColor?: string;
+  icon?: string;
+  iconColor?: QIconProps["color"];
+}
+
 export interface RegistryCardProps {
   id: string | number;
   title: string;
@@ -35,15 +45,7 @@ export interface RegistryCardProps {
   nameColor?: string;
   icon?: string;
   iconColor?: QIconProps["color"];
-  recentRegistries: Array<{
-    id: string | number;
-    name: string;
-    value: string | number;
-    valueComplement?: string;
-    valueColor?: string;
-    icon?: string;
-    iconColor?: QIconProps["color"];
-  }>;
+  recentRegistries: Array<RecentRegistry>;
 }
 
 export type ClientPayload = {
