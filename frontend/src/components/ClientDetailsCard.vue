@@ -189,7 +189,7 @@ watch(
   { immediate: true },
 );
 watch(error, (err) => {
-  if (err) emit("load-error", err);
+  if (err) emit("load-error", new Error(errorMessage.value));
 });
 
 async function confirmClientDisable(): Promise<boolean> {
