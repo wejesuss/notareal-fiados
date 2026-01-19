@@ -30,7 +30,7 @@ const purchases: Purchase[] = [
 
 export async function getClientRecentPurchases(
   clientId: number,
-  limit: number = 3,
+  limit: number = 3
 ): Promise<Purchase[]> {
   await sleep(400);
 

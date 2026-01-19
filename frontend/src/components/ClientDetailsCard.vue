@@ -186,7 +186,7 @@ watch(
   (c) => {
     isActive.value = !!c?.isActive;
   },
-  { immediate: true }
+  { immediate: true },
 );
 watch(error, (err) => {
   if (err) emit("load-error", err);
