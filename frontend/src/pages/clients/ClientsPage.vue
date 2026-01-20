@@ -107,7 +107,7 @@ const rowsPerPage = 10;
 
 const clients = computed(() => getClients());
 const totalPages = computed(() =>
-  Math.ceil(clients.value.length / rowsPerPage)
+  Math.ceil(clients.value.length / rowsPerPage),
 );
 const paginatedClients = computed(() => {
   const start = (page.value - 1) * rowsPerPage;
@@ -118,7 +118,7 @@ watch(
   () => clients.value.length,
   () => {
     page.value = 1;
-  }
+  },
 );
 const { navigateTo } = useNavigation();
 </script>
