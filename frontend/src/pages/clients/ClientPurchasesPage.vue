@@ -62,11 +62,20 @@
             </q-item-label>
 
             <q-item-label
-              caption
-              class="row q-col-gutter-sm purchase-contact-label"
+              class="q-col-gutter-md text-grey-9 purchase-amount-label caption-medium text-weight-medium"
             >
-              <span>{{ formatCurrency(purchase.totalValue) }}</span>
-              <span>{{ formatCurrency(purchase.totalPaidValue) }}</span>
+              <div class="row items-center text-body2">
+                <span class="q-mr-xs">Total da compra:</span>
+                <span class="text-weight-bold text-blue-grey-7">{{
+                  formatCurrency(purchase.totalValue)
+                }}</span>
+              </div>
+              <div class="row items-center text-body2">
+                <span class="q-mr-xs">Valor Pago:</span>
+                <span class="text-weight-bold text-blue-grey-7">{{
+                  formatCurrency(purchase.totalPaidValue)
+                }}</span>
+              </div>
             </q-item-label>
 
             <!-- Edit button aligned after content -->
@@ -212,7 +221,7 @@ watch(
   background-color: #f0f0f0;
 }
 
-.purchase-contact-label {
+.purchase-amount-label {
   margin-top: 2px;
 }
 
