@@ -15,7 +15,14 @@
     <!-- Content -->
     <q-card>
       <q-card-section>
-        <div class="text-subtitle1">Lista de compras</div>
+        <div class="text-subtitle1">
+          Lista de compras
+          <span
+            v-if="clientName"
+            class="text-primary text-subtitle2 letter-spaced q-ml-xs"
+            >({{ clientName }})
+          </span>
+        </div>
       </q-card-section>
 
       <q-separator />
@@ -45,16 +52,13 @@
           :key="purchase.id"
           clickable
           v-ripple
-          class="purchase-row q-my-md q-pa-sm q-mx-md q-py-md"
+          class="purchase-row purchase-container q-my-md q-mx-md q-pa-md"
           @click="navigateTo(`/purchases/${purchase.id}`)"
         >
           <!-- Main content -->
           <q-item-section>
             <q-item-label class="text-body1 text-weight-medium text-grey-10">
               {{ purchase.description }}
-              <span class="q-ml-sm text-caption text-indigo-14 letter-spaced"
-                >({{ formatStatus(purchase.status, { titleCase: true }) }})
-              </span>
             </q-item-label>
 
             <q-item-label
@@ -84,7 +88,13 @@
           </q-item-section>
 
           <!-- Status chip pinned right -->
-          <q-item-section side top>
+          <q-item-section side top class="justify-between">
+            <q-chip
+              :color="resolveStatusColor(purchase.status)"
+              text-color="white"
+            >
+              {{ formatStatus(purchase.status, { titleCase: true }) }}
+            </q-chip>
             <q-chip
               :color="purchase.isActive ? 'positive' : 'grey-7'"
               text-color="white"
@@ -118,14 +128,15 @@
 import { computed, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useQuasar } from "quasar";
-import type { Purchase } from "src/models";
-import { getClientPurchases } from "src/services";
+import type { Purchase, PurchaseStatus } from "src/models";
+import { getClientById, getClientPurchases } from "src/services";
 import { useNavigation } from "src/composables/useNavigation";
 import { formatStatus } from "src/utils/formatters/statusLabel";
 import { formatCurrency } from "src/utils/formatters/currency";
 
 const $route = useRoute();
 const $q = useQuasar();
+const { navigateTo } = useNavigation();
 
 async function clientNotFoundNotifyAndNavigate(e: Error) {
   $q.notify({ type: "negative", message: e.message });
@@ -144,6 +155,7 @@ const id = computed(() => {
 
   return pathId;
 });
+const clientName = ref<string | null>(null);
 
 const page = ref(1);
 const rowsPerPage = 10;
@@ -155,11 +167,24 @@ const paginatedPurchases = computed(() => {
   const start = (page.value - 1) * rowsPerPage;
   return purchases.value.slice(start, start + rowsPerPage);
 });
+const resolveStatusColor = (status: PurchaseStatus) => {
+  switch (status) {
+    case "paid":
+      return "positive";
+
+    case "partial":
+      return "amber";
+
+    case "pending":
+      return "red-7";
+  }
+};
 
 watch(
   () => id.value,
   async (newId) => {
     purchases.value = (await getClientPurchases(newId)) ?? [];
+    clientName.value = (await getClientById(newId)).name;
   },
   { immediate: true },
 );
@@ -170,16 +195,11 @@ watch(
     page.value = 1;
   },
 );
-const { navigateTo } = useNavigation();
 </script>
 
 <style lang="css" scoped>
-.letter-spaced {
-  letter-spacing: 0.06em;
-}
-
-.caption-medium {
-  font-size: 0.8rem;
+.purchase-container {
+  min-height: 10em;
 }
 
 .purchase-row {
@@ -194,5 +214,9 @@ const { navigateTo } = useNavigation();
 
 .purchase-contact-label {
   margin-top: 2px;
+}
+
+.caption-medium {
+  font-size: 0.8rem;
 }
 </style>
