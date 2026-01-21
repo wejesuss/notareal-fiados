@@ -192,8 +192,17 @@ const resolveStatusColor = (status: PurchaseStatus) => {
 watch(
   () => id.value,
   async (newId) => {
-    purchases.value = (await getClientPurchases(newId)) ?? [];
-    clientName.value = (await getClientById(newId)).name;
+    try {
+      const [client, clientPurchases] = await Promise.all([
+        getClientById(newId),
+        getClientPurchases(newId),
+      ]);
+
+      clientName.value = client.name;
+      purchases.value = clientPurchases;
+    } catch (e) {
+      await clientNotFoundNotifyAndNavigate(e as Error);
+    }
   },
   { immediate: true },
 );
