@@ -28,6 +28,13 @@ const purchases: Purchase[] = [
   },
 ];
 
+export async function getClientPurchases(
+  clientId: number
+): Promise<Purchase[]> {
+  await sleep(400);
+  return purchases.filter((p) => p.clientId === clientId);
+}
+
 export async function getClientRecentPurchases(
   clientId: number,
   limit: number = 3
