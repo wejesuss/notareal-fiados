@@ -48,6 +48,7 @@
           class="client-row q-my-md q-pa-sm q-mx-md q-py-md"
           @click="navigateTo(`/clients/${client.id}`)"
         >
+          <!-- Main content -->
           <q-item-section>
             <q-item-label class="text-body1 text-weight-medium text-grey-10">
               {{ client.name }}
@@ -65,9 +66,25 @@
               <span>{{ client.email ?? "Sem email" }}</span>
               <span>{{ client.phone ?? "Sem telefone" }}</span>
             </q-item-label>
+
+            <!-- Edit button aligned after content -->
+            <div class="q-mt-md">
+              <q-btn
+                outline
+                rounded
+                padding="4px 12px"
+                size="12px"
+                color="primary"
+                @click.stop.prevent="navigateTo(`/clients/${client.id}/edit`)"
+              >
+                <q-icon name="edit" class="q-mr-sm" size="xs" />
+                <span class="caption-medium">Editar</span>
+              </q-btn>
+            </div>
           </q-item-section>
 
-          <q-item-section side>
+          <!-- Status chip pinned right -->
+          <q-item-section side top>
             <q-chip
               :color="client.isActive ? 'positive' : 'grey-7'"
               text-color="white"
