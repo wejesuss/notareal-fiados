@@ -48,7 +48,7 @@
 
       <q-list v-else class="q-pb-sm">
         <q-item
-          v-for="purchase in paginatedPurchases"
+          v-for="purchase in purchasesWithUI"
           :key="purchase.id"
           clickable
           v-ripple
@@ -98,11 +98,8 @@
 
           <!-- Status chip pinned right -->
           <q-item-section side top class="justify-between">
-            <q-chip
-              :color="resolveStatusColor(purchase.status)"
-              text-color="white"
-            >
-              {{ formatStatus(purchase.status, { titleCase: true }) }}
+            <q-chip :color="purchase.statusUI.color" text-color="white">
+              {{ purchase.statusUI.label }}
             </q-chip>
             <q-chip
               outline
@@ -138,10 +135,10 @@
 import { computed, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useQuasar } from "quasar";
-import type { Purchase, PurchaseStatus } from "src/models";
+import type { Purchase } from "src/models";
 import { getClientById, getClientPurchases } from "src/services";
 import { useNavigation } from "src/composables/useNavigation";
-import { formatStatus } from "src/utils/formatters/purchaseStatus";
+import { getPurchaseStatusUI } from "src/utils/formatters/purchaseStatus";
 import { formatCurrency } from "src/utils/formatters/currency";
 
 const $route = useRoute();
@@ -177,18 +174,12 @@ const paginatedPurchases = computed(() => {
   const start = (page.value - 1) * rowsPerPage;
   return purchases.value.slice(start, start + rowsPerPage);
 });
-const resolveStatusColor = (status: PurchaseStatus) => {
-  switch (status) {
-    case "paid":
-      return "positive";
-
-    case "partial":
-      return "amber";
-
-    case "pending":
-      return "red-7";
-  }
-};
+const purchasesWithUI = computed(() =>
+  paginatedPurchases.value.map((p) => ({
+    ...p,
+    statusUI: getPurchaseStatusUI(p.status, { titleCase: true }),
+  })),
+);
 
 watch(
   () => id.value,
