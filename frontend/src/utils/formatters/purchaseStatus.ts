@@ -12,8 +12,8 @@ const statusLabels: PurchaseStatusMap = {
   paid: "pago",
 };
 const statusColor: PurchaseStatusMap = {
-  pending: "red-7",
-  partial: "amber",
+  pending: "red-8",
+  partial: "orange-8",
   paid: "positive",
 };
 
