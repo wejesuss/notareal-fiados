@@ -140,7 +140,7 @@ import { useQuasar } from "quasar";
 import type { Purchase, PurchaseStatus } from "src/models";
 import { getClientById, getClientPurchases } from "src/services";
 import { useNavigation } from "src/composables/useNavigation";
-import { formatStatus } from "src/utils/formatters/statusLabel";
+import { formatStatus } from "src/utils/formatters/purchaseStatus";
 import { formatCurrency } from "src/utils/formatters/currency";
 
 const $route = useRoute();
