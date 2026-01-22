@@ -105,6 +105,7 @@
               {{ formatStatus(purchase.status, { titleCase: true }) }}
             </q-chip>
             <q-chip
+              outline
               :color="purchase.isActive ? 'positive' : 'grey-7'"
               text-color="white"
             >
