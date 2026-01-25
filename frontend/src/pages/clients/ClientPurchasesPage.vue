@@ -57,7 +57,7 @@
         >
           <!-- Main content -->
           <q-item-section>
-            <q-item-label class="text-body1 text-weight-medium text-grey-10">
+            <q-item-label class="text-body1 text-weight-medium text-blue-8">
               {{ purchase.description }}
             </q-item-label>
 
