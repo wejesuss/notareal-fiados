@@ -170,7 +170,7 @@ const $route = useRoute();
 const $q = useQuasar();
 const { navigateTo } = useNavigation();
 const id = computed(() => Number($route.params.id));
-const { loading, error, purchases, reload } = useClientPurchases(toRef(id));
+const { loading, error, purchases } = useClientPurchases(toRef(id));
 
 async function clientNotFoundNotifyAndNavigate(e: Error, route = "/clients") {
   $q.notify({ type: "negative", message: e.message });
@@ -216,7 +216,7 @@ watch(
     }
 
     try {
-      const [client] = await Promise.all([getClientById(newId), reload()]);
+      const client = await getClientById(newId);
 
       clientName.value = client.name;
     } catch (e) {
