@@ -13,6 +13,7 @@ export function useClientPurchases(clientId: Ref<number>) {
     try {
       purchases.value = await getClientPurchases(clientId.value);
     } catch (e) {
+      console.error(e);
       error.value = e as Error;
       purchases.value = [];
     } finally {
