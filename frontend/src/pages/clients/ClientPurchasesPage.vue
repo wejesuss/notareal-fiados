@@ -27,7 +27,28 @@
 
       <q-separator />
 
-      <q-card-section v-if="purchases.length === 0" class="text-center q-py-xl">
+      <!-- Load state -->
+      <q-card-section v-if="loadState === 'loading'">
+        <ContentState
+          message="Carregando compras..."
+          icon-name="shopping_cart"
+        />
+      </q-card-section>
+
+      <!-- Error state -->
+      <q-card-section v-else-if="loadState === 'error'">
+        <ContentState
+          :message="error?.message || 'Erro ao carregar compras'"
+          icon-name="error_outline"
+          icon-color="amber-10"
+        />
+      </q-card-section>
+
+      <!-- Empty state -->
+      <q-card-section
+        v-else-if="loadState === 'empty'"
+        class="text-center q-py-xl"
+      >
         <q-icon name="shopping_cart" size="48px" color="grey-6"></q-icon>
 
         <div class="text-subtitle1 q-mt-md">Nenhuma compra ainda</div>
@@ -46,127 +67,121 @@
         ></q-btn>
       </q-card-section>
 
-      <q-list v-else class="q-pb-sm">
-        <q-item
-          v-for="purchase in purchasesWithUI"
-          :key="purchase.id"
-          clickable
-          v-ripple
-          class="purchase-row purchase-container q-my-md q-mx-md q-pa-md"
-          @click="navigateTo(`/purchases/${purchase.id}`)"
-        >
-          <!-- Main content -->
-          <q-item-section>
-            <q-item-label class="text-body1 text-weight-medium text-blue-8">
-              {{ purchase.description }}
-            </q-item-label>
+      <!-- Happy path -->
+      <div v-else>
+        <q-list class="q-pb-sm">
+          <q-item
+            v-for="purchase in purchasesWithUI"
+            :key="purchase.id"
+            clickable
+            v-ripple
+            class="purchase-row purchase-container q-my-md q-mx-md q-pa-md"
+            @click="navigateTo(`/purchases/${purchase.id}`)"
+          >
+            <!-- Main content -->
+            <q-item-section>
+              <q-item-label class="text-body1 text-weight-medium text-blue-8">
+                {{ purchase.description }}
+              </q-item-label>
 
-            <q-item-label
-              class="q-col-gutter-md text-grey-9 purchase-amount-label caption-medium text-weight-medium"
-            >
-              <div class="row items-center text-body2">
-                <span class="q-mr-xs">Total da compra:</span>
-                <span class="text-weight-bold text-blue-grey-7">{{
-                  formatCurrency(purchase.totalValue)
-                }}</span>
-              </div>
-              <div class="row items-center text-body2">
-                <span class="q-mr-xs">Valor Pago:</span>
-                <span class="text-weight-bold text-blue-grey-7">{{
-                  formatCurrency(purchase.totalPaidValue)
-                }}</span>
-              </div>
-            </q-item-label>
-
-            <!-- Edit button aligned after content -->
-            <div class="q-mt-md">
-              <q-btn
-                outline
-                rounded
-                padding="4px 12px"
-                size="12px"
-                color="primary"
-                @click.stop.prevent="
-                  navigateTo(`/purchases/${purchase.id}/edit`)
-                "
+              <q-item-label
+                class="q-col-gutter-md text-grey-9 purchase-amount-label caption-medium text-weight-medium"
               >
-                <q-icon name="edit" class="q-mr-sm" size="xs" />
-                <span class="caption-medium">Editar</span>
-              </q-btn>
-            </div>
-          </q-item-section>
+                <div class="row items-center text-body2">
+                  <span class="q-mr-xs">Total da compra:</span>
+                  <span class="text-weight-bold text-blue-grey-7">{{
+                    formatCurrency(purchase.totalValue)
+                  }}</span>
+                </div>
+                <div class="row items-center text-body2">
+                  <span class="q-mr-xs">Valor Pago:</span>
+                  <span class="text-weight-bold text-blue-grey-7">{{
+                    formatCurrency(purchase.totalPaidValue)
+                  }}</span>
+                </div>
+              </q-item-label>
 
-          <!-- Status chip pinned right -->
-          <q-item-section side top class="justify-between">
-            <q-chip :color="purchase.statusUI.color" text-color="white">
-              {{ purchase.statusUI.label }}
-            </q-chip>
-            <q-chip
-              outline
-              :color="purchase.isActive ? 'positive' : 'grey-7'"
-              text-color="white"
-            >
-              {{ purchase.isActive ? "Ativo" : "Inativo" }}
-            </q-chip>
-          </q-item-section>
-        </q-item>
-      </q-list>
+              <!-- Edit button aligned after content -->
+              <div class="q-mt-md">
+                <q-btn
+                  outline
+                  rounded
+                  padding="4px 12px"
+                  size="12px"
+                  color="primary"
+                  @click.stop.prevent="
+                    navigateTo(`/purchases/${purchase.id}/edit`)
+                  "
+                >
+                  <q-icon name="edit" class="q-mr-sm" size="xs" />
+                  <span class="caption-medium">Editar</span>
+                </q-btn>
+              </div>
+            </q-item-section>
 
-      <q-pagination
-        v-model="page"
-        :max="totalPages"
-        direction-links
-        boundary-links
-        class="q-mt-md q-pb-md justify-center"
-        v-if="totalPages > 1"
-      >
-      </q-pagination>
+            <!-- Status chip pinned right -->
+            <q-item-section side top class="justify-between">
+              <q-chip :color="purchase.statusUI.color" text-color="white">
+                {{ purchase.statusUI.label }}
+              </q-chip>
+              <q-chip
+                outline
+                :color="purchase.isActive ? 'positive' : 'grey-7'"
+                text-color="white"
+              >
+                {{ purchase.isActive ? "Ativo" : "Inativo" }}
+              </q-chip>
+            </q-item-section>
+          </q-item>
+        </q-list>
 
-      <div v-else class="text-center q-pb-sm">
-        <span class="text-caption text-grey-7 letter-spaced"
-          >Todos os registros exibidos</span
+        <q-pagination
+          v-model="page"
+          :max="totalPages"
+          direction-links
+          boundary-links
+          class="q-mt-md q-pb-md justify-center"
+          v-if="totalPages > 1"
         >
+        </q-pagination>
+
+        <div v-else class="text-center q-pb-sm">
+          <span class="text-caption text-grey-7 letter-spaced"
+            >Todos os registros exibidos</span
+          >
+        </div>
       </div>
     </q-card>
   </q-page>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, ref, toRef, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useQuasar } from "quasar";
-import type { Purchase } from "src/models";
-import { getClientById, getClientPurchases } from "src/services";
+import { getClientById } from "src/services";
 import { useNavigation } from "src/composables/useNavigation";
 import { getPurchaseStatusUI } from "src/utils/formatters/purchaseStatus";
 import { formatCurrency } from "src/utils/formatters/currency";
+import { useClientPurchases } from "src/composables/useClientPurchases";
+import ContentState from "src/components/ContentState.vue";
 
 const $route = useRoute();
 const $q = useQuasar();
 const { navigateTo } = useNavigation();
+const id = computed(() => Number($route.params.id));
+const { loading, error, purchases, reload } = useClientPurchases(toRef(id));
 
-async function clientNotFoundNotifyAndNavigate(e: Error) {
+async function clientNotFoundNotifyAndNavigate(e: Error, route = "/clients") {
   $q.notify({ type: "negative", message: e.message });
 
-  await navigateTo("/clients");
+  await navigateTo(route);
 }
 
-const id = computed(() => {
-  const pathId = Number($route.params.id);
-  if (!Number.isInteger(pathId) || pathId <= 0) {
-    void clientNotFoundNotifyAndNavigate(
-      new Error("Identificador de cliente inválido!"),
-    );
-    return 0;
-  }
-
-  return pathId;
-});
 const clientName = ref<string | null>(null);
 
 const page = ref(1);
 const rowsPerPage = 10;
-const purchases = ref<Purchase[]>([]);
 const totalPages = computed(() =>
   Math.ceil(purchases.value.length / rowsPerPage),
 );
@@ -181,17 +196,29 @@ const purchasesWithUI = computed(() =>
   })),
 );
 
+type LoadState = "loading" | "error" | "empty" | "ready";
+const loadState = computed<LoadState>(() => {
+  if (loading.value) return "loading";
+  if (error.value) return "error";
+  if (purchases.value.length === 0) return "empty";
+  return "ready";
+});
+
 watch(
   () => id.value,
   async (newId) => {
+    if (!Number.isInteger(newId) || newId <= 0) {
+      void clientNotFoundNotifyAndNavigate(
+        new Error("Identificador de cliente inválido!"),
+      );
+
+      return;
+    }
+
     try {
-      const [client, clientPurchases] = await Promise.all([
-        getClientById(newId),
-        getClientPurchases(newId),
-      ]);
+      const [client] = await Promise.all([getClientById(newId), reload()]);
 
       clientName.value = client.name;
-      purchases.value = clientPurchases;
     } catch (e) {
       await clientNotFoundNotifyAndNavigate(e as Error);
     }
