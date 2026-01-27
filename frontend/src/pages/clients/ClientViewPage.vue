@@ -9,7 +9,7 @@
     <ClientDetailsCard
       v-if="id"
       :client-id="id"
-      @load-error="clientNotFoundNotifyAndNavigate"
+      @load-error="handleClientNotFound"
     ></ClientDetailsCard>
 
     <ClientSummaryCard v-if="id" :client-id="id"></ClientSummaryCard>
@@ -28,7 +28,7 @@ const $route = useRoute();
 const { navigateTo } = useNavigation();
 const $q = useQuasar();
 
-async function clientNotFoundNotifyAndNavigate(e: Error) {
+async function handleClientNotFound(e: Error) {
   $q.notify({ type: "negative", message: e.message });
 
   await navigateTo("/clients");
@@ -36,9 +36,7 @@ async function clientNotFoundNotifyAndNavigate(e: Error) {
 const id = computed(() => {
   const pathId = Number($route.params.id);
   if (!Number.isInteger(pathId) || pathId <= 0) {
-    void clientNotFoundNotifyAndNavigate(
-      new Error("Identificador de cliente inválido!")
-    );
+    void handleClientNotFound(new Error("Identificador de cliente inválido!"));
     return 0;
   }
 

@@ -169,13 +169,13 @@ import ContentState from "src/components/ContentState.vue";
 const $route = useRoute();
 const $q = useQuasar();
 const { navigateTo } = useNavigation();
-const id = computed(() => Number($route.params.id));
+const clientId = computed(() => Number($route.params.id));
 const clientDisplayName = ref<string | null>(null);
 
 const { loading, error, purchases, paginatedPurchases, page, totalPages } =
-  useClientPurchases(toRef(id));
+  useClientPurchases(toRef(clientId));
 
-async function clientNotFoundNotifyAndNavigate(e: Error, route = "/clients") {
+async function handleClientNotFound(e: Error, route = "/clients") {
   $q.notify({ type: "negative", message: e.message });
 
   await navigateTo(route);
@@ -197,10 +197,10 @@ const purchasesWithUI = computed(() =>
 );
 
 watch(
-  () => id.value,
+  () => clientId.value,
   async (newId) => {
     if (!Number.isInteger(newId) || newId <= 0) {
-      void clientNotFoundNotifyAndNavigate(
+      void handleClientNotFound(
         new Error("Identificador de cliente inválido!"),
       );
 
@@ -214,7 +214,7 @@ watch(
         .filter(Boolean)
         .join(" - ");
     } catch (e) {
-      await clientNotFoundNotifyAndNavigate(e as Error);
+      await handleClientNotFound(e as Error);
     }
   },
   { immediate: true },

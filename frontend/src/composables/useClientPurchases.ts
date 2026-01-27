@@ -19,7 +19,7 @@ export function useClientPurchases(
     return purchases.value.slice(start, start + rowsPerPage);
   });
 
-  async function load() {
+  async function fetchPurchases() {
     if (!Number.isInteger(clientId.value) || clientId.value <= 0) {
       purchases.value = [];
       return;
@@ -38,7 +38,7 @@ export function useClientPurchases(
     }
   }
 
-  watch(clientId, load, { immediate: true });
+  watch(clientId, fetchPurchases, { immediate: true });
   watch(purchases, () => (page.value = 1));
 
   return {
@@ -48,6 +48,6 @@ export function useClientPurchases(
     totalPages,
     purchases,
     paginatedPurchases,
-    reload: load,
+    reload: fetchPurchases,
   };
 }
