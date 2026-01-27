@@ -18,9 +18,9 @@
         <div class="text-subtitle1">
           Lista de compras
           <span
-            v-if="clientName"
+            v-if="clientIdentity"
             class="text-primary text-subtitle2 letter-spaced q-ml-xs"
-            >({{ clientName }})
+            >({{ clientIdentity }})
           </span>
         </div>
       </q-card-section>
@@ -170,31 +170,16 @@ const $route = useRoute();
 const $q = useQuasar();
 const { navigateTo } = useNavigation();
 const id = computed(() => Number($route.params.id));
-const { loading, error, purchases } = useClientPurchases(toRef(id));
+const clientIdentity = ref<string | null>(null);
+
+const { loading, error, purchases, paginatedPurchases, page, totalPages } =
+  useClientPurchases(toRef(id));
 
 async function clientNotFoundNotifyAndNavigate(e: Error, route = "/clients") {
   $q.notify({ type: "negative", message: e.message });
 
   await navigateTo(route);
 }
-
-const clientName = ref<string | null>(null);
-
-const page = ref(1);
-const rowsPerPage = 10;
-const totalPages = computed(() =>
-  Math.ceil(purchases.value.length / rowsPerPage),
-);
-const paginatedPurchases = computed(() => {
-  const start = (page.value - 1) * rowsPerPage;
-  return purchases.value.slice(start, start + rowsPerPage);
-});
-const purchasesWithUI = computed(() =>
-  paginatedPurchases.value.map((p) => ({
-    ...p,
-    statusUI: getPurchaseStatusUI(p.status, { titleCase: true }),
-  })),
-);
 
 type LoadState = "loading" | "error" | "empty" | "ready";
 const loadState = computed<LoadState>(() => {
@@ -203,6 +188,13 @@ const loadState = computed<LoadState>(() => {
   if (purchases.value.length === 0) return "empty";
   return "ready";
 });
+
+const purchasesWithUI = computed(() =>
+  paginatedPurchases.value.map((p) => ({
+    ...p,
+    statusUI: getPurchaseStatusUI(p.status, { titleCase: true }),
+  })),
+);
 
 watch(
   () => id.value,
@@ -218,19 +210,12 @@ watch(
     try {
       const client = await getClientById(newId);
 
-      clientName.value = client.name;
+      clientIdentity.value = client.name;
     } catch (e) {
       await clientNotFoundNotifyAndNavigate(e as Error);
     }
   },
   { immediate: true },
-);
-
-watch(
-  () => purchases.value.length,
-  () => {
-    page.value = 1;
-  },
 );
 </script>
 
