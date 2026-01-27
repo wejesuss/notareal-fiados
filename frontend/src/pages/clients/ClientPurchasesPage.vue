@@ -18,9 +18,9 @@
         <div class="text-subtitle1">
           Lista de compras
           <span
-            v-if="clientIdentity"
+            v-if="clientDisplayName"
             class="text-primary text-subtitle2 letter-spaced q-ml-xs"
-            >({{ clientIdentity }})
+            >({{ clientDisplayName }})
           </span>
         </div>
       </q-card-section>
@@ -170,7 +170,7 @@ const $route = useRoute();
 const $q = useQuasar();
 const { navigateTo } = useNavigation();
 const id = computed(() => Number($route.params.id));
-const clientIdentity = ref<string | null>(null);
+const clientDisplayName = ref<string | null>(null);
 
 const { loading, error, purchases, paginatedPurchases, page, totalPages } =
   useClientPurchases(toRef(id));
@@ -210,7 +210,9 @@ watch(
     try {
       const client = await getClientById(newId);
 
-      clientIdentity.value = client.name;
+      clientDisplayName.value = [client.name, client.nickname]
+        .filter(Boolean)
+        .join(" - ");
     } catch (e) {
       await clientNotFoundNotifyAndNavigate(e as Error);
     }
