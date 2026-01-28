@@ -85,25 +85,26 @@
                 {{ purchase.description }}
               </q-item-label>
 
-              <div
-                v-if="$q.screen.xs"
-                class="row q-gutter-sm q-mt-sm q-mx-xs justify-between"
-              >
-                <q-chip :color="purchase.statusUI.color" text-color="white">
-                  {{ purchase.statusUI.label }}
-                </q-chip>
-                <q-chip
-                  outline
-                  :color="purchase.isActive ? 'positive' : 'grey-7'"
-                  text-color="white"
-                >
-                  {{ purchase.isActive ? "Ativo" : "Inativo" }}
-                </q-chip>
-              </div>
+              <q-item-label v-if="$q.screen.xs">
+                <!-- Status chip inlined for small screens -->
+                <div class="row q-gutter-sm q-mt-sm q-mx-xs justify-between">
+                  <q-chip :color="purchase.statusUI.color" text-color="white">
+                    {{ purchase.statusUI.label }}
+                  </q-chip>
+                  <q-chip
+                    outline
+                    :color="purchase.isActive ? 'positive' : 'grey-7'"
+                    text-color="white"
+                  >
+                    {{ purchase.isActive ? "Ativo" : "Inativo" }}
+                  </q-chip>
+                </div>
+              </q-item-label>
 
               <q-item-label
                 class="text-grey-9 purchase-amount-label caption-medium text-weight-medium"
               >
+                <!-- Purchases amounts -->
                 <div v-if="$q.screen.gt.xs">
                   <div class="row items-center text-body2">
                     <span class="q-mr-xs">Total da compra:</span>
@@ -120,6 +121,7 @@
                 </div>
 
                 <div v-else>
+                  <!-- small screens rendering fallback -->
                   <div class="row items-center text-body2">
                     <span class="q-mr-xs">Pago:</span>
                     <span class="text-weight-bold text-blue-grey-7"
@@ -148,13 +150,13 @@
               </div>
             </q-item-section>
 
-            <!-- Status chip pinned right -->
             <q-item-section
               v-if="$q.screen.gt.xs"
               side
               top
               class="justify-between"
             >
+              <!-- Status chip pinned right for greater screens -->
               <q-chip :color="purchase.statusUI.color" text-color="white">
                 {{ purchase.statusUI.label }}
               </q-chip>
