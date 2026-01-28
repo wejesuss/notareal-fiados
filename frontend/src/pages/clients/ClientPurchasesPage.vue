@@ -75,7 +75,8 @@
             :key="purchase.id"
             clickable
             v-ripple
-            class="purchase-row purchase-container q-my-md q-mx-md q-pa-md"
+            :class="{ 'q-mx-md': $q.screen.gt.xs, 'q-px-md': $q.screen.gt.xs }"
+            class="purchase-row purchase-container q-my-md q-mx-sm q-pa-sm"
             @click="navigateTo(`/purchases/${purchase.id}`)"
           >
             <!-- Main content -->
@@ -85,19 +86,31 @@
               </q-item-label>
 
               <q-item-label
-                class="q-col-gutter-md text-grey-9 purchase-amount-label caption-medium text-weight-medium"
+                class="text-grey-9 purchase-amount-label caption-medium text-weight-medium"
               >
-                <div class="row items-center text-body2">
-                  <span class="q-mr-xs">Total da compra:</span>
-                  <span class="text-weight-bold text-blue-grey-7">{{
-                    formatCurrency(purchase.totalValue)
-                  }}</span>
+                <div v-if="$q.screen.gt.xs">
+                  <div class="row items-center text-body2">
+                    <span class="q-mr-xs">Total da compra:</span>
+                    <span class="text-weight-bold text-blue-grey-7">{{
+                      formatCurrency(purchase.totalValue)
+                    }}</span>
+                  </div>
+                  <div class="row items-center text-body2 q-mt-md">
+                    <span class="q-mr-xs">Valor Pago:</span>
+                    <span class="text-weight-bold text-blue-grey-7">{{
+                      formatCurrency(purchase.totalPaidValue)
+                    }}</span>
+                  </div>
                 </div>
-                <div class="row items-center text-body2">
-                  <span class="q-mr-xs">Valor Pago:</span>
-                  <span class="text-weight-bold text-blue-grey-7">{{
-                    formatCurrency(purchase.totalPaidValue)
-                  }}</span>
+
+                <div v-else>
+                  <div class="row items-center text-body2">
+                    <span class="q-mr-xs">Pago:</span>
+                    <span class="text-weight-bold text-blue-grey-7"
+                      >{{ formatCurrency(purchase.totalValue) }} /
+                      {{ formatCurrency(purchase.totalPaidValue) }}</span
+                    >
+                  </div>
                 </div>
               </q-item-label>
 
@@ -175,6 +188,8 @@ const clientDisplayName = ref<string | null>(null);
 const { loading, error, purchases, paginatedPurchases, page, totalPages } =
   useClientPurchases(toRef(clientId));
 
+$q.screen.setSizes({ sm: 540 });
+
 async function handleClientNotFound(e: Error, route = "/clients") {
   $q.notify({ type: "negative", message: e.message });
 
@@ -226,6 +241,12 @@ watch(
   min-height: 10em;
 }
 
+@media screen and (max-width: 540px) {
+  .purchase-container {
+    min-height: 16em;
+  }
+}
+
 .purchase-row {
   border: 1px solid #e0e0e0;
   border-radius: 12px;
@@ -237,7 +258,7 @@ watch(
 }
 
 .purchase-amount-label {
-  margin-top: 2px;
+  margin-top: 16px;
 }
 
 .caption-medium {
