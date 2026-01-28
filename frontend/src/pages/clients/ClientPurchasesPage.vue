@@ -85,6 +85,22 @@
                 {{ purchase.description }}
               </q-item-label>
 
+              <div
+                v-if="$q.screen.xs"
+                class="row q-gutter-sm q-mt-sm q-mx-xs justify-between"
+              >
+                <q-chip :color="purchase.statusUI.color" text-color="white">
+                  {{ purchase.statusUI.label }}
+                </q-chip>
+                <q-chip
+                  outline
+                  :color="purchase.isActive ? 'positive' : 'grey-7'"
+                  text-color="white"
+                >
+                  {{ purchase.isActive ? "Ativo" : "Inativo" }}
+                </q-chip>
+              </div>
+
               <q-item-label
                 class="text-grey-9 purchase-amount-label caption-medium text-weight-medium"
               >
@@ -133,7 +149,12 @@
             </q-item-section>
 
             <!-- Status chip pinned right -->
-            <q-item-section side top class="justify-between">
+            <q-item-section
+              v-if="$q.screen.gt.xs"
+              side
+              top
+              class="justify-between"
+            >
               <q-chip :color="purchase.statusUI.color" text-color="white">
                 {{ purchase.statusUI.label }}
               </q-chip>
@@ -243,7 +264,7 @@ watch(
 
 @media screen and (max-width: 540px) {
   .purchase-container {
-    min-height: 16em;
+    min-height: 14em;
   }
 }
 
