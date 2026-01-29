@@ -190,26 +190,34 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, toRef, watch } from "vue";
+import { computed, toRef, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useQuasar } from "quasar";
-import { getClientById } from "src/services";
 import { useNavigation } from "src/composables/useNavigation";
 import { getPurchaseStatusUI } from "src/utils/formatters/purchaseStatus";
 import { formatCurrency } from "src/utils/formatters/currency";
 import { useClientPurchases } from "src/composables/useClientPurchases";
 import ContentState from "src/components/ContentState.vue";
+import { useClientDetails } from "src/composables";
+
+type LoadState = "loading" | "error" | "empty" | "ready";
 
 const $route = useRoute();
 const $q = useQuasar();
 const { navigateTo } = useNavigation();
 const clientId = computed(() => Number($route.params.id));
-const clientDisplayName = ref<string | null>(null);
 
+const { client, error: clientError } = useClientDetails(toRef(clientId));
 const { loading, error, purchases, paginatedPurchases, page, totalPages } =
   useClientPurchases(toRef(clientId));
 
 const isCompact = computed(() => $q.screen.width < 540);
+const loadState = computed<LoadState>(() => {
+  if (loading.value) return "loading";
+  if (clientError.value || error.value) return "error";
+  if (purchases.value.length === 0) return "empty";
+  return "ready";
+});
 
 async function handleClientNotFound(e: Error, route = "/clients") {
   $q.notify({ type: "negative", message: e.message });
@@ -217,14 +225,11 @@ async function handleClientNotFound(e: Error, route = "/clients") {
   await navigateTo(route);
 }
 
-type LoadState = "loading" | "error" | "empty" | "ready";
-const loadState = computed<LoadState>(() => {
-  if (loading.value) return "loading";
-  if (error.value) return "error";
-  if (purchases.value.length === 0) return "empty";
-  return "ready";
+const clientDisplayName = computed(() => {
+  return client.value
+    ? [client.value.name, client.value.nickname].filter(Boolean).join(" - ")
+    : null;
 });
-
 const purchasesWithUI = computed(() =>
   paginatedPurchases.value.map((p) => ({
     ...p,
@@ -232,29 +237,10 @@ const purchasesWithUI = computed(() =>
   })),
 );
 
-watch(
-  () => clientId.value,
-  async (newId) => {
-    if (!Number.isInteger(newId) || newId <= 0) {
-      void handleClientNotFound(
-        new Error("Identificador de cliente inválido!"),
-      );
-
-      return;
-    }
-
-    try {
-      const client = await getClientById(newId);
-
-      clientDisplayName.value = [client.name, client.nickname]
-        .filter(Boolean)
-        .join(" - ");
-    } catch (e) {
-      await handleClientNotFound(e as Error);
-    }
-  },
-  { immediate: true },
-);
+watch(clientError, async (err) => {
+  if (!err) return;
+  await handleClientNotFound(err);
+});
 </script>
 
 <style lang="css" scoped>
