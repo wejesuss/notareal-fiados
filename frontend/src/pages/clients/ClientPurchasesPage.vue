@@ -89,11 +89,11 @@
 
               <q-item-label v-if="isCompact">
                 <!-- Status chip inlined for small screens -->
-                <div class="q-mt-sm">
-                  <q-chip :color="purchase.statusUI.color" text-color="white">
-                    {{ purchase.statusUI.label }}
-                  </q-chip>
-                </div>
+                <PurchaseStatusChip
+                  class="q-mt-sm"
+                  :label="purchase.statusUI.label"
+                  :color="purchase.statusUI.color"
+                />
               </q-item-label>
 
               <q-item-label
@@ -123,29 +123,26 @@
                 </q-btn>
 
                 <!-- Active status chip bottom-right -->
-                <q-chip
+                <PurchaseStatusChip
                   v-if="isCompact"
                   outline
                   :color="purchase.activeStatusUI.color"
-                  text-color="white"
-                >
-                  {{ purchase.activeStatusUI.label }}
-                </q-chip>
+                  :label="purchase.activeStatusUI.label"
+                />
               </div>
             </q-item-section>
 
             <q-item-section v-if="!isCompact" side top class="justify-between">
               <!-- Status chip pinned right for larger screens -->
-              <q-chip :color="purchase.statusUI.color" text-color="white">
-                {{ purchase.statusUI.label }}
-              </q-chip>
-              <q-chip
+              <PurchaseStatusChip
+                :label="purchase.statusUI.label"
+                :color="purchase.statusUI.color"
+              />
+              <PurchaseStatusChip
                 outline
+                :label="purchase.activeStatusUI.label"
                 :color="purchase.activeStatusUI.color"
-                text-color="white"
-              >
-                {{ purchase.activeStatusUI.label }}
-              </q-chip>
+              />
             </q-item-section>
           </q-item>
         </q-list>
@@ -185,6 +182,7 @@ import {
 } from "src/utils/formatters";
 import ContentState from "src/components/ContentState.vue";
 import PurchaseAmounts from "src/components/PurchaseAmounts.vue";
+import PurchaseStatusChip from "src/components/PurchaseStatusChip.vue";
 
 type LoadState = "loading" | "error" | "empty" | "ready";
 
