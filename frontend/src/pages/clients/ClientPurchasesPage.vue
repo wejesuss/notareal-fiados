@@ -75,7 +75,7 @@
             :key="purchase.id"
             clickable
             v-ripple
-            :class="{ 'q-mx-md': $q.screen.gt.xs, 'q-px-md': $q.screen.gt.xs }"
+            :class="{ 'q-mx-md': !isCompact, 'q-px-md': !isCompact }"
             class="purchase-row purchase-container q-my-md q-mx-sm q-pa-sm"
             @click="navigateTo(`/purchases/${purchase.id}`)"
           >
@@ -85,7 +85,7 @@
                 {{ purchase.description }}
               </q-item-label>
 
-              <q-item-label v-if="$q.screen.xs">
+              <q-item-label v-if="isCompact">
                 <!-- Status chip inlined for small screens -->
                 <div class="row q-gutter-sm q-mt-sm q-mx-xs justify-between">
                   <q-chip :color="purchase.statusUI.color" text-color="white">
@@ -105,7 +105,7 @@
                 class="text-grey-9 purchase-amount-label caption-medium text-weight-medium"
               >
                 <!-- Purchases amounts -->
-                <div v-if="$q.screen.gt.xs">
+                <div v-if="!isCompact">
                   <div class="row items-center text-body2">
                     <span class="q-mr-xs">Total da compra:</span>
                     <span class="text-weight-bold text-blue-grey-7">{{
@@ -150,12 +150,7 @@
               </div>
             </q-item-section>
 
-            <q-item-section
-              v-if="$q.screen.gt.xs"
-              side
-              top
-              class="justify-between"
-            >
+            <q-item-section v-if="!isCompact" side top class="justify-between">
               <!-- Status chip pinned right for greater screens -->
               <q-chip :color="purchase.statusUI.color" text-color="white">
                 {{ purchase.statusUI.label }}
@@ -211,7 +206,7 @@ const clientDisplayName = ref<string | null>(null);
 const { loading, error, purchases, paginatedPurchases, page, totalPages } =
   useClientPurchases(toRef(clientId));
 
-$q.screen.setSizes({ sm: 540 });
+const isCompact = computed(() => $q.screen.width < 540);
 
 async function handleClientNotFound(e: Error, route = "/clients") {
   $q.notify({ type: "negative", message: e.message });
