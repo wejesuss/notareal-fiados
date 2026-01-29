@@ -87,16 +87,9 @@
 
               <q-item-label v-if="isCompact">
                 <!-- Status chip inlined for small screens -->
-                <div class="row q-gutter-sm q-mt-sm q-mx-xs justify-between">
+                <div class="q-mt-sm">
                   <q-chip :color="purchase.statusUI.color" text-color="white">
                     {{ purchase.statusUI.label }}
-                  </q-chip>
-                  <q-chip
-                    outline
-                    :color="purchase.isActive ? 'positive' : 'grey-7'"
-                    text-color="white"
-                  >
-                    {{ purchase.isActive ? "Ativo" : "Inativo" }}
                   </q-chip>
                 </div>
               </q-item-label>
@@ -133,7 +126,7 @@
               </q-item-label>
 
               <!-- Edit button aligned after content -->
-              <div class="q-mt-md">
+              <div class="row justify-between items-center q-mt-md">
                 <q-btn
                   outline
                   rounded
@@ -147,6 +140,16 @@
                   <q-icon name="edit" class="q-mr-sm" size="xs" />
                   <span class="caption-medium">Editar</span>
                 </q-btn>
+
+                <!-- Active status chip bottom-right -->
+                <q-chip
+                  v-if="isCompact"
+                  outline
+                  :color="purchase.isActive ? 'positive' : 'grey-7'"
+                  text-color="white"
+                >
+                  {{ purchase.isActive ? "Ativo" : "Inativo" }}
+                </q-chip>
               </div>
             </q-item-section>
 
