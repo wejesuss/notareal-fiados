@@ -1,24 +1,20 @@
-import type { Purchase } from "src/models";
-
 type PurchaseActiveStatusUI = {
   label: string;
   color: string;
 };
 
-const activeStatusLabels = {
-  true: "Ativo",
-  false: "Inativo",
+const toActiveStatusLabel = (isActive: boolean) => {
+  return isActive ? "Ativo" : "Inativo";
 };
-const activeStatusColor = {
-  true: "positive",
-  false: "grey-7",
+const toActiveStatusColor = (isActive: boolean) => {
+  return isActive ? "positive" : "grey-7";
 };
 
 export function getPurchaseActiveStatusUI(
-  isActive: Purchase["isActive"]
+  isActive: boolean
 ): PurchaseActiveStatusUI {
   return {
-    label: activeStatusLabels[`${isActive}`],
-    color: activeStatusColor[`${isActive}`],
+    label: toActiveStatusLabel(isActive),
+    color: toActiveStatusColor(isActive),
   };
 }
