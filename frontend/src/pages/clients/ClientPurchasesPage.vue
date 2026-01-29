@@ -212,7 +212,8 @@ const { client, error: clientError } = useClientDetails(toRef(clientId));
 const { loading, error, purchases, paginatedPurchases, page, totalPages } =
   useClientPurchases(toRef(clientId));
 
-const isCompact = computed(() => $q.screen.width < 540);
+const COMPACT_WIDTH = 540;
+const isCompact = computed(() => $q.screen.width < COMPACT_WIDTH);
 const loadState = computed<LoadState>(() => {
   if (loading.value) return "loading";
   if (clientError.value || error.value) return "error";
