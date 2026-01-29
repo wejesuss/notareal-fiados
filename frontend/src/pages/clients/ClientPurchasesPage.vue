@@ -15,11 +15,13 @@
     <!-- Content -->
     <q-card>
       <q-card-section>
-        <div class="text-subtitle1">
-          Lista de compras
+        <div
+          class="text-subtitle1 row items-center q-gutter-x-sm q-col-gutter-y-xs"
+        >
+          <span>Lista de compras</span>
           <span
             v-if="clientDisplayName"
-            class="text-primary text-subtitle2 letter-spaced q-ml-xs"
+            class="text-primary text-subtitle2 letter-spaced client-name"
             >({{ clientDisplayName }})
           </span>
         </div>
@@ -244,6 +246,10 @@ watch(
   .purchase-container {
     min-height: 14em;
   }
+}
+
+.client-name {
+  min-width: 0;
 }
 
 .purchase-row {
