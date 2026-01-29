@@ -5,7 +5,8 @@ const purchases: Purchase[] = [
   {
     id: 1,
     clientId: 2,
-    description: "Compra de produtos agrícolas e vitaminas",
+    description:
+      "Compra de produtos agrícolas e vitaminas e outras coisinhas mais",
     totalValue: 350,
     totalPaidValue: 0,
     status: "pending",
