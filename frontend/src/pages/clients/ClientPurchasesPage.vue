@@ -145,25 +145,25 @@
                 <q-chip
                   v-if="isCompact"
                   outline
-                  :color="purchase.isActive ? 'positive' : 'grey-7'"
+                  :color="purchase.activeStatusUI.color"
                   text-color="white"
                 >
-                  {{ purchase.isActive ? "Ativo" : "Inativo" }}
+                  {{ purchase.activeStatusUI.label }}
                 </q-chip>
               </div>
             </q-item-section>
 
             <q-item-section v-if="!isCompact" side top class="justify-between">
-              <!-- Status chip pinned right for greater screens -->
+              <!-- Status chip pinned right for larger screens -->
               <q-chip :color="purchase.statusUI.color" text-color="white">
                 {{ purchase.statusUI.label }}
               </q-chip>
               <q-chip
                 outline
-                :color="purchase.isActive ? 'positive' : 'grey-7'"
+                :color="purchase.activeStatusUI.color"
                 text-color="white"
               >
-                {{ purchase.isActive ? "Ativo" : "Inativo" }}
+                {{ purchase.activeStatusUI.label }}
               </q-chip>
             </q-item-section>
           </q-item>
@@ -195,6 +195,7 @@ import { useRoute } from "vue-router";
 import { useQuasar } from "quasar";
 import { useNavigation } from "src/composables/useNavigation";
 import { getPurchaseStatusUI } from "src/utils/formatters/purchaseStatus";
+import { getPurchaseActiveStatusUI } from "src/utils/formatters/purchaseActiveStatus";
 import { formatCurrency } from "src/utils/formatters/currency";
 import { useClientPurchases } from "src/composables/useClientPurchases";
 import ContentState from "src/components/ContentState.vue";
@@ -234,6 +235,7 @@ const purchasesWithUI = computed(() =>
   paginatedPurchases.value.map((p) => ({
     ...p,
     statusUI: getPurchaseStatusUI(p.status, { titleCase: true }),
+    activeStatusUI: getPurchaseActiveStatusUI(p.isActive),
   })),
 );
 
