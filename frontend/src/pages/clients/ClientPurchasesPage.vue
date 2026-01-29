@@ -193,13 +193,17 @@
 import { computed, toRef, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useQuasar } from "quasar";
-import { useNavigation } from "src/composables/useNavigation";
-import { getPurchaseStatusUI } from "src/utils/formatters/purchaseStatus";
-import { getPurchaseActiveStatusUI } from "src/utils/formatters/purchaseActiveStatus";
-import { formatCurrency } from "src/utils/formatters/currency";
-import { useClientPurchases } from "src/composables/useClientPurchases";
+import {
+  useNavigation,
+  useClientDetails,
+  useClientPurchases,
+} from "src/composables";
+import {
+  getPurchaseStatusUI,
+  getPurchaseActiveStatusUI,
+  formatCurrency,
+} from "src/utils/formatters";
 import ContentState from "src/components/ContentState.vue";
-import { useClientDetails } from "src/composables";
 
 type LoadState = "loading" | "error" | "empty" | "ready";
 
