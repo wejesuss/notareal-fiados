@@ -9,6 +9,12 @@ export function useClientDetails(clientId: Ref<number>) {
   const client = ref<Client | null>(null);
 
   async function load() {
+    if (!Number.isInteger(clientId.value) || clientId.value <= 0) {
+      error.value = new Error("Identificador do cliente inválido!");
+      client.value = null;
+      return;
+    }
+
     loading.value = true;
     error.value = null;
     try {
