@@ -97,32 +97,11 @@
               <q-item-label
                 class="text-grey-9 purchase-amount-label caption-medium text-weight-medium"
               >
-                <!-- Purchases amounts -->
-                <div v-if="!isCompact">
-                  <div class="row items-center text-body2">
-                    <span class="q-mr-xs">Total da compra:</span>
-                    <span class="text-weight-bold text-blue-grey-7">{{
-                      formatCurrency(purchase.totalValue)
-                    }}</span>
-                  </div>
-                  <div class="row items-center text-body2 q-mt-md">
-                    <span class="q-mr-xs">Valor Pago:</span>
-                    <span class="text-weight-bold text-blue-grey-7">{{
-                      formatCurrency(purchase.totalPaidValue)
-                    }}</span>
-                  </div>
-                </div>
-
-                <div v-else>
-                  <!-- small screens rendering fallback -->
-                  <div class="row items-center text-body2">
-                    <span class="q-mr-xs">Pago:</span>
-                    <span class="text-weight-bold text-blue-grey-7"
-                      >{{ formatCurrency(purchase.totalValue) }} /
-                      {{ formatCurrency(purchase.totalPaidValue) }}</span
-                    >
-                  </div>
-                </div>
+                <PurchaseAmounts
+                  :total="purchase.totalValue"
+                  :paid="purchase.totalPaidValue"
+                  :compact="isCompact"
+                ></PurchaseAmounts>
               </q-item-label>
 
               <!-- Edit button aligned after content -->
@@ -201,9 +180,9 @@ import {
 import {
   getPurchaseStatusUI,
   getPurchaseActiveStatusUI,
-  formatCurrency,
 } from "src/utils/formatters";
 import ContentState from "src/components/ContentState.vue";
+import PurchaseAmounts from "src/components/PurchaseAmounts.vue";
 
 type LoadState = "loading" | "error" | "empty" | "ready";
 
