@@ -239,12 +239,16 @@ const purchasesWithUI = computed(() =>
   })),
 );
 
-watch(clientError, async (err) => {
-  if (!err) return;
-  await handleClientNotFound(
-    new Error(err.message || "Erro ao carregar cliente!"),
-  );
-});
+watch(
+  clientError,
+  async (err) => {
+    if (!err) return;
+    await handleClientNotFound(
+      new Error(err.message || "Erro ao carregar cliente!"),
+    );
+  },
+  { once: true },
+);
 </script>
 
 <style lang="css" scoped>
