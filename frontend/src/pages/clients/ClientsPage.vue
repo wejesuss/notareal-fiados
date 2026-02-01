@@ -145,10 +145,6 @@ const { navigateTo } = useNavigation();
   letter-spacing: 0.06em;
 }
 
-.caption-medium {
-  font-size: 0.8rem;
-}
-
 .client-row {
   border: 1px solid #e0e0e0;
   border-radius: 12px;

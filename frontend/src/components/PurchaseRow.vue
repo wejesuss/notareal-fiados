@@ -22,7 +22,7 @@
       </q-item-label>
 
       <q-item-label
-        class="text-grey-9 purchase-amount-label caption-medium text-weight-medium"
+        class="text-grey-9 purchase-amount-label text-weight-medium"
       >
         <PurchaseAmounts
           :total="purchase.totalValue"
@@ -129,9 +129,5 @@ const isCompact = computed(() => $q.screen.width < COMPACT_WIDTH);
 
 .purchase-timestamp-label {
   margin-top: 20px;
-}
-
-.caption-medium {
-  font-size: 0.8rem;
 }
 </style>

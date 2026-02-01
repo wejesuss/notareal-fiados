@@ -162,8 +162,4 @@ watch(
 .client-name {
   min-width: 0;
 }
-
-.caption-medium {
-  font-size: 0.8rem;
-}
 </style>
