@@ -1,9 +1,6 @@
+import type { PurchaseStatusUI } from "src/components/models";
 import type { PurchaseStatus } from "src/models";
 
-type PurchaseStatusUI = {
-  label: string;
-  color: string;
-};
 type PurchaseStatusMap = Record<PurchaseStatus, string>;
 
 const statusLabels: PurchaseStatusMap = {

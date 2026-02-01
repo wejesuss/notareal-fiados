@@ -1,7 +1,4 @@
-type PurchaseActiveStatusUI = {
-  label: string;
-  color: string;
-};
+import type { PurchaseActiveStatusUI } from "src/components/models";
 
 const toActiveStatusLabel = (isActive: boolean) => {
   return isActive ? "Ativo" : "Inativo";
