@@ -182,11 +182,8 @@ import {
   useNavigation,
   useClientDetails,
   useClientPurchases,
+  usePurchasesUI,
 } from "src/composables";
-import {
-  getPurchaseStatusUI,
-  getPurchaseActiveStatusUI,
-} from "src/utils/formatters";
 import ContentState from "src/components/ContentState.vue";
 import PurchaseAmounts from "src/components/PurchaseAmounts.vue";
 import PurchaseStatusChip from "src/components/PurchaseStatusChip.vue";
@@ -202,6 +199,7 @@ const clientId = computed(() => Number($route.params.id));
 const { client, error: clientError } = useClientDetails(toRef(clientId));
 const { loading, error, purchases, paginatedPurchases, page, totalPages } =
   useClientPurchases(toRef(clientId));
+const { purchasesWithUI } = usePurchasesUI(paginatedPurchases);
 
 const COMPACT_WIDTH = 540;
 const isCompact = computed(() => $q.screen.width < COMPACT_WIDTH);
@@ -223,13 +221,6 @@ const clientDisplayName = computed(() => {
     ? [client.value.name, client.value.nickname].filter(Boolean).join(" - ")
     : null;
 });
-const purchasesWithUI = computed(() =>
-  paginatedPurchases.value.map((p) => ({
-    ...p,
-    statusUI: getPurchaseStatusUI(p.status, { titleCase: true }),
-    activeStatusUI: getPurchaseActiveStatusUI(p.isActive),
-  })),
-);
 
 watch(
   clientError,
