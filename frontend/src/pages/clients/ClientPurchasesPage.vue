@@ -106,6 +106,13 @@
                 ></PurchaseAmounts>
               </q-item-label>
 
+              <q-item-label class="text-grey-8 purchase-timestamp-label">
+                <PurchaseTimeStamps
+                  :created-at="purchase.createdAt"
+                  :updated-at="purchase.updatedAt"
+                ></PurchaseTimeStamps>
+              </q-item-label>
+
               <!-- Edit button aligned after content -->
               <div class="row justify-between items-center q-mt-md">
                 <q-btn
@@ -183,6 +190,7 @@ import {
 import ContentState from "src/components/ContentState.vue";
 import PurchaseAmounts from "src/components/PurchaseAmounts.vue";
 import PurchaseStatusChip from "src/components/PurchaseStatusChip.vue";
+import PurchaseTimeStamps from "src/components/PurchaseTimeStamps.vue";
 
 type LoadState = "loading" | "error" | "empty" | "ready";
 
@@ -262,6 +270,10 @@ watch(
 
 .purchase-amount-label {
   margin-top: 16px;
+}
+
+.purchase-timestamp-label {
+  margin-top: 20px;
 }
 
 .caption-medium {
