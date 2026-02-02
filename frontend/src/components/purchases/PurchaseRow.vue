@@ -80,7 +80,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useQuasar } from "quasar";
-import type { PurchaseUI } from "./models";
+import type { PurchaseUI } from "../types";
 import PurchaseAmounts from "src/components/PurchaseAmounts.vue";
 import PurchaseStatusChip from "src/components/PurchaseStatusChip.vue";
 import PurchaseTimeStamps from "src/components/PurchaseTimeStamps.vue";

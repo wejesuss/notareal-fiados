@@ -116,7 +116,7 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { useNavigation } from "src/composables/useNavigation";
+import { useNavigation } from "src/composables/core/useNavigation";
 import { getClients } from "src/services";
 
 const page = ref(1);

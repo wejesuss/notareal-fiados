@@ -68,7 +68,7 @@
 
 <script setup lang="ts">
 import { computed, toRef } from "vue";
-import type { RecentRegistry, RegistryCardProps } from "./models";
+import type { RecentRegistry, RegistryCardProps } from "../types";
 import { formatCurrency } from "src/utils/formatters/currency";
 import { getPurchaseStatusUI } from "src/utils/formatters/purchaseStatus";
 import { useNavigation, useClientRecentPurchases } from "src/composables";

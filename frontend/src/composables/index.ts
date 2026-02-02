@@ -1,8 +1,8 @@
-export * from "./useNavigation";
+export * from "./core/useNavigation";
 
-export * from "./useClientDetails";
-export * from "./useClientSummary";
-export * from "./useClientRecentPurchases";
-export * from "./useClientPurchases";
+export * from "./clients/useClientDetails";
+export * from "./clients/useClientSummary";
+export * from "./clients/useClientRecentPurchases";
+export * from "./clients/useClientPurchases";
 
-export * from "./usePurchasesUI";
+export * from "./purchases/usePurchasesUI";

@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { useNavigation } from "src/composables/useNavigation";
+import { useNavigation } from "src/composables/core/useNavigation";
 
 const { navigateTo } = useNavigation();
 </script>

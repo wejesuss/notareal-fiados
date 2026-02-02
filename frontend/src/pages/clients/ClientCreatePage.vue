@@ -27,8 +27,8 @@
 import { useQuasar } from "quasar";
 import { createClient } from "src/services";
 import ClientForm from "src/components/ClientForm.vue";
-import { useNavigation } from "src/composables/useNavigation";
-import type { ClientPayload } from "src/components/models";
+import { useNavigation } from "src/composables/core/useNavigation";
+import type { ClientPayload } from "src/components/types";
 
 const { navigateTo } = useNavigation();
 const $q = useQuasar();
