@@ -5,10 +5,11 @@ const purchases: Purchase[] = [
   {
     id: 1,
     clientId: 2,
-    description: "Compra de produtos agrícolas e vitaminas",
+    description:
+      "Compra de produtos agrícolas e vitaminas e outras coisinhas mais",
     totalValue: 350,
     totalPaidValue: 0,
-    status: "partial",
+    status: "pending",
     noteNumber: "NF-002-001",
     isActive: true,
     createdAt: "2025-12-19T10:36:31.000Z",
@@ -21,12 +22,19 @@ const purchases: Purchase[] = [
     totalValue: 49.9,
     totalPaidValue: 49.9,
     status: "paid",
-    noteNumber: "NF-002-001",
+    noteNumber: "NF-002-002",
     isActive: true,
     createdAt: "2025-12-19T10:36:31.000Z",
     updatedAt: "2025-12-19T10:36:31.000Z",
   },
 ];
+
+export async function getClientPurchases(
+  clientId: number
+): Promise<Purchase[]> {
+  await sleep(400);
+  return purchases.filter((p) => p.clientId === clientId);
+}
 
 export async function getClientRecentPurchases(
   clientId: number,

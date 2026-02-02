@@ -70,7 +70,7 @@
 import { computed, toRef } from "vue";
 import type { RecentRegistry, RegistryCardProps } from "./models";
 import { formatCurrency } from "src/utils/formatters/currency";
-import { formatStatus } from "src/utils/formatters/statusLabel";
+import { getPurchaseStatusUI } from "src/utils/formatters/purchaseStatus";
 import { useNavigation, useClientRecentPurchases } from "src/composables";
 import RegistryCard from "./RegistryCard.vue";
 import ContentState from "./ContentState.vue";
@@ -106,15 +106,16 @@ const newPurchaseRoute = computed(
 const recentRegistries = computed<RecentRegistry[]>(() =>
   recentPurchases.value.map((p) => {
     const paid = p.status === "paid";
+    const { label, color } = getPurchaseStatusUI(p.status);
 
     return {
       id: p.id,
       name: p.description,
       value: formatCurrency(p.totalValue),
-      valueComplement: formatStatus(p.status),
+      valueComplement: label,
       ...(paid && {
-        iconColor: "green",
-        valueColor: "text-green",
+        iconColor: color,
+        valueColor: `text-${color}`,
       }),
     };
   }),

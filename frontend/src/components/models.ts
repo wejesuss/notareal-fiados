@@ -1,4 +1,5 @@
 import type { QCardActionsProps, QIconProps } from "quasar";
+import type { Purchase } from "src/models";
 
 export interface SystemOverviewCardProps {
   /**
@@ -53,4 +54,19 @@ export type ClientPayload = {
   nickname: string | null;
   phone: string | null;
   email: string | null;
+};
+
+export type PurchaseStatusUI = {
+  label: string;
+  color: string;
+};
+
+export type PurchaseActiveStatusUI = {
+  label: string;
+  color: string;
+};
+
+export type PurchaseUI = Purchase & {
+  statusUI: PurchaseStatusUI;
+  activeStatusUI: PurchaseActiveStatusUI;
 };

@@ -65,7 +65,7 @@ const clientFormPayload = computed((): ClientPayload => {
   };
 });
 
-async function clientNotFoundNotifyAndNavigate() {
+async function handleClientNotFound() {
   $q.notify({ type: "negative", message: "Cliente não encontrado" });
   await navigateTo("/clients");
 }
@@ -74,7 +74,7 @@ async function loadClient(id: number) {
   loading.value = true;
 
   if (!Number.isInteger(id) || id <= 0) {
-    await clientNotFoundNotifyAndNavigate();
+    await handleClientNotFound();
     return;
   }
 
@@ -82,7 +82,7 @@ async function loadClient(id: number) {
     client.value = await getClientById(id);
     isActive.value = client.value.isActive;
   } catch {
-    await clientNotFoundNotifyAndNavigate();
+    await handleClientNotFound();
   } finally {
     loading.value = false;
   }
@@ -93,7 +93,7 @@ watch(
   async (newId) => {
     await loadClient(newId);
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 async function submit(payload: ClientPayload) {

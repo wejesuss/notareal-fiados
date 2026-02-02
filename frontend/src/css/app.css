@@ -3,6 +3,10 @@
   letter-spacing: 0.06em;
 }
 
+.caption-medium {
+  font-size: 0.8rem;
+}
+
 .client-container {
   max-width: 560px;
   margin: 0 auto;
