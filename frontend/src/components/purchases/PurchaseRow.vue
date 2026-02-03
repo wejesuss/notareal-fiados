@@ -15,7 +15,6 @@
       <q-item-label v-if="isCompact">
         <!-- Status chip inlined for small screens -->
         <PurchaseStatusChip
-          class="q-mt-sm"
           :label="purchase.statusUI.label"
           :color="purchase.statusUI.color"
         />
