@@ -94,7 +94,7 @@
 import { computed } from "vue";
 import { useNavigation } from "src/composables/core/useNavigation";
 import { formatCurrency } from "src/utils/formatters/currency";
-import type { SystemOverviewCardProps } from "../types";
+import type { SystemOverviewCardProps } from "src/components/types";
 
 const props = defineProps<SystemOverviewCardProps>();
 const { navigateTo } = useNavigation();

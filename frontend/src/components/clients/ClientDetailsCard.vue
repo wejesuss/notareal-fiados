@@ -147,9 +147,8 @@ import { useQuasar } from "quasar";
 import type { ClientUpdate } from "src/models";
 import { updateClient } from "src/services";
 import { formatDate } from "src/utils/formatters/date";
-import { useNavigation } from "src/composables/core/useNavigation";
-import ContentState from "./ContentState.vue";
-import { useClientDetails } from "src/composables/clients/useClientDetails";
+import { useNavigation, useClientDetails } from "src/composables";
+import { ContentState } from "src/components/common";
 
 interface ClientDetailsCardProps {
   clientId: number;

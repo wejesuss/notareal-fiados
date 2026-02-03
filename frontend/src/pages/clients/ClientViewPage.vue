@@ -21,8 +21,7 @@ import { computed } from "vue";
 import { useQuasar } from "quasar";
 import { useRoute } from "vue-router";
 import { useNavigation } from "src/composables/core/useNavigation";
-import ClientDetailsCard from "src/components/ClientDetailsCard.vue";
-import ClientSummaryCard from "src/components/ClientSummaryCard.vue";
+import { ClientDetailsCard, ClientSummaryCard } from "src/components/clients";
 
 const $route = useRoute();
 const { navigateTo } = useNavigation();

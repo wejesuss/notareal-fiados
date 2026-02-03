@@ -82,7 +82,7 @@
 import { computed, toRef } from "vue";
 import { formatCurrency } from "src/utils/formatters/currency";
 import { useClientSummary } from "src/composables/clients/useClientSummary";
-import ContentState from "./ContentState.vue";
+import { ContentState } from "src/components/common";
 import ClientRecentPurchases from "./ClientRecentPurchases.vue";
 
 interface ClientSummaryCardProps {

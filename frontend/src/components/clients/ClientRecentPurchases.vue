@@ -68,12 +68,11 @@
 
 <script setup lang="ts">
 import { computed, toRef } from "vue";
-import type { RecentRegistry, RegistryCardProps } from "../types";
 import { formatCurrency } from "src/utils/formatters/currency";
 import { getPurchaseStatusUI } from "src/utils/formatters/purchaseStatus";
 import { useNavigation, useClientRecentPurchases } from "src/composables";
-import RegistryCard from "./RegistryCard.vue";
-import ContentState from "./ContentState.vue";
+import type { RecentRegistry, RegistryCardProps } from "src/components/types";
+import { RegistryCard, ContentState } from "src/components/common";
 
 interface ClientRecentPurchasesProps {
   clientId: number;

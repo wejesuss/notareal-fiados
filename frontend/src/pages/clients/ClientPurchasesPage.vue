@@ -112,8 +112,8 @@ import {
   useClientPurchases,
   usePurchasesUI,
 } from "src/composables";
-import ContentState from "src/components/ContentState.vue";
-import PurchaseRow from "src/components/PurchaseRow.vue";
+import { ContentState } from "src/components/common";
+import { PurchaseRow } from "src/components/purchases";
 
 type LoadState = "loading" | "error" | "empty" | "ready";
 

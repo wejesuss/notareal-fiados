@@ -40,10 +40,9 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import SystemOverviewCard from "src/components/SystemOverviewCard.vue";
-import RegistryCard from "src/components/RegistryCard.vue";
-import ActionsCard from "src/components/ActionsCard.vue";
 import type { RegistryCardProps } from "src/components/types";
+import SystemOverviewCard from "src/components/dashboard/SystemOverviewCard.vue";
+import { RegistryCard, ActionsCard } from "src/components/common";
 import { formatCurrency } from "src/utils/formatters/currency";
 
 const registryCards = computed<RegistryCardProps[]>(() => [

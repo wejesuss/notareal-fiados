@@ -90,7 +90,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, useSlots } from "vue";
 import { useNavigation } from "src/composables/core/useNavigation";
-import type { RegistryCardProps } from "../types";
+import type { RegistryCardProps } from "src/components/types";
 
 const nameElements = ref<HTMLElement[]>([]);
 const hasOverflow = ref<Record<string, boolean>>({});

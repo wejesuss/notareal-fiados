@@ -43,9 +43,9 @@ import { useQuasar } from "quasar";
 import { useRoute } from "vue-router";
 import type { Client } from "src/models";
 import { updateClient, getClientById } from "src/services";
-import ClientForm from "src/components/ClientForm.vue";
 import { useNavigation } from "src/composables/core/useNavigation";
 import type { ClientPayload } from "src/components/types";
+import { ClientForm } from "src/components/clients";
 
 const $route = useRoute();
 const { navigateTo } = useNavigation();
