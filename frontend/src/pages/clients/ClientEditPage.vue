@@ -97,7 +97,6 @@ watch(
 );
 
 async function submit(payload: ClientPayload) {
-  console.log(payload);
   await updateClient(id.value, {
     ...payload,
     isActive: isActive.value,
