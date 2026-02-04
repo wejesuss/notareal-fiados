@@ -6,3 +6,4 @@ export * from "./clients/useClientRecentPurchases";
 export * from "./clients/useClientPurchases";
 
 export * from "./purchases/usePurchasesUI";
+export * from "./purchases/usePurchaseDetails";

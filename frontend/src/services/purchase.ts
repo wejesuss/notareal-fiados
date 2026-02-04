@@ -29,6 +29,15 @@ const purchases: Purchase[] = [
   },
 ];
 
+export async function getPurchaseById(purchaseId: number): Promise<Purchase> {
+  await sleep(300);
+  const found = purchases.find((p) => p.id === purchaseId);
+
+  if (!found) throw new Error("Compra não encontrada!");
+
+  return found;
+}
+
 export async function getClientPurchases(
   clientId: number
 ): Promise<Purchase[]> {
