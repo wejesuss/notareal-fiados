@@ -8,7 +8,7 @@
 
   <q-page v-else-if="purchase" padding class="purchase-details">
     <!-- Header -->
-    <div class="row items-start q-mt-sm q-mb-lg">
+    <div class="row items-start q-mt-sm q-mb-xl">
       <div class="col">
         <div class="text-h5 q-mb-sm">Visualizar Compra</div>
         <div class="text-caption text-grey-7">
@@ -18,8 +18,16 @@
       </div>
     </div>
 
-    <!-- Summary card -->
+    <!-- Details card -->
     <q-card class="q-mb-lg">
+      <!-- Happy Path -->
+      <q-card-section class="row items-center q-gutter-md">
+        <div class="text-subtitle1 text-grey-9">Detalhes da compra</div>
+        <q-icon name="shopping_bag" size="md" color="grey-6"></q-icon>
+      </q-card-section>
+
+      <q-separator />
+
       <q-card-section>
         <div class="row items-center justify-between text-blue-8">
           <div class="text-subtitle1">Total</div>
@@ -144,9 +152,11 @@ const payments: Payment[] = [
 </script>
 
 <style scoped>
-.purchase-details {
-  max-width: 720px;
-  margin: 0 auto;
+@media screen and (min-width: 720px) {
+  .purchase-details {
+    max-width: 800px;
+    margin: 0 auto;
+  }
 }
 
 .purchase-status {
