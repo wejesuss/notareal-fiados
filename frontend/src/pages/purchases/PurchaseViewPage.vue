@@ -16,19 +16,6 @@
           <span class="text-blue-7">{{ purchase.noteNumber }}</span>
         </div>
       </div>
-
-      <q-btn flat round icon="more_vert" aria-label="Actions">
-        <q-menu>
-          <q-list dense>
-            <q-item clickable>
-              <q-item-section>Duplicar</q-item-section>
-            </q-item>
-            <q-item clickable>
-              <q-item-section class="text-negative">Excluir</q-item-section>
-            </q-item>
-          </q-list>
-        </q-menu>
-      </q-btn>
     </div>
 
     <!-- Summary card -->
