@@ -6,7 +6,7 @@
     ></ContentState>
   </q-card>
 
-  <q-page v-else-if="purchase" padding class="purchase-details">
+  <q-page v-else-if="purchase" padding>
     <!-- Header -->
     <div class="row items-start q-mt-sm q-mb-xl">
       <div class="col">
@@ -169,18 +169,14 @@ const payments: Payment[] = [
 </script>
 
 <style scoped>
-@media screen and (min-width: 720px) {
-  .purchase-details {
-    max-width: 800px;
-    margin: 0 auto;
-  }
-}
-
 .inset-card {
   background-color: #fafafa;
   border: 1px solid #e0e0e0;
   border-radius: 12px;
   padding: 12px 16px;
+
+  max-width: var(--inset-card-width);
+  margin: 0 auto;
 }
 
 .inset-card:active {
@@ -194,7 +190,7 @@ const payments: Payment[] = [
 }
 
 .purchase-status {
-  max-width: 500px;
+  max-width: calc(var(--inset-card-width) - 220px);
   margin: 0 auto;
 }
 

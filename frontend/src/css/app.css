@@ -1,4 +1,8 @@
 /* app global css */
+:root {
+  --inset-card-width: 720px;
+}
+
 .letter-spaced {
   letter-spacing: 0.06em;
 }
