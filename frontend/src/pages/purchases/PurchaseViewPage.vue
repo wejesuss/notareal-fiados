@@ -37,8 +37,15 @@
           </div>
 
           <div
-            class="row items-center justify-between q-mt-sm q-mb-lg text-grey-8"
+            class="row items-center justify-between q-mt-sm q-mb-lg text-grey-8 q-gutter-x-lg"
           >
+            <div class="text-subtitle2" v-if="clientName">
+              Nome do cliente:
+              <span class="text-subtitle1 text-weight-bold">
+                {{ clientName }}
+              </span>
+            </div>
+
             <div class="text-subtitle2">
               Número da Nota:
               <span class="text-subtitle1 text-weight-bold">
@@ -47,17 +54,39 @@
             </div>
           </div>
 
-          <div class="row items-center justify-between text-blue-8">
-            <div class="text-subtitle1">Total</div>
-            <div class="text-h6 text-weight-bold">
-              {{ formatCurrency(purchase.totalValue) }}
+          <div class="purchase-totals">
+            <div class="row items-center justify-between text-blue-8">
+              <div class="text-subtitle1">Total</div>
+              <div class="text-h6 text-weight-bold">
+                {{ formatCurrency(purchase.totalValue) }}
+              </div>
+            </div>
+
+            <div
+              class="row items-center justify-between q-mt-md text-orange-10"
+            >
+              <div class="text-subtitle1">Pago</div>
+              <div class="text-h6 text-weight-bold">
+                {{ formatCurrency(purchase.totalPaidValue) }}
+              </div>
             </div>
           </div>
 
-          <div class="row items-center justify-between q-mt-md text-orange-10">
-            <div class="text-subtitle1">Pago</div>
-            <div class="text-h6 text-weight-bold">
-              {{ formatCurrency(purchase.totalPaidValue) }}
+          <div
+            class="row items-center justify-between q-mt-lg text-grey-7 q-gutter-x-lg"
+          >
+            <div class="text-subtitle2">
+              Criado Em:
+              <span class="text-subtitle1 text-weight-bold">
+                {{ formatDate(purchase.createdAt) }}
+              </span>
+            </div>
+
+            <div class="text-subtitle2">
+              Atualizado Em:
+              <span class="text-subtitle1 text-weight-bold">
+                {{ formatDate(purchase.updatedAt) }}
+              </span>
             </div>
           </div>
         </div>
@@ -137,7 +166,7 @@ import {
   getPurchaseActiveStatusUI,
   getPurchaseStatusUI,
 } from "src/utils/formatters";
-import { usePurchaseDetails } from "src/composables";
+import { useClientDetails, usePurchaseDetails } from "src/composables";
 import { PurchaseStatusChip } from "src/components/purchases";
 import { ContentState } from "src/components/common";
 
@@ -156,7 +185,13 @@ interface Payment {
 
 const $route = useRoute();
 const purchaseId = computed(() => Number($route.params.id));
+const clientId = computed(() => purchase.value?.clientId || 0);
 const { loading, error, purchase } = usePurchaseDetails(toRef(purchaseId));
+const {
+  loading: clientLoading,
+  error: clientError,
+  client,
+} = useClientDetails(toRef(clientId));
 
 const loadState = computed(() => {
   if (loading.value) return "loading";
@@ -165,10 +200,20 @@ const loadState = computed(() => {
   return "ready";
 });
 const isActive = ref(purchase.value?.isActive || false);
+const clientName = ref(client.value?.name);
 
 watch(
   () => purchase.value,
   () => (isActive.value = purchase.value?.isActive || false),
+);
+
+watch(
+  () => client.value,
+  () => {
+    if (clientLoading.value || clientError.value) return;
+
+    clientName.value = client.value?.name;
+  },
 );
 
 function submitDialog(newValue: boolean) {
@@ -211,6 +256,12 @@ const payments: Payment[] = [
 .inset-card-inactive {
   border-color: var(--q-negative);
   background-color: #f5f5f5;
+}
+
+.purchase-totals {
+  border-top: 1px solid #bbbbbb;
+  border-bottom: 1px solid #bbbbbb;
+  padding: 8px 4px;
 }
 
 .purchase-status {
