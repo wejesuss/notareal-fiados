@@ -76,12 +76,23 @@
           ></PurchaseStatusChip>
         </div>
         <div class="col-6">
-          <PurchaseStatusChip
-            class="q-mt-xs"
-            :label="getPurchaseActiveStatusUI(purchase.isActive).label"
-            :color="getPurchaseActiveStatusUI(purchase.isActive).color"
-            outline
-          />
+          <div>
+            <q-toggle
+              name="active-status"
+              checked-icon="check"
+              :color="getPurchaseActiveStatusUI(purchase.isActive).color"
+              unchecked-icon="clear"
+              v-model="isActive"
+              @update:model-value="submitDialog"
+            >
+              <PurchaseStatusChip
+                style="margin-top: 4px"
+                :label="getPurchaseActiveStatusUI(purchase.isActive).label"
+                :color="getPurchaseActiveStatusUI(purchase.isActive).color"
+                outline
+              />
+            </q-toggle>
+          </div>
         </div>
       </q-card-section>
     </q-card>
@@ -118,7 +129,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, toRef } from "vue";
+import { computed, ref, toRef, watch } from "vue";
 import { useRoute } from "vue-router";
 import {
   formatCurrency,
@@ -153,6 +164,17 @@ const loadState = computed(() => {
 
   return "ready";
 });
+const isActive = ref(purchase.value?.isActive || false);
+
+watch(
+  () => purchase.value,
+  () => (isActive.value = purchase.value?.isActive || false),
+);
+
+function submitDialog(newValue: boolean) {
+  if (!purchase.value) return;
+  purchase.value.isActive = newValue;
+}
 
 const payments: Payment[] = [
   {
@@ -192,7 +214,7 @@ const payments: Payment[] = [
 }
 
 .purchase-status {
-  max-width: calc(var(--inset-card-width) - 220px);
+  max-width: calc(var(--inset-card-width) - 230px);
   margin: 0 auto;
 }
 
