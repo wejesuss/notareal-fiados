@@ -29,17 +29,34 @@
       <q-separator />
 
       <q-card-section>
-        <div class="row items-center justify-between text-blue-8">
-          <div class="text-subtitle1">Total</div>
-          <div class="text-h6 text-weight-bold">
-            {{ formatCurrency(purchase.totalValue) }}
+        <div class="inset-card">
+          <div class="text-orange-14">
+            <div class="text-h6 text-weight-bold">
+              {{ purchase.description }}
+            </div>
           </div>
-        </div>
 
-        <div class="row items-center justify-between text-orange-10 q-mt-lg">
-          <div class="text-subtitle1">Pago</div>
-          <div class="text-h6 text-weight-bold">
-            {{ formatCurrency(purchase.totalPaidValue) }}
+          <div
+            class="row items-center justify-between q-mt-md q-mb-lg text-grey-8"
+          >
+            <div class="text-subtitle2">Número da Nota:</div>
+            <div class="text-subtitle1 text-weight-bold">
+              {{ purchase.noteNumber }}
+            </div>
+          </div>
+
+          <div class="row items-center justify-between text-blue-8">
+            <div class="text-subtitle2">Total</div>
+            <div class="text-h6 text-weight-bold">
+              {{ formatCurrency(purchase.totalValue) }}
+            </div>
+          </div>
+
+          <div class="row items-center justify-between q-mt-md text-orange-10">
+            <div class="text-subtitle2">Pago</div>
+            <div class="text-h6 text-weight-bold">
+              {{ formatCurrency(purchase.totalPaidValue) }}
+            </div>
           </div>
         </div>
       </q-card-section>
@@ -159,12 +176,29 @@ const payments: Payment[] = [
   }
 }
 
+.inset-card {
+  background-color: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 12px 16px;
+}
+
+.inset-card:active {
+  background-color: #f0f0f0;
+  transition: 0.3s all;
+}
+
+.inset-card-inactive {
+  border-color: var(--q-negative);
+  background-color: #f5f5f5;
+}
+
 .purchase-status {
   max-width: 500px;
   margin: 0 auto;
 }
 
-.purchase-status-end {
+.purchase-status *:last-child {
   justify-items: end;
 }
 
