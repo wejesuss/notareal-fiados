@@ -66,20 +66,20 @@
       <q-card-section class="row purchase-status">
         <div class="col-6">
           <PurchaseStatusChip
-            class="q-mt-xs"
-            :label="getPurchaseActiveStatusUI(purchase.isActive).label"
-            :color="getPurchaseActiveStatusUI(purchase.isActive).color"
-            outline
-          />
-        </div>
-        <div class="col-6 purchase-status-end">
-          <PurchaseStatusChip
             class="text-body2"
             :label="
               getPurchaseStatusUI(purchase.status, { titleCase: true }).label
             "
             :color="getPurchaseStatusUI(purchase.status).color"
           ></PurchaseStatusChip>
+        </div>
+        <div class="col-6">
+          <PurchaseStatusChip
+            class="q-mt-xs"
+            :label="getPurchaseActiveStatusUI(purchase.isActive).label"
+            :color="getPurchaseActiveStatusUI(purchase.isActive).color"
+            outline
+          />
         </div>
       </q-card-section>
     </q-card>
@@ -198,7 +198,7 @@ const payments: Payment[] = [
   margin: 0 auto;
 }
 
-.purchase-status *:last-child {
+.purchase-status .col-6:last-child {
   justify-items: end;
 }
 
