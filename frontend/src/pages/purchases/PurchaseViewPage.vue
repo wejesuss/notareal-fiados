@@ -37,23 +37,25 @@
           </div>
 
           <div
-            class="row items-center justify-between q-mt-md q-mb-lg text-grey-8"
+            class="row items-center justify-between q-mt-sm q-mb-lg text-grey-8"
           >
-            <div class="text-subtitle2">Número da Nota:</div>
-            <div class="text-subtitle1 text-weight-bold">
-              {{ purchase.noteNumber }}
+            <div class="text-subtitle2">
+              Número da Nota:
+              <span class="text-subtitle1 text-weight-bold">
+                {{ purchase.noteNumber }}
+              </span>
             </div>
           </div>
 
           <div class="row items-center justify-between text-blue-8">
-            <div class="text-subtitle2">Total</div>
+            <div class="text-subtitle1">Total</div>
             <div class="text-h6 text-weight-bold">
               {{ formatCurrency(purchase.totalValue) }}
             </div>
           </div>
 
           <div class="row items-center justify-between q-mt-md text-orange-10">
-            <div class="text-subtitle2">Pago</div>
+            <div class="text-subtitle1">Pago</div>
             <div class="text-h6 text-weight-bold">
               {{ formatCurrency(purchase.totalPaidValue) }}
             </div>
