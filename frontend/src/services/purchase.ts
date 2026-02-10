@@ -27,6 +27,18 @@ const purchases: Purchase[] = [
     createdAt: "2025-12-19T10:36:31.000Z",
     updatedAt: "2025-12-19T10:36:31.000Z",
   },
+  {
+    id: 3,
+    clientId: 1,
+    description: "Compra de adubo",
+    totalValue: 99.75,
+    totalPaidValue: 29,
+    status: "partial",
+    noteNumber: "NF-001-003",
+    isActive: false,
+    createdAt: "2026-02-10T10:36:31.000Z",
+    updatedAt: "2026-02-10T10:36:31.000Z",
+  },
 ];
 
 export async function getPurchaseById(purchaseId: number): Promise<Purchase> {
