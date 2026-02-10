@@ -95,7 +95,7 @@
 
       <q-separator />
 
-      <q-card-section class="row purchase-status">
+      <q-card-section class="row items-center purchase-status">
         <div class="col-6">
           <PurchaseStatusChip
             class="text-body2"
