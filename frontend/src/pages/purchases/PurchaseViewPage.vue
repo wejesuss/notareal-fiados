@@ -281,6 +281,12 @@ const payments: Payment[] = [
   margin: 0 auto;
 }
 
+@media (max-width: 550px) {
+  .purchase-status {
+    max-width: 100%;
+  }
+}
+
 .purchase-status .col-6:last-child {
   justify-items: end;
 }
