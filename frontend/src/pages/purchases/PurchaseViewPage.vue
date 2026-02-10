@@ -277,7 +277,7 @@ const payments: Payment[] = [
 }
 
 .purchase-status {
-  max-width: calc(var(--inset-card-width) - 230px);
+  max-width: calc(var(--inset-card-width) - var(--purchase-status-offset));
   margin: 0 auto;
 }
 
