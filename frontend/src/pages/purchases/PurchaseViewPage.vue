@@ -30,43 +30,44 @@
 
       <q-card-section>
         <div class="inset-card">
-          <div class="text-orange-14">
-            <div class="text-h6 text-weight-bold">
+          <div class="text-blue-8">
+            <div class="text-h6">
               {{ purchase.description }}
             </div>
           </div>
 
           <div
-            class="row items-center justify-between q-mt-sm q-mb-lg text-grey-8 q-gutter-x-lg"
+            class="row items-center justify-between q-mt-md q-mb-lg q-gutter-x-lg"
           >
-            <div class="text-subtitle2" v-if="clientName">
+            <div class="text-subtitle2 text-grey-8" v-if="clientName">
               Nome do cliente:
               <span class="text-subtitle1 text-weight-bold">
                 {{ clientName }}
               </span>
             </div>
 
-            <div class="text-subtitle2">
+            <div class="text-subtitle2 text-grey-7">
               Número da Nota:
-              <span class="text-subtitle1 text-weight-bold">
+              <span class="text-subtitle1 text-weight-medium text-grey-6">
                 {{ purchase.noteNumber }}
               </span>
             </div>
           </div>
 
           <div class="purchase-totals">
-            <div class="row items-center justify-between text-blue-8">
+            <div class="row items-center justify-between text-grey-9">
               <div class="text-subtitle1">Total</div>
-              <div class="text-h6 text-weight-bold">
+              <div class="text-h6 text-weight-bold text-blue-grey-7">
                 {{ formatCurrency(purchase.totalValue) }}
               </div>
             </div>
 
-            <div
-              class="row items-center justify-between q-mt-md text-orange-10"
-            >
-              <div class="text-subtitle1">Pago</div>
-              <div class="text-h6 text-weight-bold">
+            <div class="row items-center justify-between q-mt-md">
+              <div class="text-subtitle1 text-grey-9">Pago</div>
+              <div
+                class="text-h6 text-weight-bold"
+                :class="'text-' + getPurchaseStatusUI(purchase.status).color"
+              >
                 {{ formatCurrency(purchase.totalPaidValue) }}
               </div>
             </div>
@@ -239,7 +240,7 @@ const payments: Payment[] = [
 
 <style scoped>
 .inset-card {
-  background-color: #fafafa;
+  background-color: #f5f5f5;
   border: 1px solid #e0e0e0;
   border-radius: 12px;
   padding: 12px 16px;
@@ -249,13 +250,12 @@ const payments: Payment[] = [
 }
 
 .inset-card:active {
-  background-color: #f0f0f0;
+  background-color: #efefef;
   transition: 0.3s all;
 }
 
 .inset-card-inactive {
   border-color: var(--q-negative);
-  background-color: #f5f5f5;
 }
 
 .purchase-totals {
