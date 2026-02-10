@@ -66,7 +66,7 @@
               <div class="text-subtitle1 text-grey-9">Pago</div>
               <div
                 class="text-h6 text-weight-bold"
-                :class="'text-' + getPurchaseStatusUI(purchase.status).color"
+                :class="purchaseStatusUI.textColor"
               >
                 {{ formatCurrency(purchase.totalPaidValue) }}
               </div>
@@ -99,10 +99,8 @@
         <div class="col-6">
           <PurchaseStatusChip
             class="text-body2"
-            :label="
-              getPurchaseStatusUI(purchase.status, { titleCase: true }).label
-            "
-            :color="getPurchaseStatusUI(purchase.status).color"
+            :label="purchaseStatusUI.label"
+            :color="purchaseStatusUI.color"
           ></PurchaseStatusChip>
         </div>
         <div class="col-6">
@@ -110,15 +108,15 @@
             <q-toggle
               name="active-status"
               checked-icon="check"
-              :color="getPurchaseActiveStatusUI(purchase.isActive).color"
+              :color="purchaseActiveStatusUI.color"
               unchecked-icon="clear"
               v-model="isActive"
               @update:model-value="submitDialog"
             >
               <PurchaseStatusChip
                 style="margin-top: 4px"
-                :label="getPurchaseActiveStatusUI(purchase.isActive).label"
-                :color="getPurchaseActiveStatusUI(purchase.isActive).color"
+                :label="purchaseActiveStatusUI.label"
+                :color="purchaseActiveStatusUI.color"
                 outline
               />
             </q-toggle>
@@ -170,6 +168,10 @@ import {
 import { useClientDetails, usePurchaseDetails } from "src/composables";
 import { PurchaseStatusChip } from "src/components/purchases";
 import { ContentState } from "src/components/common";
+import type {
+  PurchaseActiveStatusUI,
+  PurchaseStatusUI,
+} from "src/components/types";
 
 interface Payment {
   id: number;
@@ -202,6 +204,16 @@ const loadState = computed(() => {
 });
 const isActive = ref(purchase.value?.isActive || false);
 const clientName = ref(client.value?.name);
+const purchaseStatusUI = computed<PurchaseStatusUI>(() => {
+  if (!purchase.value) return { color: "", label: "", textColor: "" };
+
+  return getPurchaseStatusUI(purchase.value?.status, { titleCase: true });
+});
+const purchaseActiveStatusUI = computed<PurchaseActiveStatusUI>(() => {
+  if (!purchase.value) return { color: "", label: "", textColor: "" };
+
+  return getPurchaseActiveStatusUI(purchase.value?.isActive);
+});
 
 watch(
   () => purchase.value,

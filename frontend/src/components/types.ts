@@ -59,11 +59,13 @@ export type ClientPayload = {
 export type PurchaseStatusUI = {
   label: string;
   color: string;
+  textColor: string;
 };
 
 export type PurchaseActiveStatusUI = {
   label: string;
   color: string;
+  textColor: string;
 };
 
 export type PurchaseUI = Purchase & {

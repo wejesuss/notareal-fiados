@@ -105,7 +105,7 @@ const newPurchaseRoute = computed(
 const recentRegistries = computed<RecentRegistry[]>(() =>
   recentPurchases.value.map((p) => {
     const paid = p.status === "paid";
-    const { label, color } = getPurchaseStatusUI(p.status);
+    const { label, color, textColor } = getPurchaseStatusUI(p.status);
 
     return {
       id: p.id,
@@ -114,7 +114,7 @@ const recentRegistries = computed<RecentRegistry[]>(() =>
       valueComplement: label,
       ...(paid && {
         iconColor: color,
-        valueColor: `text-${color}`,
+        valueColor: textColor,
       }),
     };
   }),

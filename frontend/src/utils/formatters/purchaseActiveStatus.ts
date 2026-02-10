@@ -10,8 +10,10 @@ const toActiveStatusColor = (isActive: boolean) => {
 export function getPurchaseActiveStatusUI(
   isActive: boolean
 ): PurchaseActiveStatusUI {
+  const color = toActiveStatusColor(isActive);
   return {
     label: toActiveStatusLabel(isActive),
-    color: toActiveStatusColor(isActive),
+    color: color,
+    textColor: `text-${color}`,
   };
 }

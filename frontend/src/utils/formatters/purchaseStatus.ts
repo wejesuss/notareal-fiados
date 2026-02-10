@@ -33,5 +33,6 @@ export function getPurchaseStatusUI(
   return {
     label: formatStatus(status, options),
     color: statusColor[status],
+    textColor: `text-${statusColor[status]}`,
   };
 }
