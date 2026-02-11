@@ -1,4 +1,4 @@
-import type { Purchase } from "src/models";
+import type { Purchase, PurchaseUpdate } from "src/models";
 import { sleep } from "src/utils/timing/sleep";
 
 const purchases: Purchase[] = [
@@ -50,6 +50,34 @@ export async function getPurchaseById(purchaseId: number): Promise<Purchase> {
   return { ...found };
 }
 
+export async function updatePurchase(
+  id: number,
+  payload: PurchaseUpdate
+): Promise<Purchase> {
+  await sleep(300);
+
+  const index = purchases.findIndex((purchase) => purchase.id === id);
+  if (index === -1) {
+    throw new Error(`Compra de id ${id} não encontrado!`);
+  }
+
+  const purchase = purchases[index];
+  if (!purchase) {
+    throw new Error(`Compra de id ${id} não encontrado!`);
+  }
+
+  const updatedPurchase: Purchase = {
+    ...purchase,
+    ...payload,
+    updatedAt: new Date().toISOString(),
+  };
+
+  purchases[index] = updatedPurchase;
+
+  return updatedPurchase;
+}
+
+// Client related functions
 export async function getClientPurchases(
   clientId: number
 ): Promise<Purchase[]> {

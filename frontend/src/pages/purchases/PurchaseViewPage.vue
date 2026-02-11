@@ -160,6 +160,8 @@
 <script setup lang="ts">
 import { computed, ref, toRef, watch } from "vue";
 import { useRoute } from "vue-router";
+import { updatePurchase } from "src/services";
+import type { PurchaseUpdate } from "src/models";
 import {
   formatCurrency,
   formatDate,
@@ -246,16 +248,18 @@ watch(
   },
 );
 
-async function submit(newValue: boolean) {
-  return new Promise<void>((resolve, reject) => {
-    if (!purchase.value) {
-      reject(new Error("Compra inválida!"));
-      return;
-    }
+async function submit(nextValue: boolean) {
+  if (!purchase.value) return;
 
-    purchase.value.isActive = newValue;
-    resolve();
-  });
+  const payload: PurchaseUpdate = {
+    ...purchase.value,
+    isActive: nextValue,
+  };
+
+  await updatePurchase(purchaseId.value, payload);
+
+  // Keep local purchase snapshot in sync after successful update
+  purchase.value.isActive = nextValue;
 }
 
 const payments: Payment[] = [
