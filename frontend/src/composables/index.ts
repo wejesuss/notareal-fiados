@@ -1,4 +1,5 @@
 export * from "./core/useNavigation";
+export * from "./core/useActiveToggleConfirmation";
 
 export * from "./clients/useClientDetails";
 export * from "./clients/useClientSummary";
