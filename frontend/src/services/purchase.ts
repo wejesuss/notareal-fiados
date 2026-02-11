@@ -47,7 +47,7 @@ export async function getPurchaseById(purchaseId: number): Promise<Purchase> {
 
   if (!found) throw new Error("Compra não encontrada!");
 
-  return found;
+  return { ...found };
 }
 
 export async function getClientPurchases(
