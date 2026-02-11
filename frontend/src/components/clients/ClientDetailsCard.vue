@@ -234,7 +234,7 @@ async function submitDialog(nextValue: boolean) {
         : "Cliente ativado. Compras e pagamentos não serão ativadas.",
     });
   } catch (e) {
-    console.error(e, typeof e);
+    console.error(e);
     isActive.value = previousIsActive;
 
     $q.notify({
