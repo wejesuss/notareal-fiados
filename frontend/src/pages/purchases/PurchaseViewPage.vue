@@ -256,10 +256,10 @@ async function submit(nextValue: boolean) {
     isActive: nextValue,
   };
 
-  await updatePurchase(purchaseId.value, payload);
+  const updated = await updatePurchase(purchaseId.value, payload);
 
   // Keep local purchase snapshot in sync after successful update
-  purchase.value.isActive = nextValue;
+  purchase.value = updated;
 }
 
 const payments: Payment[] = [
