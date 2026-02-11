@@ -110,8 +110,9 @@
               checked-icon="check"
               :color="purchaseActiveStatusUI.color"
               unchecked-icon="clear"
-              v-model="isActive"
+              :model-value="isActive"
               @update:model-value="submitDialog"
+              :disable="submitting"
             >
               <PurchaseStatusChip
                 style="margin-top: 4px"
@@ -165,7 +166,11 @@ import {
   getPurchaseActiveStatusUI,
   getPurchaseStatusUI,
 } from "src/utils/formatters";
-import { useClientDetails, usePurchaseDetails } from "src/composables";
+import {
+  useActiveToggleConfirmation,
+  useClientDetails,
+  usePurchaseDetails,
+} from "src/composables";
 import { PurchaseStatusChip } from "src/components/purchases";
 import { ContentState } from "src/components/common";
 import type {
@@ -186,6 +191,18 @@ interface Payment {
   updatedAt: Date | string;
 }
 
+const dialogConfig = {
+  title: "Tem certeza que deseja desativar esta compra?",
+  message:
+    "Esta compra não poderá receber novas operações e todos os pagamentos desta compra serão desativados.",
+  checkboxLabel: "Entendo e desejo desativar a compra",
+};
+const notifyConfig = {
+  disabledMessage: "Compra desativada com sucesso.",
+  enabledMessage: "Compra ativada. Pagamentos não serão ativados.",
+  errorMessage: "Erro ao atualizar status da compra.",
+};
+
 const $route = useRoute();
 const purchaseId = computed(() => Number($route.params.id));
 const clientId = computed(() => purchase.value?.clientId || 0);
@@ -195,6 +212,12 @@ const {
   error: clientError,
   client,
 } = useClientDetails(toRef(clientId));
+const { submitting, isActive, submitDialog } = useActiveToggleConfirmation(
+  toRef(purchase),
+  dialogConfig,
+  notifyConfig,
+  submit,
+);
 
 const loadState = computed(() => {
   if (loading.value) return "loading";
@@ -202,7 +225,6 @@ const loadState = computed(() => {
 
   return "ready";
 });
-const isActive = ref(purchase.value?.isActive || false);
 const clientName = ref(client.value?.name);
 const purchaseStatusUI = computed<PurchaseStatusUI>(() => {
   if (!purchase.value) return { color: "", label: "", textColor: "" };
@@ -216,11 +238,6 @@ const purchaseActiveStatusUI = computed<PurchaseActiveStatusUI>(() => {
 });
 
 watch(
-  () => purchase.value,
-  () => (isActive.value = purchase.value?.isActive || false),
-);
-
-watch(
   () => client.value,
   () => {
     if (clientLoading.value || clientError.value) return;
@@ -229,9 +246,16 @@ watch(
   },
 );
 
-function submitDialog(newValue: boolean) {
-  if (!purchase.value) return;
-  purchase.value.isActive = newValue;
+async function submit(newValue: boolean) {
+  return new Promise<void>((resolve, reject) => {
+    if (!purchase.value) {
+      reject(new Error("Compra inválida!"));
+      return;
+    }
+
+    purchase.value.isActive = newValue;
+    resolve();
+  });
 }
 
 const payments: Payment[] = [
