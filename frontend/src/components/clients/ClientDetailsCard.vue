@@ -163,9 +163,9 @@ const dialogConfig = {
   checkboxLabel: "Entendo e desejo desativar o cliente",
 };
 const notifyConfig = {
-  disabledMessage: "Cliente desativado com sucesso",
+  disabledMessage: "Cliente desativado com sucesso.",
   enabledMessage: "Cliente ativado. Compras e pagamentos não serão ativadas.",
-  errorMessage: "Erro ao atualizar status do cliente",
+  errorMessage: "Erro ao atualizar status do cliente.",
 };
 
 const props = defineProps<ClientDetailsCardProps>();
