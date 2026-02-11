@@ -90,6 +90,25 @@
               </span>
             </div>
           </div>
+
+          <q-separator class="q-mt-md" />
+
+          <q-card-actions align="center" class="purchase-action">
+            <q-btn
+              flat
+              role="button"
+              tabindex="0"
+              color="primary"
+              class="full-width"
+              :disable="submitting"
+              @click="navigateTo(purchaseEditRoute)"
+              @keydown.enter="navigateTo(purchaseEditRoute)"
+              @keydown.space.prevent="navigateTo(purchaseEditRoute)"
+            >
+              <q-icon name="edit" class="q-mr-sm" size="xs" />
+              <span class="text-body2 text-weight-medium">Editar compra</span>
+            </q-btn>
+          </q-card-actions>
         </div>
       </q-card-section>
 
@@ -171,6 +190,7 @@ import {
 import {
   useActiveToggleConfirmation,
   useClientDetails,
+  useNavigation,
   usePurchaseDetails,
 } from "src/composables";
 import { PurchaseStatusChip } from "src/components/purchases";
@@ -208,6 +228,7 @@ const notifyConfig = {
 const $route = useRoute();
 const purchaseId = computed(() => Number($route.params.id));
 const clientId = computed(() => purchase.value?.clientId || 0);
+const { navigateTo } = useNavigation();
 const { loading, error, purchase } = usePurchaseDetails(toRef(purchaseId));
 const {
   loading: clientLoading,
@@ -238,6 +259,7 @@ const purchaseActiveStatusUI = computed<PurchaseActiveStatusUI>(() => {
 
   return getPurchaseActiveStatusUI(purchase.value?.isActive);
 });
+const purchaseEditRoute = computed(() => `/purchases/${purchaseId.value}/edit`);
 
 watch(
   () => client.value,
@@ -302,6 +324,10 @@ const payments: Payment[] = [
   border-top: 1px solid #bbbbbb;
   border-bottom: 1px solid #bbbbbb;
   padding: 8px 4px;
+}
+
+.purchase-action {
+  padding: 2px 0;
 }
 
 .purchase-status {
