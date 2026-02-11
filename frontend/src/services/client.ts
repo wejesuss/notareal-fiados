@@ -76,7 +76,7 @@ export async function updateClient(
 
     const client = clients[index];
     if (!client) {
-      return rej(new Error(`CLiente de id ${id} não encontrado!`));
+      return rej(new Error(`Cliente de id ${id} não encontrado!`));
     }
 
     const updatedClient: Client = {
