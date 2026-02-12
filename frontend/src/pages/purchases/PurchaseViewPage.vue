@@ -1,25 +1,34 @@
 <template>
-  <q-card v-if="loadState === 'loading'" class="q-mt-xl q-pa-md">
-    <ContentState
-      message="Carregando compra..."
-      icon-name="find_in_page"
-    ></ContentState>
-  </q-card>
-
-  <q-page v-else-if="purchase" padding>
+  <q-page padding>
     <!-- Header -->
     <div class="row items-start q-mt-sm q-mb-xl">
       <div class="col">
         <div class="text-h5 q-mb-sm">Visualizar Compra</div>
-        <div class="text-caption text-grey-7">
+        <div class="text-caption text-grey-7" v-if="purchase">
           {{ formatDate(purchase.updatedAt) }} ·
           <span class="text-blue-7">{{ purchase.noteNumber }}</span>
         </div>
       </div>
     </div>
 
+    <q-card v-if="loadState === 'loading'" class="q-mb-xl q-pa-md">
+      <ContentState
+        message="Carregando compra..."
+        icon-name="find_in_page"
+      ></ContentState>
+    </q-card>
+
+    <q-card v-else-if="loadState === 'error'" class="q-my-xl q-pa-md">
+      <ContentState
+        :message="errorMessage"
+        message-color="text-amber-8"
+        icon-name="error_outline"
+        icon-color="amber-10"
+      ></ContentState>
+    </q-card>
+
     <!-- Details card -->
-    <q-card class="q-mb-lg">
+    <q-card v-else-if="purchase" class="q-mb-lg">
       <!-- Happy Path -->
       <q-card-section class="row items-center q-gutter-md">
         <div class="text-subtitle1 text-grey-9">Detalhes da compra</div>
@@ -260,6 +269,9 @@ const purchaseActiveStatusUI = computed<PurchaseActiveStatusUI>(() => {
   return getPurchaseActiveStatusUI(purchase.value?.isActive);
 });
 const purchaseEditRoute = computed(() => `/purchases/${purchaseId.value}/edit`);
+const errorMessage = computed(
+  () => error.value?.message || "Erro inesperado ao carregar compra",
+);
 
 watch(
   () => client.value,
