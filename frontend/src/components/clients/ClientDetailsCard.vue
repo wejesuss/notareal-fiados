@@ -128,8 +128,6 @@
               class="full-width"
               :disable="submitting"
               @click="navigateTo(clientEditRoute)"
-              @keydown.enter="navigateTo(clientEditRoute)"
-              @keydown.space.prevent="navigateTo(clientEditRoute)"
             >
               <q-icon name="edit" class="q-mr-sm" size="xs" />
               <span class="text-body2 text-weight-medium">Editar cliente</span>
