@@ -1,9 +1,4 @@
 /* app global css */
-:root {
-  --purchase-container-width: 650px;
-  --purchase-status-width: 500px;
-}
-
 .letter-spaced {
   letter-spacing: 0.06em;
 }

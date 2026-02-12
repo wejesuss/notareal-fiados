@@ -312,7 +312,7 @@ const payments: Payment[] = [
   border-radius: 12px;
   padding: 12px 16px;
 
-  max-width: var(--purchase-container-width);
+  max-width: 650px;
   margin: 0 auto;
 }
 
@@ -335,7 +335,7 @@ const payments: Payment[] = [
 }
 
 .purchase-status {
-  max-width: var(--purchase-status-width);
+  max-width: 500px;
   margin: 0 auto;
 }
 
