@@ -74,7 +74,7 @@
           </div>
 
           <div
-            class="row items-center justify-between q-mt-lg text-grey-7 q-gutter-x-lg"
+            class="row items-center justify-between q-mt-md text-grey-7 q-gutter-x-lg"
           >
             <div class="text-subtitle2">
               Criado Em:
@@ -321,9 +321,12 @@ const payments: Payment[] = [
 }
 
 .purchase-totals {
-  border-top: 1px solid #bbbbbb;
-  border-bottom: 1px solid #bbbbbb;
   padding: 8px 4px;
+}
+
+.purchase-totals > :first-child {
+  padding-bottom: 12px;
+  border-bottom: 1px solid #bbbbbb;
 }
 
 .purchase-action {
