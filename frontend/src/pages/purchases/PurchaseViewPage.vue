@@ -38,7 +38,7 @@
       <q-separator />
 
       <q-card-section>
-        <div class="inset-card">
+        <div class="purchase-container purchase-container-inactive">
           <div class="text-blue-8">
             <div class="text-h6">
               {{ purchase.description }}
@@ -111,8 +111,6 @@
               class="full-width"
               :disable="submitting"
               @click="navigateTo(purchaseEditRoute)"
-              @keydown.enter="navigateTo(purchaseEditRoute)"
-              @keydown.space.prevent="navigateTo(purchaseEditRoute)"
             >
               <q-icon name="edit" class="q-mr-sm" size="xs" />
               <span class="text-body2 text-weight-medium">Editar compra</span>
@@ -163,8 +161,8 @@
       <q-list>
         <q-item v-for="payment in payments" :key="payment.id" class="q-py-md">
           <q-item-section
-            class="bordered"
-            :class="{ 'bordered-negative': !payment.isActive }"
+            class="payment-item"
+            :class="{ 'payment-item-negative': !payment.isActive }"
           >
             <div class="row items-start justify-between">
               <div class="row q-gutter-md">
@@ -186,7 +184,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, toRef, watch } from "vue";
+import { computed, toRef } from "vue";
 import { useRoute } from "vue-router";
 import { updatePurchase } from "src/services";
 import type { PurchaseUpdate } from "src/models";
@@ -257,7 +255,11 @@ const loadState = computed(() => {
 
   return "ready";
 });
-const clientName = ref(client.value?.name);
+const clientName = computed(() => {
+  if (clientLoading.value || clientError.value) return undefined;
+
+  return client.value?.name;
+});
 const purchaseStatusUI = computed<PurchaseStatusUI>(() => {
   if (!purchase.value) return { color: "", label: "", textColor: "" };
 
@@ -271,15 +273,6 @@ const purchaseActiveStatusUI = computed<PurchaseActiveStatusUI>(() => {
 const purchaseEditRoute = computed(() => `/purchases/${purchaseId.value}/edit`);
 const errorMessage = computed(
   () => error.value?.message || "Erro inesperado ao carregar compra",
-);
-
-watch(
-  () => client.value,
-  () => {
-    if (clientLoading.value || clientError.value) return;
-
-    clientName.value = client.value?.name;
-  },
 );
 
 async function submit(nextValue: boolean) {
@@ -313,23 +306,19 @@ const payments: Payment[] = [
 </script>
 
 <style scoped>
-.inset-card {
+.purchase-container {
   background-color: #f5f5f5;
   border: 1px solid #e0e0e0;
   border-radius: 12px;
   padding: 12px 16px;
 
-  max-width: var(--inset-card-width);
+  max-width: var(--purchase-container-width);
   margin: 0 auto;
 }
 
-.inset-card:active {
+.purchase-container:active {
   background-color: #efefef;
   transition: 0.3s all;
-}
-
-.inset-card-inactive {
-  border-color: var(--q-negative);
 }
 
 .purchase-totals {
@@ -346,7 +335,7 @@ const payments: Payment[] = [
 }
 
 .purchase-status {
-  max-width: calc(var(--inset-card-width) - var(--purchase-status-offset));
+  max-width: var(--purchase-status-width);
   margin: 0 auto;
 }
 
@@ -360,13 +349,13 @@ const payments: Payment[] = [
   justify-items: end;
 }
 
-.bordered {
+.payment-item {
   padding: 8px 12px;
   border: 1px #26cf4d solid;
   border-radius: 6px;
 }
 
-.bordered-negative {
+.payment-item-negative {
   border-color: var(--q-negative);
 }
 </style>

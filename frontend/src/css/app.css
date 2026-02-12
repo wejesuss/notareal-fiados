@@ -1,7 +1,7 @@
 /* app global css */
 :root {
-  --inset-card-width: 650px;
-  --purchase-status-offset: 180px;
+  --purchase-container-width: 650px;
+  --purchase-status-width: 500px;
 }
 
 .letter-spaced {
