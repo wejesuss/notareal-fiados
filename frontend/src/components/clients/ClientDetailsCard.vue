@@ -128,8 +128,6 @@
               class="full-width"
               :disable="submitting"
               @click="navigateTo(clientEditRoute)"
-              @keydown.enter="navigateTo(clientEditRoute)"
-              @keydown.space.prevent="navigateTo(clientEditRoute)"
             >
               <q-icon name="edit" class="q-mr-sm" size="xs" />
               <span class="text-body2 text-weight-medium">Editar cliente</span>
@@ -142,32 +140,45 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, toRef, watch } from "vue";
-import { useQuasar } from "quasar";
+import { computed, toRef, watch } from "vue";
 import type { ClientUpdate } from "src/models";
 import { updateClient } from "src/services";
 import { formatDate } from "src/utils/formatters/date";
-import { useNavigation } from "src/composables/useNavigation";
-import ContentState from "./ContentState.vue";
-import { useClientDetails } from "src/composables/useClientDetails";
+import {
+  useNavigation,
+  useClientDetails,
+  useActiveToggleConfirmation,
+} from "src/composables";
+import { ContentState } from "src/components/common";
 
 interface ClientDetailsCardProps {
   clientId: number;
 }
 type LoadState = "loading" | "error" | "empty" | "ready";
+const dialogConfig = {
+  title: "Tem certeza que deseja desativar este cliente?",
+  message: `Este cliente não poderá ser usado para novas operações e todas as suas compras e pagamentos serão desativadas.`,
+  checkboxLabel: "Entendo e desejo desativar o cliente",
+};
+const notifyConfig = {
+  disabledMessage: "Cliente desativado com sucesso.",
+  enabledMessage: "Cliente ativado. Compras e pagamentos não serão ativadas.",
+  errorMessage: "Erro ao atualizar status do cliente.",
+};
 
 const props = defineProps<ClientDetailsCardProps>();
-
-const $q = useQuasar();
 const { navigateTo } = useNavigation();
 const { loading, error, client } = useClientDetails(toRef(props, "clientId"));
+const { submitting, isActive, submitDialog } = useActiveToggleConfirmation(
+  toRef(client),
+  dialogConfig,
+  notifyConfig,
+  submit,
+);
 
 const emit = defineEmits<{
   (e: "load-error", error: Error): void;
 }>();
-
-const submitting = ref(false);
-const isActive = ref(false);
 
 const clientEditRoute = computed(() => `/clients/${props.clientId}/edit`);
 const errorMessage = computed(() => {
@@ -181,71 +192,9 @@ const loadState = computed<LoadState>(() => {
   return "ready";
 });
 
-watch(
-  client,
-  (c) => {
-    isActive.value = !!c?.isActive;
-  },
-  { immediate: true },
-);
 watch(error, (err) => {
   if (err) emit("load-error", new Error(errorMessage.value));
 });
-
-async function confirmClientDisable(): Promise<boolean> {
-  return new Promise((resolve) => {
-    $q.dialog({
-      title: "Tem certeza que deseja desativar este cliente?",
-      message: `Este cliente não poderá ser usado para novas operações e todas as suas compras e pagamentos serão desativadas.`,
-      options: {
-        model: [""],
-        type: "checkbox",
-        isValid: (model) => model.includes("opt1"),
-        items: [
-          { label: "Entendo e desejo desativar o cliente", value: "opt1" },
-        ],
-      },
-      cancel: "Cancelar",
-      ok: "Desativar",
-      noBackdropDismiss: true,
-    })
-      .onCancel(() => resolve(false))
-      .onOk(() => resolve(true));
-  });
-}
-
-async function submitDialog(nextValue: boolean) {
-  if (submitting.value || !client.value) return;
-  const previousIsActive = isActive.value;
-
-  if (nextValue === false) {
-    const confirmed = await confirmClientDisable();
-    if (!confirmed) return;
-  }
-
-  submitting.value = true;
-  isActive.value = nextValue;
-  try {
-    await submit(nextValue);
-
-    $q.notify({
-      type: "positive",
-      message: !nextValue
-        ? "Cliente desativado com sucesso"
-        : "Cliente ativado. Compras e pagamentos não serão ativadas.",
-    });
-  } catch (e) {
-    console.error(e, typeof e);
-    isActive.value = previousIsActive;
-
-    $q.notify({
-      type: "negative",
-      message: "Erro ao atualizar status do cliente",
-    });
-  } finally {
-    submitting.value = false;
-  }
-}
 
 async function submit(nextValue: boolean) {
   const payload: ClientUpdate = {

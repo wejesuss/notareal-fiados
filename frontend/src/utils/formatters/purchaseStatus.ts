@@ -1,4 +1,4 @@
-import type { PurchaseStatusUI } from "src/components/models";
+import type { PurchaseStatusUI } from "src/components/types";
 import type { PurchaseStatus } from "src/models";
 
 type PurchaseStatusMap = Record<PurchaseStatus, string>;
@@ -33,5 +33,6 @@ export function getPurchaseStatusUI(
   return {
     label: formatStatus(status, options),
     color: statusColor[status],
+    textColor: `text-${statusColor[status]}`,
   };
 }

@@ -92,16 +92,16 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { useNavigation } from "src/composables/useNavigation";
+import { useNavigation } from "src/composables/core/useNavigation";
 import { formatCurrency } from "src/utils/formatters/currency";
-import type { SystemOverviewCardProps } from "./models";
+import type { SystemOverviewCardProps } from "src/components/types";
 
 const props = defineProps<SystemOverviewCardProps>();
 const { navigateTo } = useNavigation();
 
 // header
 const statusLabel = computed(() =>
-  props.isHealthy ? "Sistema ativo" : "Sistema com problemas"
+  props.isHealthy ? "Sistema ativo" : "Sistema com problemas",
 );
 const statusColor = computed(() => (props.isHealthy ? "positive" : "negative"));
 const statusIcon = computed(() => (props.isHealthy ? "check_circle" : "error"));

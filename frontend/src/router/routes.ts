@@ -1,5 +1,5 @@
 import type { RouteRecordRaw } from "vue-router";
-import { validateClientID } from "./guards";
+import { validateClientID, validatePurchaseID } from "./guards";
 
 const routes: RouteRecordRaw[] = [
   {
@@ -32,6 +32,11 @@ const routes: RouteRecordRaw[] = [
         path: "/clients/:id/purchases",
         component: () => import("pages/clients/ClientPurchasesPage.vue"),
         beforeEnter: validateClientID,
+      },
+      {
+        path: "/purchases/:id",
+        component: () => import("pages/purchases/PurchaseViewPage.vue"),
+        beforeEnter: validatePurchaseID,
       },
     ],
   },

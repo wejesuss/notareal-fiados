@@ -6,3 +6,12 @@ export const validateClientID: NavigationGuard = (to) => {
     return "/clients";
   }
 };
+
+export const validatePurchaseID: NavigationGuard = (to, from) => {
+  console.log(from);
+
+  const id = Number(to.params.id);
+  if (!Number.isInteger(id) || id <= 0) {
+    return "/purchases";
+  }
+};

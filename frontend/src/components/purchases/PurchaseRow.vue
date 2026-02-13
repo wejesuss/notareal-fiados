@@ -15,7 +15,6 @@
       <q-item-label v-if="isCompact">
         <!-- Status chip inlined for small screens -->
         <PurchaseStatusChip
-          class="q-mt-sm"
           :label="purchase.statusUI.label"
           :color="purchase.statusUI.color"
         />
@@ -80,10 +79,12 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useQuasar } from "quasar";
-import type { PurchaseUI } from "./models";
-import PurchaseAmounts from "src/components/PurchaseAmounts.vue";
-import PurchaseStatusChip from "src/components/PurchaseStatusChip.vue";
-import PurchaseTimeStamps from "src/components/PurchaseTimeStamps.vue";
+import type { PurchaseUI } from "src/components/types";
+import {
+  PurchaseAmounts,
+  PurchaseStatusChip,
+  PurchaseTimeStamps,
+} from "src/components/purchases";
 
 defineProps<{
   purchase: PurchaseUI;

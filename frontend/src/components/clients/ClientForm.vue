@@ -95,7 +95,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { QForm } from "quasar";
-import type { ClientPayload } from "./models";
+import type { ClientPayload } from "../types";
 
 interface ClientFormProps {
   payload?: ClientPayload;
@@ -121,7 +121,7 @@ watch(
     if (!payload) return;
     formData.value = { ...payload };
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 const isFormValid = computed(() => !!formData.value.name);

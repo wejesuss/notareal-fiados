@@ -13,3 +13,10 @@ export interface Purchase {
   createdAt: string; // ISO date
   updatedAt: string; // ISO date
 }
+
+export interface PurchaseUpdate {
+  clientId?: number;
+  description?: string;
+  totalValue?: number;
+  isActive?: boolean;
+}
