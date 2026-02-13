@@ -1,5 +1,6 @@
-import type { Purchase, PurchaseUpdate } from "src/models";
+import type { Purchase, PurchaseUpdate, Payment } from "src/models";
 import { sleep } from "src/utils/timing/sleep";
+import { getPayments } from "./payment";
 
 const purchases: Purchase[] = [
   {
@@ -96,4 +97,12 @@ export async function getClientRecentPurchases(
       return p.clientId === clientId;
     })
     .slice(0, limit);
+}
+
+// Payment related functions
+export async function getPurchasePayments(
+  purchaseId: number
+): Promise<Payment[]> {
+  const payments = await getPayments();
+  return payments.filter((p) => p.purchaseId === purchaseId);
 }

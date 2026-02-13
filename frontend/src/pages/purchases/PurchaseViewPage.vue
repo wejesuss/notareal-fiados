@@ -69,10 +69,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, toRef } from "vue";
+import { computed, ref, toRef, watch } from "vue";
 import { useRoute } from "vue-router";
-import { updatePurchase } from "src/services";
-import type { PurchaseUpdate } from "src/models";
+import { getPurchasePayments, updatePurchase } from "src/services";
+import type { Payment, PurchaseUpdate } from "src/models";
 import { formatCurrency, formatDate } from "src/utils/formatters";
 import {
   useActiveToggleConfirmation,
@@ -81,19 +81,6 @@ import {
 } from "src/composables";
 import { PurchaseDetailsCard } from "src/components/purchases";
 import { ContentState } from "src/components/common";
-
-interface Payment {
-  id: number;
-  purchaseId: number;
-  description: string | null;
-  amount: number;
-  paymentDate: Date | string | null;
-  method: string;
-  receiptNumber: string; // REC-0001
-  isActive: boolean;
-  createdAt: Date | string;
-  updatedAt: Date | string;
-}
 
 const dialogConfig = {
   title: "Tem certeza que deseja desativar esta compra?",
@@ -121,6 +108,14 @@ const { submitting, isActive, submitDialog } = useActiveToggleConfirmation(
   dialogConfig,
   notifyConfig,
   submit,
+);
+const payments = ref<Payment[]>([]);
+watch(
+  purchaseId,
+  async (newPurchaseId) => {
+    payments.value = await getPurchasePayments(newPurchaseId);
+  },
+  { immediate: true },
 );
 
 const loadState = computed(() => {
@@ -155,21 +150,6 @@ async function submit(nextValue: boolean) {
   // Keep local purchase snapshot in sync after successful update
   purchase.value = updated;
 }
-
-const payments: Payment[] = [
-  {
-    id: 1,
-    purchaseId: purchase.value?.id || 2,
-    description: "Pagamento adiantado",
-    amount: 50,
-    paymentDate: "2026-02-03T19:36:37.000Z",
-    method: "Pix",
-    receiptNumber: "REC-002-001",
-    isActive: true,
-    createdAt: "2026-02-03T19:36:37.000Z",
-    updatedAt: "2026-02-03T19:36:37.000Z",
-  },
-];
 </script>
 
 <style scoped>
