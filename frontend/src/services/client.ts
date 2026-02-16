@@ -1,8 +1,11 @@
+import { api } from "src/boot/axios";
 import type {
   Client,
   ClientCreate,
   ClientSummary,
   ClientUpdate,
+  ClientListParams,
+  ClientListResponse,
 } from "src/models";
 import { sleep } from "src/utils/timing/sleep";
 
@@ -32,8 +35,14 @@ const summaries: ClientSummary[] = [
   { clientId: 2, totalPurchases: 7, totalPaid: 0, outstandingBalance: 130.7 },
 ];
 
-export function getClients(): Client[] {
-  return clients;
+export async function getClients(params?: ClientListParams): Promise<Client[]> {
+  const { data } = await api.get<ClientListResponse>("/clients", {
+    params: params,
+  });
+
+  console.log(data.message);
+
+  return data.clients;
 }
 
 export function getRecentClients(limit: number = 5): Client[] {

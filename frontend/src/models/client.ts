@@ -1,3 +1,4 @@
+// Frontend models
 export interface Client {
   id: number;
   name: string;
@@ -30,3 +31,12 @@ export interface ClientSummary {
   totalPaid: number;
   outstandingBalance: number;
 }
+
+// API models
+export type ClientListParams = {
+  onlyActive?: boolean;
+  limit?: number;
+  offset?: number;
+};
+
+export type ClientListResponse = { message: string; clients: Client[] };

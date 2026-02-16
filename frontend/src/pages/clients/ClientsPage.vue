@@ -118,11 +118,19 @@
 import { computed, ref, watch } from "vue";
 import { useNavigation } from "src/composables/core/useNavigation";
 import { getClients } from "src/services";
+import type { Client } from "src/models";
 
 const page = ref(1);
 const rowsPerPage = 10;
 
-const clients = computed(() => getClients());
+const clients = ref<Client[]>([]);
+watch(
+  () => rowsPerPage,
+  async () => {
+    clients.value = await getClients({ onlyActive: false });
+  },
+  { immediate: true },
+);
 const totalPages = computed(() =>
   Math.ceil(clients.value.length / rowsPerPage),
 );
