@@ -115,36 +115,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
 import { useNavigation } from "src/composables/core/useNavigation";
-import { getClients } from "src/services";
-import type { Client } from "src/models";
+import { useClients } from "src/composables";
 
-const page = ref(1);
+const onlyActive = false;
 const rowsPerPage = 10;
 
-const clients = ref<Client[]>([]);
-watch(
-  () => rowsPerPage,
-  async () => {
-    clients.value = await getClients({ onlyActive: false });
-  },
-  { immediate: true },
+const { clients, page, paginatedClients, totalPages } = useClients(
+  onlyActive,
+  rowsPerPage,
 );
-const totalPages = computed(() =>
-  Math.ceil(clients.value.length / rowsPerPage),
-);
-const paginatedClients = computed(() => {
-  const start = (page.value - 1) * rowsPerPage;
-  return clients.value.slice(start, start + rowsPerPage);
-});
 
-watch(
-  () => clients.value.length,
-  () => {
-    page.value = 1;
-  },
-);
 const { navigateTo } = useNavigation();
 </script>
 
