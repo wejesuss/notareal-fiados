@@ -61,6 +61,7 @@ class ClientWithMessageResponseSchema(BaseModel):
 class ClientListResponseSchema(BaseModel):
     message: str
     clients: List[ClientResponseSchema]
+    total: int
 
 
 # ===== LISTING =====

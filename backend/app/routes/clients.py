@@ -30,8 +30,12 @@ def list_clients(params: ClientListQuerySchema = Depends()):
     offset = params.offset
     only_active = params.only_active
 
-    clients = get_clients(limit, offset, only_active)
-    return {"message": "Clientes encontrados.", "clients": clients}
+    result = get_clients(limit, offset, only_active)
+    return {
+        "message": "Clientes encontrados.",
+        "total": result.total,
+        "clients": result.items,
+    }
 
 
 @router.get("/{client_id}", response_model=ClientResponseSchema)
