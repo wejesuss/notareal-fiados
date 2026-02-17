@@ -1,8 +1,8 @@
-import { computed, ref, watch } from "vue";
+import { computed, type Ref, ref, watch } from "vue";
 import type { Client } from "src/models";
 import { getClients } from "src/services/client";
 
-export function useClients(rowsPerPage: number = 10, onlyActive?: boolean) {
+export function useClients(rowsPerPage: Ref<number>, onlyActive: Ref<boolean>) {
   const loading = ref(false);
   const error = ref<Error | null>(null);
   const clients = ref<Client[]>([]);
@@ -10,7 +10,7 @@ export function useClients(rowsPerPage: number = 10, onlyActive?: boolean) {
   const total = ref(0);
 
   const totalPages = computed(() =>
-    Math.max(1, Math.ceil(total.value / rowsPerPage))
+    Math.max(1, Math.ceil(total.value / rowsPerPage.value))
   );
 
   async function fetchClients() {
@@ -18,11 +18,11 @@ export function useClients(rowsPerPage: number = 10, onlyActive?: boolean) {
     error.value = null;
 
     try {
-      const offset = (page.value - 1) * rowsPerPage;
+      const offset = (page.value - 1) * rowsPerPage.value;
       const response = await getClients({
-        limit: rowsPerPage,
+        limit: rowsPerPage.value,
         offset,
-        onlyActive: onlyActive ?? true,
+        onlyActive: onlyActive.value,
       });
 
       clients.value = response.clients;
@@ -38,6 +38,13 @@ export function useClients(rowsPerPage: number = 10, onlyActive?: boolean) {
   }
 
   watch(page, fetchClients, { immediate: true });
+  watch([rowsPerPage, onlyActive], async () => {
+    if (page.value !== 1) {
+      page.value = 1;
+    } else {
+      await fetchClients();
+    }
+  });
 
   return {
     loading,

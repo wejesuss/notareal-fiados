@@ -14,8 +14,31 @@
 
     <!-- Content -->
     <q-card>
-      <q-card-section>
+      <q-card-section class="row items-center justify-between">
         <div class="text-subtitle1">Lista de clientes</div>
+        <div class="row items-center q-gutter-sm q-gutter-x-md">
+          <q-select
+            v-model="onlyActive"
+            :options="activeOptions"
+            label="Filtro"
+            dense
+            outlined
+            emit-value
+            map-options
+            style="min-width: 160px"
+          ></q-select>
+
+          <q-select
+            v-model="rowsPerPage"
+            :options="rowsOptions"
+            label="Por página"
+            dense
+            outlined
+            emit-value
+            map-options
+            style="min-width: 120px"
+          ></q-select>
+        </div>
       </q-card-section>
 
       <q-separator />
@@ -117,9 +140,20 @@
 <script setup lang="ts">
 import { useNavigation } from "src/composables/core/useNavigation";
 import { useClients } from "src/composables";
+import { ref } from "vue";
 
-const onlyActive = false;
-const rowsPerPage = 10;
+const onlyActive = ref(true);
+const rowsPerPage = ref(10);
+
+const activeOptions = [
+  { label: "Todos", value: false },
+  { label: "Somente Ativos", value: true },
+];
+const rowsOptions = [
+  { label: "10", value: 10 },
+  { label: "20", value: 20 },
+  { label: "50", value: 50 },
+];
 
 const { clients, page, totalPages } = useClients(rowsPerPage, onlyActive);
 
