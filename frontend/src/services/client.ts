@@ -35,14 +35,14 @@ const summaries: ClientSummary[] = [
   { clientId: 2, totalPurchases: 7, totalPaid: 0, outstandingBalance: 130.7 },
 ];
 
-export async function getClients(params?: ClientListParams): Promise<Client[]> {
+export async function getClients(
+  params?: ClientListParams
+): Promise<ClientListResponse> {
   const { data } = await api.get<ClientListResponse>("/clients", {
     params: params,
   });
 
-  console.log(data.message);
-
-  return data.clients;
+  return data;
 }
 
 export function getRecentClients(limit: number = 5): Client[] {

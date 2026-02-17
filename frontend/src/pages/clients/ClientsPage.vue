@@ -41,7 +41,7 @@
 
       <q-list v-else class="q-pb-sm">
         <q-item
-          v-for="client in paginatedClients"
+          v-for="client in clients"
           :key="client.id"
           clickable
           v-ripple
@@ -105,7 +105,7 @@
       >
       </q-pagination>
 
-      <div v-else class="text-center q-pb-sm">
+      <div v-if="page == totalPages" class="text-center q-pb-sm">
         <span class="text-caption text-grey-7 letter-spaced"
           >Todos os registros exibidos</span
         >
@@ -121,10 +121,7 @@ import { useClients } from "src/composables";
 const onlyActive = false;
 const rowsPerPage = 10;
 
-const { clients, page, paginatedClients, totalPages } = useClients(
-  onlyActive,
-  rowsPerPage,
-);
+const { clients, page, totalPages } = useClients(rowsPerPage, onlyActive);
 
 const { navigateTo } = useNavigation();
 </script>

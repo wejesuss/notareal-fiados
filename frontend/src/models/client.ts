@@ -39,4 +39,8 @@ export type ClientListParams = {
   offset?: number;
 };
 
-export type ClientListResponse = { message: string; clients: Client[] };
+export type ClientListResponse = {
+  message: string;
+  total: number;
+  clients: Client[];
+};
