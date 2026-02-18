@@ -2,11 +2,15 @@ import { computed, type Ref, ref, watch } from "vue";
 import type { Client } from "src/models";
 import { getClients } from "src/services/client";
 
-export function useClients(rowsPerPage: Ref<number>, onlyActive: Ref<boolean>) {
+export function useClients(
+  page: Ref<number>,
+  rowsPerPage: Ref<number>,
+  onlyActive: Ref<boolean>
+) {
   const loading = ref(false);
   const error = ref<Error | null>(null);
   const clients = ref<Client[]>([]);
-  const page = ref(1);
+
   const total = ref(0);
 
   const totalPages = computed(() =>
@@ -37,7 +41,7 @@ export function useClients(rowsPerPage: Ref<number>, onlyActive: Ref<boolean>) {
     }
   }
 
-  watch(page, fetchClients, { immediate: true });
+  watch([page, rowsPerPage, onlyActive], fetchClients, { immediate: true });
   watch([rowsPerPage, onlyActive], async () => {
     if (page.value !== 1) {
       page.value = 1;
@@ -49,7 +53,6 @@ export function useClients(rowsPerPage: Ref<number>, onlyActive: Ref<boolean>) {
   return {
     loading,
     error,
-    page,
     totalPages,
     clients,
     reload: fetchClients,

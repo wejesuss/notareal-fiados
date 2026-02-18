@@ -159,15 +159,13 @@
 </template>
 
 <script setup lang="ts">
-import { useNavigation, useClients } from "src/composables";
-import { computed, ref } from "vue";
+import { useNavigation, useClients, useClientsQuery } from "src/composables";
+import { computed } from "vue";
 import { ContentState } from "src/components/common";
 
 type LoadState = "loading" | "error" | "empty" | "ready";
 
 const { navigateTo } = useNavigation();
-const onlyActive = ref(true);
-const rowsPerPage = ref(10);
 
 const activeOptions = [
   { label: "Todos", value: false },
@@ -179,7 +177,11 @@ const rowsOptions = [
   { label: "50", value: 50 },
 ];
 
-const { loading, error, clients, page, totalPages, reload } = useClients(
+const { page, rowsPerPage, onlyActive } = useClientsQuery(
+  rowsOptions.map((row) => row.value),
+);
+const { loading, error, clients, totalPages, reload } = useClients(
+  page,
   rowsPerPage,
   onlyActive,
 );
