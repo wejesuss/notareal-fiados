@@ -10,14 +10,17 @@ export function useClients(
   const loading = ref(false);
   const error = ref<Error | null>(null);
   const clients = ref<Client[]>([]);
-
   const total = ref(0);
+
+  let requestId = 0;
 
   const totalPages = computed(() =>
     Math.max(1, Math.ceil(total.value / rowsPerPage.value))
   );
 
   async function fetchClients() {
+    const currentId = ++requestId;
+
     loading.value = true;
     error.value = null;
 
@@ -29,6 +32,11 @@ export function useClients(
         onlyActive: onlyActive.value,
       });
 
+      // Ignore outdated response
+      if (currentId !== requestId) {
+        return;
+      }
+
       clients.value = response.clients;
       total.value = response.total;
     } catch (e) {
@@ -37,7 +45,9 @@ export function useClients(
       clients.value = [];
       total.value = 0;
     } finally {
-      loading.value = false;
+      if (currentId === requestId) {
+        loading.value = false;
+      }
     }
   }
 
