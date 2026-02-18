@@ -206,6 +206,10 @@ const errorMessage = computed(
   border: 1px solid #e0e0e0;
   border-radius: 12px;
   background-color: #fafafa;
+
+  max-width: 560px;
+  margin-inline: auto;
+  width: 100%;
 }
 
 .client-row:active {
