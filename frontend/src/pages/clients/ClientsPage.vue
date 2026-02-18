@@ -12,8 +12,29 @@
       />
     </div>
 
+    <q-card v-if="loadState === 'loading'" class="q-my-xl q-pa-md">
+      <ContentState
+        message="Carregando clientes..."
+        icon-name="person_search"
+      ></ContentState>
+    </q-card>
+
+    <q-card v-else-if="loadState === 'error'" class="q-my-xl q-pa-md">
+      <ContentState
+        :message="errorMessage"
+        message-color="text-amber-8"
+        icon-name="error_outline"
+        icon-color="amber-10"
+      ></ContentState>
+      <div class="q-mt-sm text-center">
+        <q-btn rounded outline color="grey-8" @click="reload">
+          Tentar de novo
+        </q-btn>
+      </div>
+    </q-card>
+
     <!-- Content -->
-    <q-card>
+    <q-card v-else>
       <q-card-section class="row items-center justify-between">
         <div class="text-subtitle1">Lista de clientes</div>
         <div class="row items-center q-gutter-sm q-gutter-x-md">
@@ -43,7 +64,7 @@
 
       <q-separator />
 
-      <q-card-section v-if="clients.length === 0" class="text-center q-py-xl">
+      <q-card-section v-if="loadState === 'empty'" class="text-center q-py-xl">
         <q-icon name="people_outline" size="48px" color="grey-6"></q-icon>
 
         <div class="text-subtitle1 q-mt-md">Nenhum cliente ainda</div>
@@ -138,10 +159,13 @@
 </template>
 
 <script setup lang="ts">
-import { useNavigation } from "src/composables/core/useNavigation";
-import { useClients } from "src/composables";
-import { ref } from "vue";
+import { useNavigation, useClients } from "src/composables";
+import { computed, ref } from "vue";
+import { ContentState } from "src/components/common";
 
+type LoadState = "loading" | "error" | "empty" | "ready";
+
+const { navigateTo } = useNavigation();
 const onlyActive = ref(true);
 const rowsPerPage = ref(10);
 
@@ -155,9 +179,22 @@ const rowsOptions = [
   { label: "50", value: 50 },
 ];
 
-const { clients, page, totalPages } = useClients(rowsPerPage, onlyActive);
+const { loading, error, clients, page, totalPages, reload } = useClients(
+  rowsPerPage,
+  onlyActive,
+);
 
-const { navigateTo } = useNavigation();
+const loadState = computed<LoadState>(() => {
+  if (loading.value) return "loading";
+  if (error.value) return "error";
+  if (clients.value.length === 0) return "empty";
+
+  return "ready";
+});
+
+const errorMessage = computed(
+  () => error.value?.message || "Erro ao carregar clientes",
+);
 </script>
 
 <style lang="css" scoped>
