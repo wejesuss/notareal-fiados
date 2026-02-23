@@ -65,6 +65,7 @@ export function useClients(
     error,
     totalPages,
     clients,
+    total,
     reload: fetchClients,
   };
 }

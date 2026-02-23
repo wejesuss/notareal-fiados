@@ -160,7 +160,7 @@
 
 <script setup lang="ts">
 import { useNavigation, useClients, useClientsQuery } from "src/composables";
-import { computed } from "vue";
+import { computed, watch } from "vue";
 import { ContentState } from "src/components/common";
 
 type LoadState = "loading" | "error" | "empty" | "ready";
@@ -180,7 +180,7 @@ const rowsOptions = [
 const { page, rowsPerPage, onlyActive } = useClientsQuery(
   rowsOptions.map((row) => row.value),
 );
-const { loading, error, clients, totalPages, reload } = useClients(
+const { loading, error, clients, totalPages, total, reload } = useClients(
   page,
   rowsPerPage,
   onlyActive,
@@ -197,6 +197,13 @@ const loadState = computed<LoadState>(() => {
 const errorMessage = computed(
   () => error.value?.message || "Erro ao carregar clientes",
 );
+
+watch(page, () => {
+  console.log(page.value, totalPages.value, total.value);
+  if (page.value > totalPages.value) {
+    page.value = totalPages.value;
+  }
+});
 </script>
 
 <style lang="css" scoped>
