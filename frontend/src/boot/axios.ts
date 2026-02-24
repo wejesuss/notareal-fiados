@@ -37,7 +37,6 @@ api.interceptors.response.use(
           // Optional: redirect to login
         }
 
-        console.log(error.message);
         if (error.message.toLowerCase().includes("timeout")) {
           message = ErrorMessages.TimeoutError;
         }
