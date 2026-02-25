@@ -58,7 +58,7 @@ export function useListQueryState(schema: QuerySchema) {
     (acc, key) => {
       const config = schema[key];
       if (!config) {
-        throw new Error(`Objeto de configuração não possui essa chave: ${key}`);
+        throw new Error(`Query schema does not contain the key: ${key}`);
       }
 
       acc[key] = computed(() => {
@@ -95,7 +95,7 @@ export function useListQueryState(schema: QuerySchema) {
     const config = schema[key];
 
     if (!config) {
-      throw new Error(`Objeto de configuração não possui essa chave: ${key}`);
+      throw new Error(`Query schema does not contain the key: ${key}`);
     }
 
     const serialized = serializeValue(value, config);
