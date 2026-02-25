@@ -4,6 +4,13 @@ import { useRoute, useRouter } from "vue-router";
 type QueryParamType = "number" | "string" | "boolean" | "tri-boolean";
 type QueryStateTypes = number | string | boolean | null;
 
+type QueryTypeMap = {
+  number: number;
+  string: string;
+  boolean: boolean;
+  "tri-boolean": boolean | null;
+};
+
 type QueryParamConfig = {
   default: QueryStateTypes;
   type: QueryParamType;
@@ -12,9 +19,13 @@ type QueryParamConfig = {
 
 type QuerySchema = Record<string, QueryParamConfig>;
 
+type SnapshotFromSchema<T extends QuerySchema> = {
+  [K in keyof T]: QueryTypeMap[T[K]["type"]];
+};
+
 export type ListQueryReturnState = ReturnType<typeof useListQueryState>;
 
-export function useListQueryState(schema: QuerySchema) {
+export function useListQueryState<T extends QuerySchema>(schema: T) {
   const route = useRoute();
   const router = useRouter();
 
@@ -114,11 +125,11 @@ export function useListQueryState(schema: QuerySchema) {
     return await router.replace({ query: newQuery });
   }
 
-  function getSnapshot() {
-    const snapshot: Record<string, unknown> = {};
+  function getSnapshot(): SnapshotFromSchema<T> {
+    const snapshot = {} as SnapshotFromSchema<T>;
 
     for (const key in state) {
-      snapshot[key] = state[key]?.value;
+      snapshot[key as keyof T] = state[key]?.value as never;
     }
 
     return snapshot;
