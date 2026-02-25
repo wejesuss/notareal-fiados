@@ -12,6 +12,8 @@ type QueryParamConfig = {
 
 type QuerySchema = Record<string, QueryParamConfig>;
 
+export type ListQueryReturnState = ReturnType<typeof useListQueryState>;
+
 export function useListQueryState(schema: QuerySchema) {
   const route = useRoute();
   const router = useRouter();
