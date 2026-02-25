@@ -1,7 +1,7 @@
 import { computed, type ComputedRef } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { type LocationQuery, useRoute, useRouter } from "vue-router";
 
-type QueryParamType = "number" | "string" | "boolean" | "tri-boolean";
+type QueryParamType = keyof QueryTypeMap;
 type QueryStateTypes = number | string | boolean | null;
 
 type QueryTypeMap = {
@@ -22,8 +22,66 @@ type QuerySchema = Record<string, QueryParamConfig>;
 type SnapshotFromSchema<T extends QuerySchema> = {
   [K in keyof T]: QueryTypeMap[T[K]["type"]];
 };
+type ComputedFromSchema<T extends QuerySchema> = {
+  [K in keyof T]: ComputedRef<QueryTypeMap[T[K]["type"]]>;
+};
 
 export type ListQueryReturnState = ReturnType<typeof useListQueryState>;
+
+/**
+ *
+ * @param value The value to be parsed and normalized
+ * @param config Config object to interpret the type of `value` and default value fallback  if `value` is `undefined`
+ * @returns The `value` normalized as number | string | boolean | null or type of `value`
+ */
+function parseValue(
+  value: string | null | undefined,
+  config: QueryParamConfig
+): QueryStateTypes {
+  if (value === undefined) return config.default;
+
+  switch (config.type) {
+    case "number": {
+      const parsed = Number(value);
+      return Number.isNaN(parsed) ? config.default : parsed;
+    }
+
+    case "boolean":
+      return value === "true";
+
+    case "tri-boolean":
+      if (value === "true") return true;
+      if (value === "false") return false;
+      return null;
+
+    default:
+      return value;
+  }
+}
+
+function setComputedState<T extends QuerySchema>(
+  schema: T,
+  query: LocationQuery
+): ComputedFromSchema<T> {
+  const state: Partial<ComputedFromSchema<T>> = {};
+  Object.keys(schema).forEach((key) => {
+    const config = schema[key];
+    if (!config) {
+      throw new Error(`Query schema does not contain the key: ${key}`);
+    }
+
+    state[key as keyof T] = computed(() => {
+      const raw = query[key];
+      if (Array.isArray(raw)) {
+        return parseValue(raw[0], config) as QueryTypeMap[T[keyof T]["type"]];
+      }
+
+      return parseValue(raw, config) as QueryTypeMap[T[keyof T]["type"]];
+    });
+  });
+
+  return state as ComputedFromSchema<T>;
+}
 
 export function useListQueryState<T extends QuerySchema>(schema: T) {
   const route = useRoute();
@@ -34,59 +92,9 @@ export function useListQueryState<T extends QuerySchema>(schema: T) {
   }
 
   /**
-   *
-   * @param value The value to be parsed and normalized
-   * @param config Config object to interpret the type of `value` and default value fallback  if `value` is `undefined`
-   * @returns The `value` normalized as number | string | boolean | null or type of `value`
-   */
-  function parseValue(
-    value: string | null | undefined,
-    config: QueryParamConfig
-  ): QueryStateTypes {
-    if (value === undefined) return config.default;
-
-    switch (config.type) {
-      case "number": {
-        const parsed = Number(value);
-        return Number.isNaN(parsed) ? config.default : parsed;
-      }
-
-      case "boolean":
-        return value === "true";
-
-      case "tri-boolean":
-        if (value === "true") return true;
-        if (value === "false") return false;
-        return null;
-
-      default:
-        return value;
-    }
-  }
-
-  /**
    * @constant `state` - The property where query state is preserved and computed
    */
-  const state = Object.keys(schema).reduce(
-    (acc, key) => {
-      const config = schema[key];
-      if (!config) {
-        throw new Error(`Query schema does not contain the key: ${key}`);
-      }
-
-      acc[key] = computed(() => {
-        const raw = route.query[key];
-        if (Array.isArray(raw)) {
-          return parseValue(raw[0], config);
-        }
-
-        return parseValue(raw, config);
-      });
-
-      return acc;
-    },
-    {} as Record<string, ComputedRef<QueryStateTypes>>
-  );
+  const state: ComputedFromSchema<T> = setComputedState(schema, route.query);
 
   function serializeValue(value: QueryStateTypes, config: QueryParamConfig) {
     if (value === null || value === config.default || value === undefined) {
@@ -128,9 +136,9 @@ export function useListQueryState<T extends QuerySchema>(schema: T) {
   function getSnapshot(): SnapshotFromSchema<T> {
     const snapshot = {} as SnapshotFromSchema<T>;
 
-    for (const key in state) {
-      snapshot[key as keyof T] = state[key]?.value as never;
-    }
+    (Object.keys(state) as Array<keyof T>).forEach((key) => {
+      snapshot[key] = state[key].value;
+    });
 
     return snapshot;
   }
