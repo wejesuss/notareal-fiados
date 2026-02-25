@@ -13,12 +13,12 @@ type QueryParamConfig = {
 type QuerySchema = Record<string, QueryParamConfig>;
 
 export function useListQueryState(schema: QuerySchema) {
-  /**
-   * TODO: Ensure page is correctly set to 1 when undefined
-   *
-   **/
   const route = useRoute();
   const router = useRouter();
+
+  if (!schema.page) {
+    throw new Error("Missing 'page' field inside 'schema'");
+  }
 
   /**
    *
@@ -112,7 +112,6 @@ export function useListQueryState(schema: QuerySchema) {
     return await router.replace({ query: newQuery });
   }
 
-  //  * TODO: Create a getSnapshot function to get computed/query state
   function getSnapshot() {
     const snapshot: Record<string, unknown> = {};
 
