@@ -63,7 +63,8 @@ function setComputedState<T extends QuerySchema>(
   schema: T,
   query: LocationQuery
 ): ComputedFromSchema<T> {
-  const state: Partial<ComputedFromSchema<T>> = {};
+  const state = {} as ComputedFromSchema<T>;
+
   Object.keys(schema).forEach((key) => {
     const config = schema[key];
     if (!config) {
@@ -80,7 +81,7 @@ function setComputedState<T extends QuerySchema>(
     });
   });
 
-  return state as ComputedFromSchema<T>;
+  return state;
 }
 
 export function useListQueryState<T extends QuerySchema>(schema: T) {
@@ -94,7 +95,7 @@ export function useListQueryState<T extends QuerySchema>(schema: T) {
   /**
    * @constant `state` - The property where query state is preserved and computed
    */
-  const state: ComputedFromSchema<T> = setComputedState(schema, route.query);
+  const state = setComputedState(schema, route.query);
 
   function serializeValue(value: QueryStateTypes, config: QueryParamConfig) {
     if (value === null || value === config.default || value === undefined) {
