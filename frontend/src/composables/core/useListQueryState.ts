@@ -97,7 +97,10 @@ export function useListQueryState<T extends QuerySchema>(schema: T) {
    */
   const state = setComputedState(schema, route.query);
 
-  function serializeValue(value: QueryStateTypes, config: QueryParamConfig) {
+  function serializeValue<K extends keyof T>(
+    value: QueryTypeMap[T[K]["type"]],
+    config: QueryParamConfig
+  ) {
     if (value === null || value === config.default || value === undefined) {
       return undefined;
     }
@@ -112,19 +115,23 @@ export function useListQueryState<T extends QuerySchema>(schema: T) {
    *
    * If `value` is undefined|null *key/value* pair is removed from route
    */
-  async function setField(key: string, value: QueryStateTypes) {
+  async function setField<K extends keyof T>(
+    key: K,
+    value: QueryTypeMap[T[K]["type"]]
+  ) {
     const newQuery = { ...route.query };
     const config = schema[key];
+    const keyStr = String(key);
 
     if (!config) {
-      throw new Error(`Query schema does not contain the key: ${key}`);
+      throw new Error(`Query schema does not contain the key: ${keyStr}`);
     }
 
     const serialized = serializeValue(value, config);
     if (serialized === undefined) {
-      delete newQuery[key];
+      delete newQuery[keyStr];
     } else {
-      newQuery[key] = serialized;
+      newQuery[keyStr] = serialized;
     }
 
     if (config.resetPageOnChange && key !== "page") {
