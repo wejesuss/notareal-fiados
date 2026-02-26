@@ -1,15 +1,15 @@
 import { computed, type ComputedRef } from "vue";
 import { type LocationQuery, useRoute, useRouter } from "vue-router";
 
-type QueryParamType = keyof QueryTypeMap;
-type QueryStateTypes = number | string | boolean | null;
-
 type QueryTypeMap = {
   number: number;
   string: string;
   boolean: boolean;
   "tri-boolean": boolean | null;
 };
+
+type QueryParamType = keyof QueryTypeMap;
+type QueryStateTypes = number | string | boolean | null;
 
 type QueryParamConfig = {
   default: QueryStateTypes;
