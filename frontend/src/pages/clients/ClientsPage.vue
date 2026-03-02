@@ -39,7 +39,7 @@
         <div class="text-subtitle1">Lista de clientes</div>
         <div class="row items-center q-gutter-sm q-gutter-x-md">
           <q-select
-            :model-value="schema.state.onlyActive.value"
+            :model-value="onlyActive"
             @update:model-value="
               (vl: boolean) => schema.setField('onlyActive', vl)
             "
@@ -53,7 +53,7 @@
           ></q-select>
 
           <q-select
-            :model-value="schema.state.rowsPerPage.value"
+            :model-value="rowsPerPage"
             @update:model-value="
               (vl: number) => schema.setField('rowsPerPage', vl)
             "
@@ -146,7 +146,7 @@
       </q-list>
 
       <q-pagination
-        :model-value="schema.state.page.value"
+        :model-value="page"
         @update:model-value="(vl: number) => schema.setField('page', vl)"
         :max="totalPages"
         direction-links
@@ -156,10 +156,7 @@
       >
       </q-pagination>
 
-      <div
-        v-if="schema.state.page.value == totalPages"
-        class="text-center q-pb-sm"
-      >
+      <div v-if="page == totalPages" class="text-center q-pb-sm">
         <span class="text-caption text-grey-7 letter-spaced"
           >Todos os registros exibidos</span
         >
@@ -193,6 +190,9 @@ const schema = useListQueryState({
   onlyActive: { default: true, type: "boolean", resetPageOnChange: true },
 });
 
+const page = computed(() => schema.state.page.value);
+const rowsPerPage = computed(() => schema.state.rowsPerPage.value);
+const onlyActive = computed(() => schema.state.onlyActive.value);
 const { loading, error, clients, totalPages, reload } = useClients(schema);
 
 const loadState = computed<LoadState>(() => {
