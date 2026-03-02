@@ -1,5 +1,5 @@
 import { computed, type ComputedRef } from "vue";
-import { type LocationQuery, useRoute, useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 type QueryTypeMap = {
   number: number;
@@ -61,7 +61,7 @@ function parseValue(
 
 function setComputedState<T extends QuerySchema>(
   schema: T,
-  query: LocationQuery
+  route: ReturnType<typeof useRoute>
 ): ComputedFromSchema<T> {
   const state = {} as ComputedFromSchema<T>;
 
@@ -72,7 +72,7 @@ function setComputedState<T extends QuerySchema>(
     }
 
     state[key as keyof T] = computed(() => {
-      const raw = query[key];
+      const raw = route.query[key];
       if (Array.isArray(raw)) {
         return parseValue(raw[0], config) as QueryTypeMap[T[keyof T]["type"]];
       }
@@ -95,7 +95,7 @@ export function useListQueryState<T extends QuerySchema>(schema: T) {
   /**
    * @constant `state` - The property where query state is preserved and computed
    */
-  const state = setComputedState(schema, route.query);
+  const state = setComputedState(schema, route);
 
   function serializeValue<K extends keyof T>(
     value: QueryTypeMap[T[K]["type"]],
