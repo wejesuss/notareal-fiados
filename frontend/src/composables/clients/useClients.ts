@@ -1,22 +1,23 @@
-import { computed, type Ref, ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import type { Client } from "src/models";
 import { getClients } from "src/services/client";
+import { type ListQueryReturnState } from "src/composables";
 
-export function useClients(
-  page: Ref<number>,
-  rowsPerPage: Ref<number>,
-  onlyActive: Ref<boolean>
-) {
+export function useClients(schema: ListQueryReturnState) {
   const loading = ref(false);
   const error = ref<Error | null>(null);
   const clients = ref<Client[]>([]);
   const total = ref(0);
 
   let requestId = 0;
+  let page = Number(schema.state.page?.value);
+  let rowsPerPage = Number(schema.state.rowsPerPage?.value);
+  let onlyActive = schema.state.onlyActive?.value === "true";
 
-  const totalPages = computed(() =>
-    Math.max(1, Math.ceil(total.value / rowsPerPage.value))
-  );
+  const totalPages = computed(() => {
+    if (!schema.state.rowsPerPage?.value) return 1;
+    return Math.max(1, Math.ceil(total.value / rowsPerPage));
+  });
 
   async function fetchClients() {
     const currentId = ++requestId;
@@ -25,11 +26,11 @@ export function useClients(
     error.value = null;
 
     try {
-      const offset = (page.value - 1) * rowsPerPage.value;
+      const offset = (page - 1) * rowsPerPage;
       const response = await getClients({
-        limit: rowsPerPage.value,
+        limit: rowsPerPage,
         offset,
-        onlyActive: onlyActive.value,
+        onlyActive: onlyActive,
       });
 
       // Ignore outdated response
@@ -51,14 +52,16 @@ export function useClients(
     }
   }
 
-  watch([page, rowsPerPage, onlyActive], fetchClients, { immediate: true });
-  watch([rowsPerPage, onlyActive], async () => {
-    if (page.value !== 1) {
-      page.value = 1;
-    } else {
+  watch(
+    () => schema.getSnapshot(),
+    async () => {
+      page = Number(schema.state.page?.value);
+      rowsPerPage = Number(schema.state.rowsPerPage?.value);
+      onlyActive = schema.state.onlyActive?.value === "true";
       await fetchClients();
-    }
-  });
+    },
+    { immediate: true }
+  );
 
   return {
     loading,

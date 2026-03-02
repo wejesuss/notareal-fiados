@@ -3,7 +3,6 @@ export * from "./core/useActiveToggleConfirmation";
 export * from "./core/useListQueryState";
 
 export * from "./clients/useClients";
-export * from "./clients/useClientsQuery";
 export * from "./clients/useClientDetails";
 export * from "./clients/useClientSummary";
 export * from "./clients/useClientRecentPurchases";

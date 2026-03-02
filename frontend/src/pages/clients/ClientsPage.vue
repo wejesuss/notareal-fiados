@@ -39,7 +39,10 @@
         <div class="text-subtitle1">Lista de clientes</div>
         <div class="row items-center q-gutter-sm q-gutter-x-md">
           <q-select
-            v-model="onlyActive"
+            :model-value="schema.state.onlyActive.value"
+            @update:model-value="
+              (vl: boolean) => schema.setField('onlyActive', vl)
+            "
             :options="activeOptions"
             label="Filtro"
             dense
@@ -50,7 +53,10 @@
           ></q-select>
 
           <q-select
-            v-model="rowsPerPage"
+            :model-value="schema.state.rowsPerPage.value"
+            @update:model-value="
+              (vl: number) => schema.setField('rowsPerPage', vl)
+            "
             :options="rowsOptions"
             label="Por página"
             dense
@@ -140,7 +146,8 @@
       </q-list>
 
       <q-pagination
-        v-model="page"
+        :model-value="schema.state.page.value"
+        @update:model-value="(vl: number) => schema.setField('page', vl)"
         :max="totalPages"
         direction-links
         boundary-links
@@ -149,7 +156,10 @@
       >
       </q-pagination>
 
-      <div v-if="page == totalPages" class="text-center q-pb-sm">
+      <div
+        v-if="schema.state.page.value == totalPages"
+        class="text-center q-pb-sm"
+      >
         <span class="text-caption text-grey-7 letter-spaced"
           >Todos os registros exibidos</span
         >
@@ -159,8 +169,8 @@
 </template>
 
 <script setup lang="ts">
-import { useNavigation, useClients, useClientsQuery } from "src/composables";
-import { computed, watch } from "vue";
+import { useNavigation, useClients, useListQueryState } from "src/composables";
+import { computed } from "vue";
 import { ContentState } from "src/components/common";
 
 type LoadState = "loading" | "error" | "empty" | "ready";
@@ -177,14 +187,13 @@ const rowsOptions = [
   { label: "50", value: 50 },
 ];
 
-const { page, rowsPerPage, onlyActive } = useClientsQuery(
-  rowsOptions.map((row) => row.value),
-);
-const { loading, error, clients, totalPages, total, reload } = useClients(
-  page,
-  rowsPerPage,
-  onlyActive,
-);
+const schema = useListQueryState({
+  page: { default: 1, type: "number", resetPageOnChange: false },
+  rowsPerPage: { default: 10, type: "number", resetPageOnChange: true },
+  onlyActive: { default: true, type: "boolean", resetPageOnChange: true },
+});
+
+const { loading, error, clients, totalPages, reload } = useClients(schema);
 
 const loadState = computed<LoadState>(() => {
   if (loading.value) return "loading";
@@ -197,13 +206,6 @@ const loadState = computed<LoadState>(() => {
 const errorMessage = computed(
   () => error.value?.message || "Erro ao carregar clientes",
 );
-
-watch(page, () => {
-  console.log(page.value, totalPages.value, total.value);
-  if (page.value > totalPages.value) {
-    page.value = totalPages.value;
-  }
-});
 </script>
 
 <style lang="css" scoped>
