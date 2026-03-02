@@ -1,23 +1,15 @@
-import { computed, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import type { Client } from "src/models";
 import { getClients } from "src/services/client";
 import { type ListQueryReturnState } from "src/composables";
 
-export function useClients(schema: ListQueryReturnState) {
+export function useClients(queryState: ListQueryReturnState) {
   const loading = ref(false);
   const error = ref<Error | null>(null);
   const clients = ref<Client[]>([]);
-  const total = ref(0);
+  const totalPages = ref(1);
 
   let requestId = 0;
-  let page = Number(schema.state.page?.value);
-  let rowsPerPage = Number(schema.state.rowsPerPage?.value);
-  let onlyActive = schema.state.onlyActive?.value === "true";
-
-  const totalPages = computed(() => {
-    if (!schema.state.rowsPerPage?.value) return 1;
-    return Math.max(1, Math.ceil(total.value / rowsPerPage));
-  });
 
   async function fetchClients() {
     const currentId = ++requestId;
@@ -26,6 +18,13 @@ export function useClients(schema: ListQueryReturnState) {
     error.value = null;
 
     try {
+      // Get updated query state
+      const { page, rowsPerPage, onlyActive } = queryState.getSnapshot() as {
+        page: number;
+        rowsPerPage: number;
+        onlyActive: boolean;
+      };
+
       const offset = (page - 1) * rowsPerPage;
       const response = await getClients({
         limit: rowsPerPage,
@@ -38,13 +37,19 @@ export function useClients(schema: ListQueryReturnState) {
         return;
       }
 
+      totalPages.value = response.total;
+      if (page && page > response.total && response.total > 0) {
+        await queryState.setField("page", response.total);
+        loading.value = false;
+        return fetchClients();
+      }
+
       clients.value = response.clients;
-      total.value = response.total;
     } catch (e) {
       console.error(e);
       error.value = e as Error;
       clients.value = [];
-      total.value = 0;
+      totalPages.value = 1;
     } finally {
       if (currentId === requestId) {
         loading.value = false;
@@ -53,11 +58,12 @@ export function useClients(schema: ListQueryReturnState) {
   }
 
   watch(
-    () => schema.getSnapshot(),
+    [
+      queryState.state.page,
+      queryState.state.rowsPerPage,
+      queryState.state.onlyActive,
+    ],
     async () => {
-      page = Number(schema.state.page?.value);
-      rowsPerPage = Number(schema.state.rowsPerPage?.value);
-      onlyActive = schema.state.onlyActive?.value === "true";
       await fetchClients();
     },
     { immediate: true }
@@ -68,7 +74,6 @@ export function useClients(schema: ListQueryReturnState) {
     error,
     totalPages,
     clients,
-    total,
     reload: fetchClients,
   };
 }
