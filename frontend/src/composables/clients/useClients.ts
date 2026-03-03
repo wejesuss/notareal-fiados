@@ -37,11 +37,10 @@ export function useClients(queryState: ListQueryReturnState) {
         return;
       }
 
-      totalPages.value = response.total;
-      if (page && page > response.total && response.total > 0) {
-        await queryState.setField("page", response.total);
-        loading.value = false;
-        return fetchClients();
+      totalPages.value = Math.max(1, Math.ceil(response.total / rowsPerPage));
+      if (page && page > totalPages.value && totalPages.value > 0) {
+        await queryState.setField("page", totalPages.value);
+        return;
       }
 
       clients.value = response.clients;
