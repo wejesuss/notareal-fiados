@@ -3,6 +3,12 @@ import type { Client } from "src/models";
 import { getClients } from "src/services/client";
 import { type ListQueryReturnState } from "src/composables";
 
+type ClientsQuerySnapshot = {
+  page: number;
+  rowsPerPage: number;
+  onlyActive: boolean;
+};
+
 export function useClients(queryState: ListQueryReturnState) {
   const loading = ref(false);
   const error = ref<Error | null>(null);
@@ -19,11 +25,8 @@ export function useClients(queryState: ListQueryReturnState) {
 
     try {
       // Get updated query state
-      const { page, rowsPerPage, onlyActive } = queryState.getSnapshot() as {
-        page: number;
-        rowsPerPage: number;
-        onlyActive: boolean;
-      };
+      const { page, rowsPerPage, onlyActive } =
+        queryState.getSnapshot() as ClientsQuerySnapshot;
 
       const offset = (page - 1) * rowsPerPage;
       const response = await getClients({
