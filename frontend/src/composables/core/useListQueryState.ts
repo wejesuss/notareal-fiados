@@ -43,7 +43,8 @@ function parseValue(
   switch (config.type) {
     case "number": {
       const parsed = Number(value);
-      return Number.isNaN(parsed) ? config.default : parsed;
+      const isGarbage = Number.isNaN(parsed) || parsed <= 0;
+      return isGarbage ? config.default : parsed;
     }
 
     case "boolean":
