@@ -73,7 +73,9 @@
       <q-card-section v-if="loadState === 'empty'" class="text-center q-py-xl">
         <q-icon name="people_outline" size="48px" color="grey-6"></q-icon>
 
-        <div class="text-subtitle1 q-mt-md">Nenhum cliente ainda</div>
+        <div class="text-subtitle1 q-mt-md">
+          Nenhum cliente encontrado com este filtro
+        </div>
         <div
           class="text-caption caption-medium letter-spaced text-grey-7 q-mt-xs"
         >
