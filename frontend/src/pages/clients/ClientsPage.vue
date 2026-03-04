@@ -156,7 +156,7 @@
       >
       </q-pagination>
 
-      <div v-if="page == totalPages" class="text-center q-pb-sm">
+      <div v-if="page === totalPages" class="text-center q-pb-sm">
         <span class="text-caption text-grey-7 letter-spaced"
           >Todos os registros exibidos</span
         >
