@@ -122,9 +122,9 @@ export function useListQueryState<
    */
   const state = setComputedState(schema, route);
 
-  function serializeValue<K extends keyof T>(
-    value: QueryTypeMap[T[K]["type"]],
-    config: QueryParamConfig
+  function serializeValue<C extends QueryParamConfig>(
+    value: QueryTypeMap[C["type"]],
+    config: C
   ) {
     if (value === null || value === config.default || value === undefined) {
       return undefined;
