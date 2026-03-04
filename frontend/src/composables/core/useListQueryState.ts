@@ -107,7 +107,9 @@ function setComputedState<T extends QuerySchema>(
   return state;
 }
 
-export function useListQueryState<T extends QuerySchema>(schema: T) {
+export function useListQueryState<
+  T extends QuerySchema & { page: NumberQueryConfig },
+>(schema: T) {
   const route = useRoute();
   const router = useRouter();
 
