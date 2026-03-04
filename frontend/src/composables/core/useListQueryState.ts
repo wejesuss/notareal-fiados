@@ -8,14 +8,36 @@ type QueryTypeMap = {
   "tri-boolean": boolean | null;
 };
 
-type QueryParamType = keyof QueryTypeMap;
-type QueryStateTypes = number | string | boolean | null;
-
-type QueryParamConfig = {
-  default: QueryStateTypes;
-  type: QueryParamType;
-  resetPageOnChange: boolean;
+type NumberQueryConfig = {
+  type: "number";
+  default: number;
+  /**
+   * @param ge - The minimum number `value` can be (greater/equal)
+   */
+  ge?: number;
 };
+
+type StringQueryConfig = {
+  type: "string";
+  default: string;
+};
+
+type BooleanQueryConfig = {
+  type: "boolean";
+  default: boolean;
+};
+
+type TriBooleanQueryConfig = {
+  type: "tri-boolean";
+  default: boolean | null;
+};
+
+type QueryParamConfig = (
+  | NumberQueryConfig
+  | StringQueryConfig
+  | BooleanQueryConfig
+  | TriBooleanQueryConfig
+) & { resetPageOnChange: boolean };
 
 type QuerySchema = Record<string, QueryParamConfig>;
 
@@ -34,10 +56,10 @@ export type ListQueryReturnState = ReturnType<typeof useListQueryState>;
  * @param config Config object to interpret the type of `value` and default value fallback  if `value` is `undefined`
  * @returns The `value` normalized as number | string | boolean | null or type of `value`
  */
-function parseValue(
+function parseValue<T extends QueryParamConfig>(
   value: string | null | undefined,
-  config: QueryParamConfig
-): QueryStateTypes {
+  config: T
+): T["default"] {
   if (value === undefined) return config.default;
 
   switch (config.type) {
