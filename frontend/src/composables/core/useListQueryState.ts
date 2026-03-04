@@ -65,8 +65,12 @@ function parseValue<T extends QueryParamConfig>(
   switch (config.type) {
     case "number": {
       const parsed = Number(value);
-      const isGarbage = Number.isNaN(parsed) || parsed <= 0;
-      return isGarbage ? config.default : parsed;
+      if (Number.isNaN(parsed)) return config.default;
+      if (config.ge !== undefined && parsed < config.ge) {
+        return config.default;
+      }
+
+      return parsed;
     }
 
     case "boolean":
