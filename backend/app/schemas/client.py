@@ -36,7 +36,7 @@ class ClientCreateSchema(ClientBase):
 
 # ===== UPDATE =====
 class ClientUpdateSchema(ClientBase):
-    is_active: int | None = Field(None, ge=0, le=1)
+    is_active: bool | None = Field(None, ge=0, le=1)
 
 
 # ===== RESPONSE =====
@@ -46,7 +46,7 @@ class ClientResponseSchema(CamelModel):
     nickname: str | None
     phone: str | None
     email: EmailStr | None
-    is_active: int
+    is_active: bool
     created_at: datetime
     updated_at: datetime
 

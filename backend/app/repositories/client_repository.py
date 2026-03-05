@@ -125,7 +125,10 @@ def update_client(client_id: int, data: dict) -> Client | None:
     for key, value in data.items():
         if key in allowed_columns:
             columns.append(f"{key} = ?")
-            values.append(value)
+            if isinstance(value, bool):
+                values.append(int(value))
+            else:
+                values.append(value)
 
     if not columns:
         raise ValidationError(error_messages.DATA_FIELDS_EMPTY)
