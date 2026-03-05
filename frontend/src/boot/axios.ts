@@ -37,6 +37,10 @@ api.interceptors.response.use(
           // Optional: redirect to login
         }
 
+        if (error.response.status === 404) {
+          message = error.response?.data.detail;
+        }
+
         if (error.message.toLowerCase().includes("timeout")) {
           message = ErrorMessages.TimeoutError;
         }

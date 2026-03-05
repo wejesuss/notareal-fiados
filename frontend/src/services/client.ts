@@ -50,15 +50,9 @@ export function getRecentClients(limit: number = 5): Client[] {
 }
 
 export async function getClientById(id: number): Promise<Client> {
-  return new Promise((res, rej) => {
-    const found = clients.find((client) => client.id === id);
+  const { data } = await api.get<Client>(`/clients/${id}`);
 
-    if (found) {
-      res(found);
-    } else {
-      rej(new Error("Cliente não encontrado!"));
-    }
-  });
+  return data;
 }
 
 export function createClient(payload: ClientCreate) {
