@@ -1,4 +1,4 @@
-import { api } from "src/boot/axios";
+import { api } from "src/api/api";
 import type {
   Client,
   ClientCreate,
