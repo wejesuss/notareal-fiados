@@ -1,5 +1,10 @@
 import axios from "axios";
 
+const ErrorMessages = {
+  NetworkError: "Erro de conexão, verifique sua rede.",
+  TimeoutError: "Tempo de espera excedido, tente novamente.",
+};
+
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   timeout: 10000,
@@ -21,15 +26,27 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error: unknown) => {
+    let message = "Erro inesperado, tente novamente.";
+
     if (axios.isAxiosError<{ detail: string }>(error)) {
-      if (error.response?.status === 401) {
-        console.error("Unauthorized");
-        // Optional: redirect to login
+      if (error.response) {
+        console.error(error.response?.data.detail);
+
+        if (error.response.status === 401) {
+          console.error("Unauthorized");
+          // Optional: redirect to login
+        }
+
+        if (error.message.toLowerCase().includes("timeout")) {
+          message = ErrorMessages.TimeoutError;
+        }
+
+        if (error.message.toLowerCase().includes("network")) {
+          message = ErrorMessages.NetworkError;
+        }
       }
 
-      console.error(error.response?.data.detail);
-
-      return Promise.reject(error);
+      return Promise.reject(new Error(message));
     }
   }
 );

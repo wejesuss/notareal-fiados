@@ -1,48 +1,79 @@
-import { computed, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import type { Client } from "src/models";
 import { getClients } from "src/services/client";
+import { type ListQueryReturnState } from "src/composables";
 
-export function useClients(rowsPerPage: number = 10, onlyActive?: boolean) {
+type ClientsQuerySnapshot = {
+  page: number;
+  rowsPerPage: number;
+  onlyActive: boolean;
+};
+
+export function useClients(queryState: ListQueryReturnState) {
   const loading = ref(false);
   const error = ref<Error | null>(null);
   const clients = ref<Client[]>([]);
-  const page = ref(1);
-  const total = ref(0);
+  const totalPages = ref(1);
 
-  const totalPages = computed(() =>
-    Math.max(1, Math.ceil(total.value / rowsPerPage))
-  );
+  let requestId = 0;
 
   async function fetchClients() {
+    const currentId = ++requestId;
+
     loading.value = true;
     error.value = null;
 
     try {
-      const offset = (page.value - 1) * rowsPerPage;
+      // Get updated query state
+      const { page, rowsPerPage, onlyActive } =
+        queryState.getSnapshot() as ClientsQuerySnapshot;
+
+      const offset = (page - 1) * rowsPerPage;
       const response = await getClients({
         limit: rowsPerPage,
         offset,
-        onlyActive: onlyActive ?? true,
+        onlyActive: onlyActive,
       });
 
+      // Ignore outdated response
+      if (currentId !== requestId) {
+        return;
+      }
+
+      totalPages.value = Math.max(1, Math.ceil(response.total / rowsPerPage));
+      if (page && page > totalPages.value && totalPages.value > 0) {
+        await queryState.setField("page", totalPages.value);
+        return;
+      }
+
       clients.value = response.clients;
-      total.value = response.total;
     } catch (e) {
       console.error(e);
       error.value = e as Error;
       clients.value = [];
-      total.value = 0;
+      totalPages.value = 1;
     } finally {
-      loading.value = false;
+      if (currentId === requestId) {
+        loading.value = false;
+      }
     }
   }
 
-  watch(page, fetchClients, { immediate: true });
+  watch(
+    [
+      queryState.state.page,
+      queryState.state.rowsPerPage,
+      queryState.state.onlyActive,
+    ],
+    async () => {
+      await fetchClients();
+    },
+    { immediate: true }
+  );
 
   return {
     loading,
     error,
-    page,
     totalPages,
     clients,
     reload: fetchClients,

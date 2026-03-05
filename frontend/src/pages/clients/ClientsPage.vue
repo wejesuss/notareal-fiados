@@ -12,18 +12,70 @@
       />
     </div>
 
+    <q-card v-if="loadState === 'loading'" class="q-my-xl q-pa-md">
+      <ContentState
+        message="Carregando clientes..."
+        icon-name="person_search"
+      ></ContentState>
+    </q-card>
+
+    <q-card v-else-if="loadState === 'error'" class="q-my-xl q-pa-md">
+      <ContentState
+        :message="errorMessage"
+        message-color="text-amber-8"
+        icon-name="error_outline"
+        icon-color="amber-10"
+      ></ContentState>
+      <div class="q-mt-sm text-center">
+        <q-btn rounded outline color="grey-8" @click="reload">
+          Tentar de novo
+        </q-btn>
+      </div>
+    </q-card>
+
     <!-- Content -->
-    <q-card>
-      <q-card-section>
+    <q-card v-else>
+      <q-card-section class="row items-center justify-between">
         <div class="text-subtitle1">Lista de clientes</div>
+        <div class="row items-center q-gutter-sm q-gutter-x-md">
+          <q-select
+            :model-value="onlyActive"
+            @update:model-value="
+              (vl: boolean) => schema.setField('onlyActive', vl)
+            "
+            :options="activeOptions"
+            label="Filtro"
+            dense
+            outlined
+            emit-value
+            map-options
+            style="min-width: 160px"
+          ></q-select>
+
+          <q-select
+            :model-value="rowsPerPage"
+            @update:model-value="
+              (vl: number) => schema.setField('rowsPerPage', vl)
+            "
+            :options="rowsOptions"
+            label="Por página"
+            dense
+            outlined
+            emit-value
+            map-options
+            style="min-width: 120px"
+          ></q-select>
+        </div>
       </q-card-section>
 
       <q-separator />
 
-      <q-card-section v-if="clients.length === 0" class="text-center q-py-xl">
+      <q-card-section v-if="loadState === 'empty'" class="text-center q-py-xl">
         <q-icon name="people_outline" size="48px" color="grey-6"></q-icon>
 
-        <div class="text-subtitle1 q-mt-md">Nenhum cliente ainda</div>
+        <div class="text-subtitle1 q-mt-md">
+          Nenhum cliente encontrado com este filtro
+        </div>
         <div
           class="text-caption caption-medium letter-spaced text-grey-7 q-mt-xs"
         >
@@ -96,7 +148,8 @@
       </q-list>
 
       <q-pagination
-        v-model="page"
+        :model-value="page"
+        @update:model-value="(vl: number) => schema.setField('page', vl)"
         :max="totalPages"
         direction-links
         boundary-links
@@ -105,7 +158,7 @@
       >
       </q-pagination>
 
-      <div v-if="page == totalPages" class="text-center q-pb-sm">
+      <div v-if="page === totalPages" class="text-center q-pb-sm">
         <span class="text-caption text-grey-7 letter-spaced"
           >Todos os registros exibidos</span
         >
@@ -115,15 +168,46 @@
 </template>
 
 <script setup lang="ts">
-import { useNavigation } from "src/composables/core/useNavigation";
-import { useClients } from "src/composables";
+import { useNavigation, useClients, useListQueryState } from "src/composables";
+import { computed } from "vue";
+import { ContentState } from "src/components/common";
 
-const onlyActive = false;
-const rowsPerPage = 10;
-
-const { clients, page, totalPages } = useClients(rowsPerPage, onlyActive);
+type LoadState = "loading" | "error" | "empty" | "ready";
 
 const { navigateTo } = useNavigation();
+
+const activeOptions = [
+  { label: "Todos", value: false },
+  { label: "Somente Ativos", value: true },
+];
+const rowsOptions = [
+  { label: "10", value: 10 },
+  { label: "20", value: 20 },
+  { label: "50", value: 50 },
+];
+
+const schema = useListQueryState({
+  page: { default: 1, type: "number", resetPageOnChange: false },
+  rowsPerPage: { default: 10, type: "number", resetPageOnChange: true },
+  onlyActive: { default: true, type: "boolean", resetPageOnChange: true },
+});
+
+const page = computed(() => schema.state.page.value);
+const rowsPerPage = computed(() => schema.state.rowsPerPage.value);
+const onlyActive = computed(() => schema.state.onlyActive.value);
+const { loading, error, clients, totalPages, reload } = useClients(schema);
+
+const loadState = computed<LoadState>(() => {
+  if (loading.value) return "loading";
+  if (error.value) return "error";
+  if (clients.value.length === 0) return "empty";
+
+  return "ready";
+});
+
+const errorMessage = computed(
+  () => error.value?.message || "Erro ao carregar clientes",
+);
 </script>
 
 <style lang="css" scoped>
@@ -135,6 +219,10 @@ const { navigateTo } = useNavigation();
   border: 1px solid #e0e0e0;
   border-radius: 12px;
   background-color: #fafafa;
+
+  max-width: 560px;
+  margin-inline: auto;
+  width: 100%;
 }
 
 .client-row:active {
