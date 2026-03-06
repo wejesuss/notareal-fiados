@@ -201,10 +201,10 @@ async function submit(nextValue: boolean) {
     isActive: nextValue,
   };
 
-  await updateClient(props.clientId, payload);
+  const response = await updateClient(props.clientId, payload);
 
   // Keep local client snapshot in sync after successful update
-  if (client.value) client.value.isActive = nextValue;
+  client.value = response.client;
 }
 </script>
 
