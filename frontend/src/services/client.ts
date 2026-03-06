@@ -6,8 +6,8 @@ import type {
   ClientUpdate,
   ClientListParams,
   ClientListResponse,
+  ClientWithMessageResponse,
 } from "src/models";
-import { sleep } from "src/utils/timing/sleep";
 
 const clients: Client[] = [
   {
@@ -68,30 +68,13 @@ export function createClient(payload: ClientCreate) {
 export async function updateClient(
   id: number,
   payload: ClientUpdate
-): Promise<Client> {
-  await sleep(300);
+): Promise<ClientWithMessageResponse> {
+  const { data } = await api.put<ClientWithMessageResponse>(
+    `/clients/${id}`,
+    payload
+  );
 
-  return new Promise((res, rej) => {
-    const index = clients.findIndex((client) => client.id === id);
-    if (index === -1) {
-      return rej(new Error(`Cliente de id ${id} não encontrado!`));
-    }
-
-    const client = clients[index];
-    if (!client) {
-      return rej(new Error(`Cliente de id ${id} não encontrado!`));
-    }
-
-    const updatedClient: Client = {
-      ...client,
-      ...payload,
-      updatedAt: new Date().toISOString(),
-    };
-
-    clients[index] = updatedClient;
-
-    res(updatedClient);
-  });
+  return data;
 }
 
 export async function getClientSummary(
