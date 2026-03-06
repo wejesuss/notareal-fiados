@@ -39,7 +39,7 @@ api.interceptors.response.use(
       return Promise.reject(new APIError(ErrorMessages.UnexpectedError));
     }
 
-    console.log(error.code);
+    console.error(error.toJSON());
     // Timeout
     if (error.code === "ECONNABORTED") {
       return Promise.reject(new APIError(ErrorMessages.TimeoutError));
@@ -63,7 +63,6 @@ api.interceptors.response.use(
       return Promise.reject(new APIError(message, status));
     }
 
-    // console.error(error.response?.data.detail);
     // Backend Error
     if (typeof data?.detail === "string") {
       return Promise.reject(new APIError(data.detail, status));
