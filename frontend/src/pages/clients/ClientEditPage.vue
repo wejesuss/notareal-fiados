@@ -46,6 +46,7 @@ import { updateClient, getClientById } from "src/services";
 import { useNavigation } from "src/composables/core/useNavigation";
 import type { ClientPayload } from "src/components/types";
 import { ClientForm } from "src/components/clients";
+import type { APIError } from "src/api/errors";
 
 const $route = useRoute();
 const { navigateTo } = useNavigation();
@@ -97,17 +98,24 @@ watch(
 );
 
 async function submit(payload: ClientPayload) {
-  await updateClient(id.value, {
-    ...payload,
-    isActive: isActive.value,
-  });
+  try {
+    await updateClient(id.value, {
+      ...payload,
+      isActive: isActive.value,
+    });
 
-  $q.notify({
-    type: "positive",
-    message: "Cliente atualizado com sucesso",
-  });
+    $q.notify({
+      type: "positive",
+      message: "Cliente atualizado com sucesso",
+    });
 
-  await navigateTo("/clients/");
+    await navigateTo(`/clients/${id.value}`);
+  } catch (error) {
+    $q.notify({
+      type: "negative",
+      message: (error as APIError).message ?? "Erro ao atualizar Cliente",
+    });
+  }
 }
 </script>
 
