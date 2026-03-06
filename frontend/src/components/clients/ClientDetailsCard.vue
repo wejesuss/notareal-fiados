@@ -198,7 +198,6 @@ watch(error, (err) => {
 
 async function submit(nextValue: boolean) {
   const payload: ClientUpdate = {
-    ...client.value,
     isActive: nextValue,
   };
 
