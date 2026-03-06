@@ -4,7 +4,7 @@ import type { Client } from "src/models";
 import { getClientById } from "src/services";
 
 export function useClientDetails(clientId: Ref<number>) {
-  const loading = ref(true);
+  const loading = ref(false);
   const error = ref<Error | null>(null);
   const client = ref<Client | null>(null);
 
@@ -20,7 +20,6 @@ export function useClientDetails(clientId: Ref<number>) {
     try {
       client.value = await getClientById(clientId.value);
     } catch (e) {
-      console.error(e);
       error.value = e as Error;
       client.value = null;
     } finally {
