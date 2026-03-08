@@ -3,11 +3,16 @@ from datetime import datetime
 from app.database import get_connection, sqlite3
 from app.models import Purchase
 from app.utils.exceptions import (
-    ValidationError, BusinessRuleError, DatabaseError,
-    error_messages
+    ValidationError,
+    BusinessRuleError,
+    DatabaseError,
+    error_messages,
 )
 
-def get_purchases(limit: int = None, offset: int = 0, only_pending: bool | None = None) -> List[Purchase]:
+
+def get_purchases(
+    limit: int = None, offset: int = 0, only_pending: bool | None = None
+) -> List[Purchase]:
     conn = None
     try:
         conn = get_connection()
@@ -17,16 +22,19 @@ def get_purchases(limit: int = None, offset: int = 0, only_pending: bool | None 
         search_limit = -1 if limit is None else limit
 
         # Create WHERE clause if only pending (or partial) purchases is requested
-        where_clause = "" # include inactive ones if only_pending is None
+        where_clause = ""  # include inactive ones if only_pending is None
         if only_pending is True:
             where_clause = "WHERE status IN ('pending', 'partial') AND is_active = 1"
         elif only_pending is False:
             where_clause = "WHERE is_active = 1"
 
-        cursor.execute(f"""
+        cursor.execute(
+            f"""
             SELECT * FROM purchases {where_clause} ORDER BY created_at DESC
             LIMIT ? OFFSET ?
-        """, (search_limit, offset))
+        """,
+            (search_limit, offset),
+        )
 
         rows = cursor.fetchall()
 
@@ -40,6 +48,7 @@ def get_purchases(limit: int = None, offset: int = 0, only_pending: bool | None 
         if conn:
             conn.close()
 
+
 def insert_purchase(data: dict) -> Purchase:
     conn = None
     try:
@@ -48,27 +57,30 @@ def insert_purchase(data: dict) -> Purchase:
 
         now = int(datetime.now().timestamp())
 
-        cursor.execute("""INSERT INTO purchases (
+        cursor.execute(
+            """INSERT INTO purchases (
                 client_id,
                 description,
-                total_value,
-                total_paid_value,
+                total_cents,
+                total_paid_cents,
                 status,
                 note_number,
                 is_active,
                 created_at,
                 updated_at
             ) VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?);
-        """, (
-            int(data.get("client_id")),
-            data.get("description"),
-            data.get("total_value"),
-            data.get("total_paid_value"),
-            data.get("status"),
-            data.get("note_number"),
-            now,
-            now
-        ))
+        """,
+            (
+                int(data.get("client_id")),
+                data.get("description"),
+                data.get("total_cents"),
+                data.get("total_paid_cents"),
+                data.get("status"),
+                data.get("note_number"),
+                now,
+                now,
+            ),
+        )
 
         conn.commit()
         purchase_id = cursor.lastrowid
@@ -85,6 +97,7 @@ def insert_purchase(data: dict) -> Purchase:
     finally:
         if conn:
             conn.close()
+
 
 def get_purchase_by_id(purchase_id: int) -> Purchase | None:
     conn = None
@@ -105,6 +118,7 @@ def get_purchase_by_id(purchase_id: int) -> Purchase | None:
         if conn:
             conn.close()
 
+
 def get_purchase_by_note_number(note_number: str) -> Purchase | None:
     conn = None
     try:
@@ -123,6 +137,7 @@ def get_purchase_by_note_number(note_number: str) -> Purchase | None:
     finally:
         if conn:
             conn.close()
+
 
 def update_purchase(purchase_id: int, data: dict) -> Purchase | None:
     conn = None
@@ -162,6 +177,7 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase | None:
         if conn:
             conn.close()
 
+
 def deactivate_purchase(purchase_id: int) -> bool:
     """Deactivate a purchase."""
     conn = None
@@ -171,10 +187,13 @@ def deactivate_purchase(purchase_id: int) -> bool:
         now = int(datetime.now().timestamp())
 
         # disable purchase with the given ID
-        cursor.execute("""
+        cursor.execute(
+            """
             UPDATE purchases SET is_active = 0, updated_at = ?
             WHERE id = ? AND is_active = 1
-        """, (now, purchase_id))
+        """,
+            (now, purchase_id),
+        )
 
         conn.commit()
 
@@ -185,8 +204,11 @@ def deactivate_purchase(purchase_id: int) -> bool:
         if conn:
             conn.close()
 
+
 # Client related functions
-def get_purchases_by_client_id(client_id: int, only_active: bool = True) -> List[Purchase]:
+def get_purchases_by_client_id(
+    client_id: int, only_active: bool = True
+) -> List[Purchase]:
     conn = None
     try:
         conn = get_connection()
@@ -196,7 +218,10 @@ def get_purchases_by_client_id(client_id: int, only_active: bool = True) -> List
         if only_active:
             where_clause += " AND is_active = 1"
 
-        cursor.execute(f"SELECT * FROM purchases {where_clause} ORDER BY created_at DESC", (client_id,))
+        cursor.execute(
+            f"SELECT * FROM purchases {where_clause} ORDER BY created_at DESC",
+            (client_id,),
+        )
 
         rows = cursor.fetchall()
 
@@ -210,6 +235,7 @@ def get_purchases_by_client_id(client_id: int, only_active: bool = True) -> List
         if conn:
             conn.close()
 
+
 def get_purchases_ids_by_client_id(client_id: int) -> List[int]:
     """Get all purchases ids for a given client."""
     conn = None
@@ -218,9 +244,12 @@ def get_purchases_ids_by_client_id(client_id: int) -> List[int]:
         cursor = conn.cursor()
 
         # get all purchases ids for that client
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT id FROM purchases WHERE client_id = ? AND is_active = 1
-        """, (client_id,))
+        """,
+            (client_id,),
+        )
         purchase_ids = [row[0] for row in cursor.fetchall()]
 
         return purchase_ids
@@ -233,6 +262,7 @@ def get_purchases_ids_by_client_id(client_id: int) -> List[int]:
         if conn:
             conn.close()
 
+
 def deactivate_purchases_by_client_id(client_id: int) -> bool:
     """Deactivate all purchases for a given client."""
     conn = None
@@ -242,10 +272,13 @@ def deactivate_purchases_by_client_id(client_id: int) -> bool:
         now = int(datetime.now().timestamp())
 
         # disable all purchases related to that client
-        cursor.execute("""
+        cursor.execute(
+            """
             UPDATE purchases SET is_active = 0, updated_at = ?
             WHERE client_id = ? AND is_active = 1
-        """, (now, client_id))
+        """,
+            (now, client_id),
+        )
 
         conn.commit()
 
