@@ -12,7 +12,7 @@ class PurchaseBase(CamelModel):
     note_number: str | None = Field(None, example="NF-0001")
 
     # optional payment fields for creation
-    amount: int | None = Field(None, example=5000)
+    amount_cents: int | None = Field(None, example=5000)
     payment_date: int | None = Field(None, example=1700000000)  # timestamp
     method: str | None = Field(None, example="pix")
     payment_description: str | None = Field(None, example="Pagamento adiantado")

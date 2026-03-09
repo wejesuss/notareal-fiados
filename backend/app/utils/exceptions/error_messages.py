@@ -26,6 +26,7 @@ PAYMENT_CREATION_FAILED = "Não é possível adicionar pagamento a uma compra de
 PAYMENT_ACTIVATION_FAILED = "Não é possível ativar pagamento de uma compra desativada."
 PAYMENT_PURCHASE_CREATION_FAILED = "Não foi possível criar o pagamento junto com a compra."
 PAYMENT_INVALID_ACTIVATION_ROUTE = "Chamada inválida. Utilize a rota correta para a ativação ou desativação do pagamento."
+PAYMENT_EXCEEDS_PURCHASE_TOTAL = "O valor do pagamento excede o valor total da compra."
 
 # === Database / Generic ===
 DATABASE_ERROR = "Erro inesperado no banco de dados."

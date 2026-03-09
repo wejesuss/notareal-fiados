@@ -1,10 +1,9 @@
-from builtins import isinstance
 from typing import List
 from datetime import datetime
 from app.models import Purchase, Payment
 from app.services import payment_service
 from app.repositories import purchase_repository
-from app.utils.helpers import filter_allowed
+from app.utils.helpers import filter_allowed, validate_amount_cents
 from app.utils.exceptions import (
     BusinessRuleError,
     NotFoundError,
@@ -14,7 +13,7 @@ from app.utils.exceptions import (
 )
 
 # fields that are allowed to be updated
-PURCHASE_ALLOWED_UPDATE_FIELDS = {"client_id", "description", "total"}
+PURCHASE_ALLOWED_UPDATE_FIELDS = {"client_id", "description", "total_cents"}
 
 
 def get_purchase_by_id(purchase_id: int) -> Purchase:
@@ -37,49 +36,47 @@ def get_purchases(
     limit: int = None, offset: int = 0, only_pending: bool | None = None
 ) -> List[Purchase]:
     purchases = purchase_repository.get_purchases(limit, offset, only_pending)
-    if not purchases:
-        return []
 
-    return purchases
+    return purchases or []
 
 
 def create_purchase(client_id: int, data: dict) -> Purchase:
-    try:
-        total = float(data.get("total", 0))
+    total_cents: int = data.get("total_cents", 0)
 
-        # Attempt to get and convert amount to float
-        amount = data.get("amount")
-        if amount is not None:
-            amount = float(amount)  # Convert only if it's not None
-            if amount <= 0:
-                raise ValidationError(error_messages.PAYMENT_INVALID_AMOUNT)
-    except ValueError:
-        raise ValidationError(error_messages.RESOURCE_CREATION_VALUE_ERROR)
+    # Validate amount_cents if present
+    amount_cents: int | None = data.get("amount_cents")
+    if amount_cents is not None:
+        validate_amount_cents(amount_cents)
 
-    if total <= 0:
+    if total_cents <= 0:
         raise ValidationError(error_messages.PURCHASE_INVALID_TOTAL)
 
     create_new_payment = False
     status = "pending"
-    total_paid = 0.0
+    total_paid_cents: int = 0
 
-    if amount is not None:
-        if amount >= total:
+    if amount_cents is not None:
+        if amount_cents > total_cents:
+            raise BusinessRuleError(error_messages.PAYMENT_EXCEEDS_PURCHASE_TOTAL)
+
+        if amount_cents == total_cents:
             create_new_payment = True
-            total_paid = total
+            total_paid_cents = total_cents
             status = "paid"
-        elif amount > 0:
+        elif amount_cents > 0:
             create_new_payment = True
-            total_paid = amount
+            total_paid_cents = amount_cents
             status = "partial"
 
-    data.update({"client_id": client_id, "status": status, "total_paid": total_paid})
+    data.update(
+        {"client_id": client_id, "status": status, "total_paid_cents": total_paid_cents}
+    )
     purchase = purchase_repository.insert_purchase(data)
 
     if create_new_payment:
         payment_data: dict = {
             "purchase_id": purchase.id,
-            "amount": amount,
+            "amount_cents": amount_cents,
             "payment_date": data.get("payment_date"),
             "method": data.get("method"),
             "description": data.get("payment_description"),
@@ -105,8 +102,8 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase:
     if "is_active" in data:
         raise ValidationError(error_messages.PURCHASE_INVALID_ACTIVATION_ROUTE)
 
-    total = data.get("total")
-    if total is not None and total <= 0:
+    total_cents = data.get("total_cents")
+    if total_cents is not None and total_cents <= 0:
         raise ValidationError(error_messages.PURCHASE_INVALID_TOTAL)
 
     # filter data fields
@@ -121,7 +118,9 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase:
     purchase = purchase_repository.update_purchase(purchase_id, validated_data)
 
     # Recalculate totals if relevant fields changed
-    relevant_fields_changed = "total" in data or "client_id" in data
+    relevant_fields_changed = (
+        "total_cents" in validated_data or "client_id" in validated_data
+    )
     if relevant_fields_changed:
         purchase = recalculate_purchase_totals(purchase_id)
 
@@ -177,7 +176,7 @@ def deactivate_purchases_by_client(client_id: int) -> bool:
         for purchase_id in purchases_ids:
             payment_service.deactivate_payments_by_purchase(purchase_id)
             purchase_repository.update_purchase(
-                purchase_id, {"total_paid": 0, "status": "pending"}
+                purchase_id, {"total_paid_cents": 0, "status": "pending"}
             )
 
     return success
@@ -229,7 +228,7 @@ def update_payment(purchase_id: int, payment_id: int, data: dict) -> Payment:
         raise BusinessRuleError(error_messages.PAYMENT_NOT_LINKED)
 
     updated = payment_service.update_payment(payment_id, data)
-    if updated and "amount" in data:
+    if updated and "amount_cents" in data:
         recalculate_purchase_totals(purchase_id)
 
     return updated or payment
@@ -283,21 +282,21 @@ def deactivate_payment(purchase_id: int, payment_id: int) -> Payment:
 def compute_purchase_totals(purchase: Purchase, payments: list[Payment]):
     """Pure function: given a purchase + payments, returns the recalculated fields."""
     active_payments = [p for p in payments if p.is_active]
-    total_paid = sum(p.amount for p in active_payments)
+    total_paid_cents = sum(p.amount_cents for p in active_payments)
 
-    if total_paid >= purchase.total:
+    if total_paid_cents >= purchase.total_cents:
         new_status = "paid"
-    elif total_paid > 0:
+    elif total_paid_cents > 0:
         new_status = "partial"
     else:
         new_status = "pending"
 
-    return {"total_paid": total_paid, "status": new_status}
+    return {"total_paid_cents": total_paid_cents, "status": new_status}
 
 
 def recalculate_purchase_totals(purchase_id: int) -> Purchase:
     """
-    Recalculate purchase total_paid and status based on active payments.
+    Recalculate purchase total_paid_cents and status based on active payments.
 
     Returns:
         Purchase: The updated Puchase after recalculation
