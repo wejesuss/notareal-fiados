@@ -6,6 +6,7 @@ from app.schemas.mixins import (
     NameValidatorMixin,
     NicknameValidatorMixin,
     PhoneValidatorMixin,
+    SummaryMixin,
 )
 
 
@@ -51,6 +52,12 @@ class ClientResponseSchema(CamelModel):
     updated_at: datetime
 
     model_config = dict(from_attributes=True)
+
+
+class ClientSummaryResponseSchema(CamelModel, SummaryMixin):
+    total_purchases: int
+    total_paid_cents: int
+    outstanding_balance_cents: int
 
 
 class ClientWithMessageResponseSchema(BaseModel):

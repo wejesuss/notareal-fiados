@@ -5,6 +5,7 @@ from app.services.client_service import (
     create_client,
     update_client,
     deactivate_client,
+    get_client_summary_by_id,
 )
 from app.services.purchase_service import get_purchases_by_client
 
@@ -16,6 +17,7 @@ from app.schemas.client import (
     ClientWithMessageResponseSchema,
     ClientCreateSchema,
     ClientUpdateSchema,
+    ClientSummaryResponseSchema,
 )
 from app.schemas.purchase import PurchaseListResponseSchema
 
@@ -87,3 +89,10 @@ def list_purchases_for_client(client_id: int, only_active: bool = True):
     purchases = get_purchases_by_client(client_id, only_active)
 
     return {"message": "Compras encontradas.", "purchases": purchases}
+
+
+@router.get("/{client_id}/summary", response_model=ClientSummaryResponseSchema)
+@handle_service_exceptions
+def get_client_summary(client_id: int):
+    """Get financial summary for a specific client."""
+    return get_client_summary_by_id(client_id)

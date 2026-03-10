@@ -2,7 +2,7 @@ from typing import List
 from datetime import datetime
 from app.database import get_connection, sqlite3
 from app.models import Client
-from app.common import PaginatedResult
+from app.common import PaginatedResult, ClientSummary
 from app.utils.exceptions import (
     ValidationError,
     BusinessRuleError,
@@ -185,6 +185,45 @@ def deactivate_client(client_id: int) -> bool:
         conn.commit()
 
         return cursor.rowcount > 0
+    except sqlite3.Error as e:
+        raise DatabaseError(error_messages.DATABASE_ERROR) from e
+    finally:
+        if conn:
+            conn.close()
+
+
+# Financial summary
+def get_client_summary(client_id: int) -> ClientSummary:
+    conn = None
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            f"""
+            SELECT
+                c.id,
+                COUNT(p.total_cents) AS total_purchases,
+                COALESCE(SUM(p.total_paid_cents), 0) AS total_paid,
+                COALESCE(SUM(p.total_cents) - SUM(p.total_paid_cents), 0) AS outstanding_balance
+            FROM clients c
+            LEFT JOIN purchases p ON p.client_id = c.id AND p.is_active = 1
+            WHERE c.id = ?
+            GROUP BY c.id, c.name
+            ORDER BY outstanding_balance DESC;
+        """,
+            (client_id,),
+        )
+        row = cursor.fetchone()
+
+        if not row:
+            return None
+
+        return ClientSummary(
+            total_purchases=row["total_purchases"],
+            total_paid_cents=row["total_paid"],
+            outstanding_balance_cents=row["outstanding_balance"],
+        )
     except sqlite3.Error as e:
         raise DatabaseError(error_messages.DATABASE_ERROR) from e
     finally:

@@ -49,3 +49,10 @@ def deactivate_client(client_id: int) -> bool:
         deactivate_purchases_by_client(client_id)
 
     return success
+
+
+# Client Financial Summary
+def get_client_summary_by_id(client_id: int):
+    get_client_or_404(client_id)
+
+    return client_repository.get_client_summary(client_id)

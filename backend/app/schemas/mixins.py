@@ -56,6 +56,23 @@ class PhoneValidatorMixin:
         return v
 
 
+# ===== Summary Mixin =====
+class SummaryMixin:
+    @computed_field
+    @property
+    def total_paid(self) -> float | None:
+        if getattr(self, "total_paid_cents", None) is None:
+            return None
+        return round(self.total_paid_cents / 100, 2)
+
+    @computed_field
+    @property
+    def outstanding_balance(self) -> float | None:
+        if getattr(self, "outstanding_balance_cents", None) is None:
+            return None
+        return round(self.outstanding_balance_cents / 100, 2)
+
+
 # ===== Amount Mixin =====
 class AmountMixin:
     @computed_field
