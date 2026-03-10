@@ -32,8 +32,8 @@ def init_database():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             client_id INTEGER NOT NULL,
             description TEXT,
-            total REAL NOT NULL,
-            total_paid REAL DEFAULT 0.0,
+            total_cents INTEGER NOT NULL,
+            total_paid_cents INTEGER DEFAULT 0,
             status TEXT DEFAULT 'pending',
             note_number TEXT UNIQUE,
             is_active INTEGER DEFAULT 1,
@@ -50,7 +50,7 @@ def init_database():
         CREATE TABLE IF NOT EXISTS payments (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             purchase_id INTEGER NOT NULL,
-            amount REAL NOT NULL,
+            amount_cents INTEGER NOT NULL,
             payment_date INTEGER, -- can be NULL
             method TEXT,
             description TEXT,
