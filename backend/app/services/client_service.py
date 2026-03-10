@@ -1,10 +1,8 @@
 from typing import List
 from app.models import Client, Purchase
 from app.common import PaginatedResult
-from app.services.purchase_service import (
-    deactivate_purchases_by_client,
-    get_purchases_by_client,
-)
+from app.services.purchase_service import deactivate_purchases_by_client
+from app.services.domain_validations import get_client_or_404
 import app.repositories.client_repository as client_repository
 from app.utils.exceptions import NotFoundError, error_messages
 
@@ -42,21 +40,12 @@ def update_client(client_id: int, data: dict) -> Client | None:
 
 def deactivate_client(client_id: int) -> bool:
     """Deactivate (soft delete) a client and cascade deactivate related purchases/payments."""
+    # Ensure client exists
+    get_client_or_404(client_id)
+
     success = client_repository.deactivate_client(client_id)
     if success:
         # cascade disable purchases and payments
         deactivate_purchases_by_client(client_id)
 
     return success
-
-
-# Purchase related services
-def list_purchases_by_client(
-    client_id: int, only_active: bool = True
-) -> List[Purchase]:
-    """List all purchases for a given client ID."""
-    client = client_repository.get_client_by_id(client_id)
-    if not client:
-        raise NotFoundError(error_messages.PURCHASE_CLIENT_NOT_FOUND)
-
-    return get_purchases_by_client(client_id, only_active)

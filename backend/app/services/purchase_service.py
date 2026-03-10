@@ -1,7 +1,7 @@
 from typing import List
 from datetime import datetime
 from app.models import Purchase, Payment
-from app.services import payment_service
+from app.services import payment_service, domain_validations
 from app.repositories import purchase_repository
 from app.utils.helpers import filter_allowed, validate_amount_cents
 from app.utils.exceptions import (
@@ -68,6 +68,9 @@ def create_purchase(client_id: int, data: dict) -> Purchase:
             total_paid_cents = amount_cents
             status = "partial"
 
+    # Ensure client exists
+    domain_validations.get_client_or_404(client_id)
+
     data.update(
         {"client_id": client_id, "status": status, "total_paid_cents": total_paid_cents}
     )
@@ -110,6 +113,10 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase:
     validated_data = filter_allowed(data, PURCHASE_ALLOWED_UPDATE_FIELDS)
     if not validated_data:
         raise ValidationError(error_messages.DATA_FIELDS_EMPTY)
+
+    if "client_id" in validated_data:
+        # Ensure client exists
+        domain_validations.get_client_or_404(validated_data.get("client_id"))
 
     original = purchase_repository.get_purchase_by_id(purchase_id)
     if not original:
@@ -160,6 +167,9 @@ def deactivate_purchase(purchase_id: int) -> Purchase:
 
 # Client related services (business logic)
 def get_purchases_by_client(client_id: int, only_active: bool = True) -> List[Purchase]:
+    # Ensure client exists
+    domain_validations.get_client_or_404(client_id)
+
     return purchase_repository.get_purchases_by_client_id(client_id, only_active)
 
 

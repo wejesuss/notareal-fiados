@@ -5,8 +5,8 @@ from app.services.client_service import (
     create_client,
     update_client,
     deactivate_client,
-    list_purchases_by_client,
 )
+from app.services.purchase_service import get_purchases_by_client
 
 from app.utils.exceptions import handle_service_exceptions
 from app.schemas.client import (
@@ -84,6 +84,6 @@ def remove_client(client_id: int):
 @handle_service_exceptions
 def list_purchases_for_client(client_id: int, only_active: bool = True):
     """List all purchases for a specific client."""
-    purchases = list_purchases_by_client(client_id, only_active)
+    purchases = get_purchases_by_client(client_id, only_active)
 
     return {"message": "Compras encontradas.", "purchases": purchases}
