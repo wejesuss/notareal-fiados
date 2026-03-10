@@ -32,7 +32,6 @@ def get_payment_by_id(payment_id: int) -> Payment | None:
 def create_payment(data: dict) -> Payment:
     """Create a new payment record."""
     amount_cents = data.get("amount_cents")
-    print(type(amount_cents))
     validate_amount_cents(amount_cents)
 
     return payment_repository.insert_payment(data)
@@ -52,7 +51,6 @@ def update_payment(payment_id: int, data: dict) -> Payment | None:
     # Validate amount_cents
     if "amount_cents" in validated_data:
         amount_cents = validated_data["amount_cents"]
-        print(type(amount_cents))
         validate_amount_cents(amount_cents)
 
     updated = payment_repository.update_payment(payment_id, validated_data)
