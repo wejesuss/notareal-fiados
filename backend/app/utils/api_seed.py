@@ -4,6 +4,10 @@ from datetime import datetime
 API_BASE = "http://127.0.0.1:8000"
 
 
+def to_cents(number: int | float) -> int:
+    return int(number * 100)
+
+
 def create_client(name, nickname, phone, email):
     data = {
         "name": name,
@@ -24,13 +28,21 @@ def create_client(name, nickname, phone, email):
 
 
 def create_purchase(
-    client_id, description, total_cents, amount_cents, note_number, method=None
+    client_id,
+    description,
+    total_cents,
+    amount_cents,
+    note_number,
+    payment_description=None,
+    method=None,
 ):
     data = {
         "description": description,
         "total_cents": total_cents,
-        "amount_cents": amount_cents,
         "note_number": note_number,
+        # payment
+        "amount_cents": amount_cents,
+        "payment_description": payment_description,
         "method": method,
         "payment_date": int(datetime.now().timestamp()),
         "receipt_number": f"REC-{note_number.split('-')[1]}",
@@ -76,7 +88,8 @@ def run_seed():
     clients = [
         create_client("João Silva", "joao", "11999999999", "joao@email.com"),
         create_client("Maria Souza", "maria", "11988888888", "maria@email.com"),
-        create_client("Carlos Lima", "carlos", "21977777777", "carlos@email.com"),
+        create_client("Carlos Lima", "carlos", None, "carlos@email.com"),
+        create_client("João Santos", None, "21977777777", "joaosantos@email.com"),
     ]
 
     # 2️⃣ Create purchases
@@ -85,7 +98,13 @@ def run_seed():
     if clients[0]:
         purchases.append(
             create_purchase(
-                clients[0]["id"], "Compra de sementes", 10000, 5000, "NF-0001", "Pix"
+                clients[0]["id"],
+                "Compra de sementes",
+                to_cents(100),
+                to_cents(30),
+                "NF-0001",
+                "Pagamento adiantado",
+                "Pix",
             )
         )
 
@@ -93,9 +112,10 @@ def run_seed():
             create_purchase(
                 clients[0]["id"],
                 "Compra de ferramentas",
-                30000,
-                30000,
+                to_cents(300),
+                to_cents(300),
                 "NF-0002",
+                None,
                 "Cartão",
             )
         )
@@ -103,7 +123,13 @@ def run_seed():
     if clients[1]:
         purchases.append(
             create_purchase(
-                clients[1]["id"], "Compra de adubo", 20000, None, "NF-0003", "Dinheiro"
+                clients[1]["id"],
+                "Compra de adubo",
+                20000,
+                None,
+                "NF-0003",
+                None,
+                "Dinheiro",
             )
         )
 
@@ -111,7 +137,7 @@ def run_seed():
     if purchases and purchases[0]:
         create_payment(
             purchases[0]["id"],
-            5000,
+            to_cents(50),
             "Pix",
             "Segunda parcela",
             "REC-0004",
