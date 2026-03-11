@@ -78,12 +78,10 @@ interface ClientRecentPurchasesProps {
   clientId: number;
 }
 
-const fetchLimit = 3;
 const props = defineProps<ClientRecentPurchasesProps>();
 const { navigateTo } = useNavigation();
 const { loading, error, recentPurchases } = useClientRecentPurchases(
   toRef(props, "clientId"),
-  fetchLimit,
 );
 
 type LoadState = "loading" | "error" | "empty" | "ready";

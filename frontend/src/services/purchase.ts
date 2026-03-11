@@ -100,13 +100,12 @@ export async function getClientPurchases(
 
 export async function getClientRecentPurchases(
   clientId: number,
-  limit: number = 3,
   onlyActive: boolean = true
 ): Promise<PurchasesWithMessageResponse> {
   const { data } = await api.get<PurchasesWithMessageResponse>(
     `/clients/${clientId}/purchases`,
     {
-      params: { limit, onlyActive },
+      params: { limit: 3, onlyActive },
     }
   );
 
