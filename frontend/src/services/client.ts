@@ -30,11 +30,6 @@ const clients: Client[] = [
   },
 ];
 
-const summaries: ClientSummary[] = [
-  { clientId: 1, totalPurchases: 15, totalPaid: 360, outstandingBalance: 450 },
-  { clientId: 2, totalPurchases: 7, totalPaid: 0, outstandingBalance: 130.7 },
-];
-
 export async function getClients(
   params?: ClientListParams
 ): Promise<ClientListResponse> {
@@ -80,12 +75,7 @@ export async function updateClient(
 export async function getClientSummary(
   clientId: number
 ): Promise<ClientSummary> {
-  return new Promise((res, rej) => {
-    const found = summaries.find((summary) => summary.clientId === clientId);
-    if (found) {
-      res(found);
-    } else {
-      rej(new Error("Resumo do cliente não encontrado!"));
-    }
-  });
+  const { data } = await api.get<ClientSummary>(`/clients/${clientId}/summary`);
+
+  return data;
 }

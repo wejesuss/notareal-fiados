@@ -26,8 +26,10 @@ export interface ClientUpdate {
 }
 
 export interface ClientSummary {
-  clientId: number;
   totalPurchases: number;
+  totalPaidCents: number;
+  outstandingBalanceCents: number;
+  // computed float by pydantic
   totalPaid: number;
   outstandingBalance: number;
 }
