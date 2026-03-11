@@ -110,7 +110,7 @@ const recentRegistries = computed<RecentRegistry[]>(() =>
     return {
       id: p.id,
       name: p.description,
-      value: formatCurrency(p.totalValue),
+      value: formatCurrency(p.total),
       valueComplement: label,
       ...(paid && {
         iconColor: color,
@@ -125,7 +125,9 @@ const clientPurchases = computed<RegistryCardProps>(() => ({
   title: "Últimas compras",
   titleVariant: "emphasis",
   subtitle:
-    recentPurchases.value.length === 0 ? "" : `Últimas ${fetchLimit} compras`,
+    recentPurchases.value.length <= 1
+      ? ""
+      : `Últimas ${recentPurchases.value.length} compras`,
   nameColor: "text-blue-8",
   valueColor: "text-amber-10",
   route: purchasesRoute.value,

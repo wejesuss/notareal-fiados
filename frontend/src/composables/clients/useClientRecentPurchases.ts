@@ -14,12 +14,9 @@ export function useClientRecentPurchases(
     loading.value = true;
     error.value = null;
     try {
-      recentPurchases.value = await getClientRecentPurchases(
-        clientId.value,
-        limit
-      );
+      const response = await getClientRecentPurchases(clientId.value, limit);
+      recentPurchases.value = response.purchases;
     } catch (e) {
-      console.error(e);
       error.value = e as Error;
       recentPurchases.value = [];
     } finally {

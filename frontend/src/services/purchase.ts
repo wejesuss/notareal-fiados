@@ -1,6 +1,12 @@
-import type { Purchase, PurchaseUpdate, Payment } from "src/models";
+import type {
+  Purchase,
+  PurchaseUpdate,
+  Payment,
+  PurchasesWithMessageResponse,
+} from "src/models";
 import { sleep } from "src/utils/timing/sleep";
 import { getPayments } from "./payment";
+import { api } from "src/api/api";
 
 const purchases: Purchase[] = [
   {
@@ -8,8 +14,10 @@ const purchases: Purchase[] = [
     clientId: 2,
     description:
       "Compra de produtos agrícolas e vitaminas e outras coisinhas mais",
-    totalValue: 350,
-    totalPaidValue: 0,
+    totalCents: 350,
+    totalPaidCents: 0,
+    total: 350,
+    totalPaid: 0,
     status: "pending",
     noteNumber: "NF-002-001",
     isActive: true,
@@ -20,8 +28,10 @@ const purchases: Purchase[] = [
     id: 2,
     clientId: 2,
     description: "Compra de sementes",
-    totalValue: 49.9,
-    totalPaidValue: 49.9,
+    totalCents: 4990,
+    totalPaidCents: 4990,
+    total: 49.9,
+    totalPaid: 49.9,
     status: "paid",
     noteNumber: "NF-002-002",
     isActive: true,
@@ -32,8 +42,10 @@ const purchases: Purchase[] = [
     id: 3,
     clientId: 1,
     description: "Compra de adubo",
-    totalValue: 99.75,
-    totalPaidValue: 29,
+    totalCents: 9975,
+    totalPaidCents: 2900,
+    total: 99.75,
+    totalPaid: 29,
     status: "partial",
     noteNumber: "NF-001-003",
     isActive: false,
@@ -88,15 +100,17 @@ export async function getClientPurchases(
 
 export async function getClientRecentPurchases(
   clientId: number,
-  limit: number = 3
-): Promise<Purchase[]> {
-  await sleep(400);
+  limit: number = 3,
+  onlyActive: boolean = true
+): Promise<PurchasesWithMessageResponse> {
+  const { data } = await api.get<PurchasesWithMessageResponse>(
+    `/clients/${clientId}/purchases`,
+    {
+      params: { limit, onlyActive },
+    }
+  );
 
-  return purchases
-    .filter((p) => {
-      return p.clientId === clientId;
-    })
-    .slice(0, limit);
+  return data;
 }
 
 // Payment related functions
