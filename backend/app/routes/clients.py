@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Query
 from app.services.client_service import (
     get_client_by_id,
     get_clients,
@@ -84,7 +84,9 @@ def remove_client(client_id: int):
 # Purchase related routes
 @router.get("/{client_id}/purchases", response_model=PurchaseListResponseSchema)
 @handle_service_exceptions
-def list_purchases_for_client(client_id: int, limit: int = 3, only_active: bool = True):
+def list_purchases_for_client(
+    client_id: int, limit: int = Query(3, ge=1, le=20), only_active: bool = True
+):
     """List all purchases for a specific client."""
     purchases = get_purchases_by_client(client_id, limit, only_active)
 
