@@ -166,11 +166,13 @@ def deactivate_purchase(purchase_id: int) -> Purchase:
 
 
 # Client related services (business logic)
-def get_purchases_by_client(client_id: int, only_active: bool = True) -> List[Purchase]:
+def get_purchases_by_client(
+    client_id: int, limit: int = 3, only_active: bool = True
+) -> List[Purchase]:
     # Ensure client exists
     domain_validations.get_client_or_404(client_id)
 
-    return purchase_repository.get_purchases_by_client_id(client_id, only_active)
+    return purchase_repository.get_purchases_by_client_id(client_id, limit, only_active)
 
 
 def deactivate_purchases_by_client(client_id: int) -> bool:

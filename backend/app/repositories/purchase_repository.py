@@ -207,7 +207,7 @@ def deactivate_purchase(purchase_id: int) -> bool:
 
 # Client related functions
 def get_purchases_by_client_id(
-    client_id: int, only_active: bool = True
+    client_id: int, limit: int = 3, only_active: bool = True
 ) -> List[Purchase]:
     conn = None
     try:
@@ -219,8 +219,11 @@ def get_purchases_by_client_id(
             where_clause += " AND is_active = 1"
 
         cursor.execute(
-            f"SELECT * FROM purchases {where_clause} ORDER BY created_at DESC",
-            (client_id,),
+            f"""
+            SELECT * FROM purchases {where_clause} 
+            ORDER BY created_at DESC LIMIT ?
+            """,
+            (client_id, limit),
         )
 
         rows = cursor.fetchall()
