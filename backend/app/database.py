@@ -74,6 +74,9 @@ def init_database():
     cursor.execute(
         """CREATE INDEX IF NOT EXISTS idx_payments_purchase ON payments(purchase_id)"""
     )
+    cursor.execute(
+        """CREATE INDEX IF NOT EXISTS idx_purchases_client_created ON purchases(client_id, created_at DESC)"""
+    )
 
     conn.commit()
     # cursor.close()
