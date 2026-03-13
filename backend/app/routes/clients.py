@@ -66,9 +66,9 @@ def edit_client(client_id: int, data: ClientUpdateSchema):
     return {"message": "Cliente atualizado.", "client": client}
 
 
-@router.put("/{client_id}/restore", response_model=ClientWithMessageResponseSchema)
+@router.put("/{client_id}/activate", response_model=ClientWithMessageResponseSchema)
 @handle_service_exceptions
-def restore_client(client_id: int):
+def activate_client_by_id(client_id: int):
     """Activate client changing is_active field. Related purchases/payments remain unchanged."""
     client = activate_client(client_id)
     return {"message": "Cliente restaurado.", "client": client}
