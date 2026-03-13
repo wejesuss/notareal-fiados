@@ -38,7 +38,18 @@ def update_client(client_id: int, data: dict) -> Client | None:
     return client
 
 
-def deactivate_client(client_id: int) -> bool:
+def activate_client(client_id: int) -> Client:
+    """Activate a client, keeping purchases/payments unchaged."""
+    # Ensure client exists
+    original = get_client_or_404(client_id)
+    if original.is_active:
+        raise BusinessRuleError(error_messages.CLIENT_ALREADY_ENABLED)
+
+    client = client_repository.update_client(client_id, {"is_active": 1})
+    return client
+
+
+def deactivate_client(client_id: int) -> Client:
     """Deactivate (soft delete) a client and cascade deactivate related purchases/payments."""
     # Ensure client exists
     get_client_or_404(client_id)

@@ -3,6 +3,8 @@ CLIENT_NOT_FOUND = "Cliente não encontrado."
 CLIENT_ALREADY_EXISTS = "Um cliente com esse apelido já existe."
 CLIENT_INVALID_NAME = "Nome inválido. Evite números e símbolos."
 CLIENT_DELETE_FAILED = "Não foi possível desativar o cliente."
+CLIENT_ALREADY_ENABLED = "Cliente já está ativo."
+CLIENT_ALREADY_DISABLED = "Cliente já está desativado."
 
 # === Purchases ===
 PURCHASE_NOT_FOUND = "Compra não encontrada."

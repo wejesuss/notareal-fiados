@@ -4,6 +4,7 @@ from app.services.client_service import (
     get_clients,
     create_client,
     update_client,
+    activate_client,
     deactivate_client,
     get_client_summary_by_id,
 )
@@ -65,11 +66,15 @@ def edit_client(client_id: int, data: ClientUpdateSchema):
     return {"message": "Cliente atualizado.", "client": client}
 
 
-@router.delete(
-    "/{client_id}",
-    response_model=ClientWithMessageResponseSchema,
-    response_model_exclude_none=True,
-)
+@router.put("/{client_id}/restore", response_model=ClientWithMessageResponseSchema)
+@handle_service_exceptions
+def restore_client(client_id: int):
+    """Activate client changing is_active field. Related purchases/payments remain unchanged."""
+    client = activate_client(client_id)
+    return {"message": "Cliente restaurado.", "client": client}
+
+
+@router.delete("/{client_id}", response_model=ClientWithMessageResponseSchema)
 @handle_service_exceptions
 def remove_client(client_id: int):
     """Delete a client (soft delete)."""
