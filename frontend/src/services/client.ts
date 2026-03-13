@@ -40,8 +40,14 @@ export async function getClients(
   return data;
 }
 
-export function getRecentClients(limit: number = 5): Client[] {
-  return clients.slice(0, limit);
+export async function getRecentClients(
+  limit: number = 5
+): Promise<ClientListResponse> {
+  const { data } = await api.get<ClientListResponse>("/clients", {
+    params: { limit },
+  });
+
+  return data;
 }
 
 export async function getClientById(id: number): Promise<Client> {
