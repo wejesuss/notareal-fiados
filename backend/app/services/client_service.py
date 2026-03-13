@@ -4,7 +4,12 @@ from app.common import PaginatedResult
 from app.services.purchase_service import deactivate_purchases_by_client
 from app.services.domain_validations import get_client_or_404
 import app.repositories.client_repository as client_repository
-from app.utils.exceptions import NotFoundError, error_messages
+from app.utils.exceptions import (
+    NotFoundError,
+    ValidationError,
+    BusinessRuleError,
+    error_messages,
+)
 from app.utils.helpers import filter_allowed
 
 
