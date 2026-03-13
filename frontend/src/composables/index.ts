@@ -1,4 +1,5 @@
 export * from "./core/useNavigation";
+export * from "./core/useDisableConfirmation";
 export * from "./core/useActiveToggleConfirmation";
 export * from "./core/useListQueryState";
 
