@@ -150,21 +150,12 @@ import {
   useActiveToggleConfirmation,
 } from "src/composables";
 import { ContentState } from "src/components/common";
+import { dialogConfig, notifyConfig } from "src/config/clientDialogs";
 
 interface ClientDetailsCardProps {
   clientId: number;
 }
 type LoadState = "loading" | "error" | "empty" | "ready";
-const dialogConfig = {
-  title: "Tem certeza que deseja desativar este cliente?",
-  message: `Este cliente não poderá ser usado para novas operações e todas as suas compras e pagamentos serão desativadas.`,
-  checkboxLabel: "Entendo e desejo desativar o cliente",
-};
-const notifyConfig = {
-  disabledMessage: "Cliente desativado com sucesso.",
-  enabledMessage: "Cliente ativado. Compras e pagamentos não serão ativadas.",
-  errorMessage: "Erro ao atualizar status do cliente.",
-};
 
 const props = defineProps<ClientDetailsCardProps>();
 const { navigateTo } = useNavigation();
