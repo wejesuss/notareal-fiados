@@ -62,7 +62,7 @@ class ClientSummaryResponseSchema(CamelModel, SummaryMixin):
 
 class ClientWithMessageResponseSchema(BaseModel):
     message: str
-    client: ClientResponseSchema | None = None
+    client: ClientResponseSchema
 
 
 class ClientListResponseSchema(BaseModel):

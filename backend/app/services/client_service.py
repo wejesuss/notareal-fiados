@@ -52,14 +52,18 @@ def activate_client(client_id: int) -> Client:
 def deactivate_client(client_id: int) -> Client:
     """Deactivate (soft delete) a client and cascade deactivate related purchases/payments."""
     # Ensure client exists
-    get_client_or_404(client_id)
+    original = get_client_or_404(client_id)
+    if not original.is_active:
+        raise BusinessRuleError(error_messages.CLIENT_ALREADY_DISABLED)
 
     success = client_repository.deactivate_client(client_id)
-    if success:
-        # cascade disable purchases and payments
-        deactivate_purchases_by_client(client_id)
+    if not success:
+        raise NotFoundError(error_messages.CLIENT_NOT_FOUND)
 
-    return success
+    # cascade disable purchases and payments
+    deactivate_purchases_by_client(client_id)
+
+    return client_repository.get_client_by_id(client_id)
 
 
 # Client Financial Summary

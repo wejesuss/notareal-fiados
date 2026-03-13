@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, Depends, Query
 from app.services.client_service import (
     get_client_by_id,
     get_clients,
@@ -78,12 +78,9 @@ def restore_client(client_id: int):
 @handle_service_exceptions
 def remove_client(client_id: int):
     """Delete a client (soft delete)."""
-    success = deactivate_client(client_id)
-    if not success:
-        raise HTTPException(
-            status_code=404, detail="Cliente não encontrado ou já desativado."
-        )
-    return {"message": "Cliente removido com sucesso.", "client": None}
+    client = deactivate_client(client_id)
+
+    return {"message": "Cliente removido com sucesso.", "client": client}
 
 
 # Purchase related routes
