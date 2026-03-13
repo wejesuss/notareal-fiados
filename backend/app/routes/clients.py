@@ -62,7 +62,7 @@ def add_client(data: ClientCreateSchema):
 @handle_service_exceptions
 def edit_client(client_id: int, data: ClientUpdateSchema):
     """Update client data."""
-    client = update_client(client_id, data.model_dump(exclude_none=True))
+    client = update_client(client_id, data.model_dump(exclude_unset=True))
     return {"message": "Cliente atualizado.", "client": client}
 
 

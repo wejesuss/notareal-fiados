@@ -70,12 +70,25 @@ export async function updateClient(
   id: number,
   payload: ClientUpdate
 ): Promise<ClientWithMessageResponse> {
-  const { data } = await api.put<ClientWithMessageResponse>(
-    `/clients/${id}`,
-    payload
-  );
+  const clientData = { ...payload };
+  delete clientData["isActive"];
+  let response: ClientWithMessageResponse | null = null;
 
-  return data;
+  if (clientData) {
+    response = (await api.put(`/clients/${id}`, clientData)).data;
+  }
+
+  if (payload.isActive === true) {
+    response = (await api.put(`/clients/${id}/activate`)).data;
+  } else if (payload.isActive === false) {
+    response = (await api.delete(`/clients/${id}`)).data;
+  }
+
+  if (!response) {
+    throw new Error("Nenhum campo fornecido");
+  }
+
+  return response;
 }
 
 export async function getClientSummary(

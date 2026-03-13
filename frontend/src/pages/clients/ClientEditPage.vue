@@ -43,9 +43,10 @@ import { computed, ref, watch } from "vue";
 import { useQuasar } from "quasar";
 import { useRoute } from "vue-router";
 import type { APIError } from "src/api/errors";
+import type { ClientUpdate } from "src/models";
+import type { ClientPayload } from "src/components/types";
 import { updateClient } from "src/services";
 import { ClientForm } from "src/components/clients";
-import type { ClientPayload } from "src/components/types";
 import {
   useNavigation,
   useClientDetails,
@@ -105,12 +106,16 @@ async function toggleIsActive(nextValue: boolean) {
   isActive.value = nextValue;
 }
 
-async function submit(payload: ClientPayload) {
+async function submit(formData: ClientPayload) {
   try {
-    await updateClient(id.value, {
-      ...payload,
-      isActive: isActive.value,
-    });
+    const payload: ClientUpdate = {
+      ...formData,
+      ...(client.value?.isActive !== isActive.value && {
+        isActive: isActive.value,
+      }),
+    };
+
+    await updateClient(id.value, payload);
 
     $q.notify({
       type: "positive",
