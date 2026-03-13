@@ -41,22 +41,21 @@
 import { computed, ref, watch } from "vue";
 import { useQuasar } from "quasar";
 import { useRoute } from "vue-router";
-import type { Client } from "src/models";
-import { updateClient, getClientById } from "src/services";
+import { updateClient } from "src/services";
 import { useNavigation } from "src/composables/core/useNavigation";
 import type { ClientPayload } from "src/components/types";
 import { ClientForm } from "src/components/clients";
 import type { APIError } from "src/api/errors";
+import { useClientDetails } from "src/composables";
 
 const $route = useRoute();
 const { navigateTo } = useNavigation();
 const $q = useQuasar();
 
-const client = ref<Client | null>(null);
-const loading = ref(true);
+const id = computed(() => Number($route.params.id));
+const { loading, error, client } = useClientDetails(id);
 const isActive = ref(false);
 
-const id = computed(() => Number($route.params.id));
 const clientFormPayload = computed((): ClientPayload => {
   return {
     name: client.value?.name || "",
@@ -66,36 +65,29 @@ const clientFormPayload = computed((): ClientPayload => {
   };
 });
 
-async function handleClientNotFound() {
-  $q.notify({ type: "negative", message: "Cliente não encontrado" });
+async function handleClientNotFound(e: Error) {
+  $q.notify({
+    type: "negative",
+    message: e.message || "Cliente não encontrado",
+  });
   await navigateTo("/clients");
 }
 
-async function loadClient(id: number) {
-  loading.value = true;
-
-  if (!Number.isInteger(id) || id <= 0) {
-    await handleClientNotFound();
-    return;
-  }
-
-  try {
-    client.value = await getClientById(id);
-    isActive.value = client.value.isActive;
-  } catch {
-    await handleClientNotFound();
-  } finally {
-    loading.value = false;
-  }
-}
-
 watch(
-  () => id.value,
-  async (newId) => {
-    await loadClient(newId);
+  client,
+  (newClient) => {
+    if (!newClient) return;
+
+    isActive.value = newClient.isActive;
   },
   { immediate: true },
 );
+
+watch(error, async (err) => {
+  if (!err) return;
+
+  await handleClientNotFound(err);
+});
 
 async function submit(payload: ClientPayload) {
   try {
