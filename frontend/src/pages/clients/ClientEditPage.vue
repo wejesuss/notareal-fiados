@@ -24,7 +24,8 @@
             @submit="submit"
           >
             <q-toggle
-              v-model="isActive"
+              :model-value="isActive"
+              @update:model-value="toggleIsActive"
               checked-icon="check"
               color="blue"
               :label="isActive ? 'Cliente Ativo' : 'Cliente Inativo'"
@@ -41,12 +42,16 @@
 import { computed, ref, watch } from "vue";
 import { useQuasar } from "quasar";
 import { useRoute } from "vue-router";
-import { updateClient } from "src/services";
-import { useNavigation } from "src/composables/core/useNavigation";
-import type { ClientPayload } from "src/components/types";
-import { ClientForm } from "src/components/clients";
 import type { APIError } from "src/api/errors";
-import { useClientDetails } from "src/composables";
+import { updateClient } from "src/services";
+import { ClientForm } from "src/components/clients";
+import type { ClientPayload } from "src/components/types";
+import {
+  useNavigation,
+  useClientDetails,
+  useDisableConfirmation,
+} from "src/composables";
+import { dialogConfig } from "src/config/clientDialogs";
 
 const $route = useRoute();
 const { navigateTo } = useNavigation();
@@ -54,6 +59,7 @@ const $q = useQuasar();
 
 const id = computed(() => Number($route.params.id));
 const { loading, error, client } = useClientDetails(id);
+const { confirmDisable } = useDisableConfirmation();
 const isActive = ref(false);
 
 const clientFormPayload = computed((): ClientPayload => {
@@ -88,6 +94,16 @@ watch(error, async (err) => {
 
   await handleClientNotFound(err);
 });
+
+async function toggleIsActive(nextValue: boolean) {
+  // Show dialog to confirm client deactivation
+  if (nextValue === false) {
+    const confirmed = await confirmDisable(dialogConfig);
+    if (!confirmed) return;
+  }
+
+  isActive.value = nextValue;
+}
 
 async function submit(payload: ClientPayload) {
   try {
