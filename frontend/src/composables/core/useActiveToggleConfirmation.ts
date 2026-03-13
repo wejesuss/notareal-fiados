@@ -62,7 +62,6 @@ export function useActiveToggleConfirmation<T extends ActiveResource>(
     (newValue) => {
       if (!newValue) return;
 
-      submitting.value = false;
       isActive.value = newValue.isActive;
     },
     { immediate: true }
