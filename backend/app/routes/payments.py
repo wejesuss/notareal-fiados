@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, Depends
 from app.services.purchase_service import (
     get_payments_for_purchase,
     get_payment_by_id,
