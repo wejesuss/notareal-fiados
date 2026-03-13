@@ -114,28 +114,19 @@ def get_client_by_id(client_id: int) -> Client | None:
 def update_client(client_id: int, data: dict) -> Client | None:
     conn = None
 
-    # columns that are allowed to be updated
-    allowed_columns = ["name", "nickname", "phone", "email", "is_active"]
-
     columns = []
     values = []
     now = int(datetime.now().timestamp())
 
-    # validate data fields
     for key, value in data.items():
-        if key in allowed_columns:
-            columns.append(f"{key} = ?")
-            if isinstance(value, bool):
-                values.append(int(value))
-            else:
-                values.append(value)
+        columns.append(f"{key} = ?")
+        values.append(value)
 
     if not columns:
         raise ValidationError(error_messages.DATA_FIELDS_EMPTY)
 
     # Add the updated_at timestamp
     columns.append("updated_at = ?")
-    # Add the timestamp for the updated_at column
     values.append(now)
     # Add the client_id for the WHERE clause
     values.append(client_id)

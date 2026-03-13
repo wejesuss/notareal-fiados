@@ -5,6 +5,11 @@ from app.services.purchase_service import deactivate_purchases_by_client
 from app.services.domain_validations import get_client_or_404
 import app.repositories.client_repository as client_repository
 from app.utils.exceptions import NotFoundError, error_messages
+from app.utils.helpers import filter_allowed
+
+
+# fields that are allowed to be updated
+CLIENT_ALLOWED_UPDATE_FIELDS = {"name", "nickname", "phone", "email"}
 
 
 def get_clients(
@@ -30,11 +35,16 @@ def create_client(data: dict) -> Client:
 
 
 def update_client(client_id: int, data: dict) -> Client | None:
-    client_exists = client_repository.get_client_by_id(client_id)
-    if not client_exists:
-        raise NotFoundError(error_messages.CLIENT_NOT_FOUND)
+    if "is_active" in data:
+        raise ValidationError(error_messages.CLIENT_INVALID_ACTIVATION_ROUTE)
 
-    client = client_repository.update_client(client_id, data)
+    validated_data = filter_allowed(data, CLIENT_ALLOWED_UPDATE_FIELDS)
+    if not validated_data:
+        raise ValidationError(error_messages.DATA_FIELDS_EMPTY)
+
+    get_client_or_404(client_id)
+
+    client = client_repository.update_client(client_id, validated_data)
     return client
 
 

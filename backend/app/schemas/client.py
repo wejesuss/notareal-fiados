@@ -37,7 +37,7 @@ class ClientCreateSchema(ClientBase):
 
 # ===== UPDATE =====
 class ClientUpdateSchema(ClientBase):
-    is_active: bool | None = Field(None, ge=0, le=1)
+    pass
 
 
 # ===== RESPONSE =====

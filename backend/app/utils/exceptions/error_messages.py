@@ -5,6 +5,7 @@ CLIENT_INVALID_NAME = "Nome inválido. Evite números e símbolos."
 CLIENT_DELETE_FAILED = "Não foi possível desativar o cliente."
 CLIENT_ALREADY_ENABLED = "Cliente já está ativo."
 CLIENT_ALREADY_DISABLED = "Cliente já está desativado."
+CLIENT_INVALID_ACTIVATION_ROUTE = "Chamada inválida. Utilize a rota correta para a ativação ou desativação do cliente."
 
 # === Purchases ===
 PURCHASE_NOT_FOUND = "Compra não encontrada."
