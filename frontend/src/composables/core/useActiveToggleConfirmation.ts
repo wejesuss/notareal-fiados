@@ -6,7 +6,7 @@ interface ActiveResource {
   isActive: boolean;
 }
 
-interface NotifyConfig {
+export interface NotifyConfig {
   disabledMessage: string;
   enabledMessage: string;
   errorMessage: string;
