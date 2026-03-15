@@ -1,4 +1,5 @@
 import { api } from "src/api/api";
+import { APIError, ErrorMessages } from "src/api/errors";
 import type {
   Client,
   ClientCreate,
@@ -63,7 +64,7 @@ export async function updateClient(
   }
 
   if (!response) {
-    throw new Error("Nenhum campo fornecido");
+    throw new APIError(ErrorMessages.UnexpectedError);
   }
 
   return response;
