@@ -70,17 +70,18 @@ export async function updateClient(
   id: number,
   payload: ClientUpdate
 ): Promise<ClientWithMessageResponse> {
-  const clientData = { ...payload };
-  delete clientData["isActive"];
+  const { isActive, ...clientData } = payload;
   let response: ClientWithMessageResponse | null = null;
 
-  if (clientData) {
+  // Update client only if fields exist
+  if (Object.keys(clientData).length > 0) {
     response = (await api.put(`/clients/${id}`, clientData)).data;
   }
 
-  if (payload.isActive === true) {
+  // Only change client status if status was provided
+  if (isActive === true) {
     response = (await api.put(`/clients/${id}/activate`)).data;
-  } else if (payload.isActive === false) {
+  } else if (isActive === false) {
     response = (await api.delete(`/clients/${id}`)).data;
   }
 
