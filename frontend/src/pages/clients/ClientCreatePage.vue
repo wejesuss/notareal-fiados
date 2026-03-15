@@ -34,7 +34,7 @@ const { navigateTo } = useNavigation();
 const $q = useQuasar();
 
 async function submit(payload: ClientPayload) {
-  createClient(payload);
+  await createClient(payload);
 
   $q.notify({
     type: "positive",
