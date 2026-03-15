@@ -103,7 +103,9 @@ interface ClientFormProps {
   submitIcon?: string;
 }
 
-const emit = defineEmits(["submit"]);
+const emit = defineEmits<{
+  submit: [payload: ClientPayload];
+}>();
 const props = defineProps<ClientFormProps>();
 
 const submitting = ref(false);
@@ -167,10 +169,11 @@ async function submit() {
     const valid = await formRef.value.validate(false);
     if (!valid) return;
 
-    const payload = {
-      ...formData.value,
+    const payload: ClientPayload = {
       name: formData.value.name.trim().replace(/\s+/g, " "),
       nickname: formData.value.nickname?.trim() || null,
+      phone: formData.value.phone || null,
+      email: formData.value.email || null,
     };
 
     emit("submit", payload);
