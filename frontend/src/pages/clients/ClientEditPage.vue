@@ -59,6 +59,7 @@ import {
 } from "src/composables";
 import { dialogConfig } from "src/config/clientDialogs";
 import { ContentState } from "src/components/common";
+import { isShallowEqual } from "src/utils/checkers/isShalowEqual";
 
 const $route = useRoute();
 const { navigateTo } = useNavigation();
@@ -112,11 +113,30 @@ async function toggleIsActive(nextValue: boolean) {
   isActive.value = nextValue;
 }
 
+function isFormDirty(formData: ClientPayload) {
+  if (!client.value) return false;
+
+  const original: ClientPayload = clientFormPayload.value;
+
+  return !isShallowEqual(original, formData);
+}
+
 async function submit(formData: ClientPayload) {
   try {
+    const isActiveChanged = client.value?.isActive !== isActive.value;
+
+    if (!isActiveChanged && !isFormDirty(formData)) {
+      $q.notify({
+        type: "info",
+        message: "Nenhuma alteração para salvar",
+      });
+
+      return;
+    }
+
     const payload: ClientUpdate = {
       ...formData,
-      ...(client.value?.isActive !== isActive.value && {
+      ...(isActiveChanged && {
         isActive: isActive.value,
       }),
     };
