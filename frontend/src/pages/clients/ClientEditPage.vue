@@ -6,7 +6,13 @@
     </div>
 
     <!-- Content -->
-    <q-card v-if="loading">Loading...</q-card>
+    <q-card v-if="loading" class="q-my-xl q-pa-md">
+      <ContentState
+        message="Carregando cliente..."
+        icon-name="person_search"
+        spinner
+      ></ContentState>
+    </q-card>
 
     <q-card v-else>
       <q-card-section class="row items-center q-gutter-md">
@@ -53,6 +59,7 @@ import {
   useDisableConfirmation,
 } from "src/composables";
 import { dialogConfig } from "src/config/clientDialogs";
+import { ContentState } from "src/components/common";
 
 const $route = useRoute();
 const { navigateTo } = useNavigation();
