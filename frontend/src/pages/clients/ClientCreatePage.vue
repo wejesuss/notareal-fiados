@@ -45,14 +45,23 @@ const { navigateTo } = useNavigation();
 const $q = useQuasar();
 
 async function submit(payload: ClientPayload) {
-  await createClient(payload);
+  try {
+    const { client } = await createClient(payload);
 
-  $q.notify({
-    type: "positive",
-    message: "Cliente criado com sucesso",
-  });
+    $q.notify({
+      type: "positive",
+      message: "Cliente criado com sucesso",
+    });
 
-  await navigateTo("/clients");
+    await navigateTo(`/clients/${client.id}`);
+  } catch (err) {
+    if (err instanceof Error) {
+      $q.notify({
+        type: "negative",
+        message: err.message || "Erro ao criar Cliente",
+      });
+    }
+  }
 }
 </script>
 
