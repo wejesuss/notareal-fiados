@@ -164,7 +164,7 @@ async function submit(formData: ClientPayload) {
     if (err instanceof Error) {
       $q.notify({
         type: "negative",
-        message: err.message ?? "Erro ao atualizar Cliente",
+        message: err.message || "Erro ao atualizar Cliente",
       });
     }
   }
