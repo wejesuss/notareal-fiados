@@ -37,6 +37,17 @@
               :label="isActive ? 'Cliente Ativo' : 'Cliente Inativo'"
               unchecked-icon="clear"
             />
+
+            <template #buttons-container>
+              <q-btn
+                class="q-mr-md q-py-sm"
+                color="grey-8"
+                outline
+                type="button"
+                label="Cancelar"
+                @click="navigateTo(`/clients/${id}`)"
+              />
+            </template>
           </ClientForm>
         </div>
       </q-card-section>
