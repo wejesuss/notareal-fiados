@@ -16,7 +16,18 @@
 
       <q-card-section class="text-center q-pa-lg">
         <div class="form-container">
-          <ClientForm submit-label="Salvar" @submit="submit"></ClientForm>
+          <ClientForm submit-label="Salvar" @submit="submit">
+            <template #buttons-container>
+              <q-btn
+                class="q-mr-md q-py-sm"
+                color="grey-8"
+                outline
+                type="button"
+                label="Cancelar"
+                @click="navigateTo('/clients')"
+              />
+            </template>
+          </ClientForm>
         </div>
       </q-card-section>
     </q-card>
