@@ -48,7 +48,6 @@
 import { computed, ref, watch } from "vue";
 import { useQuasar } from "quasar";
 import { useRoute } from "vue-router";
-import type { APIError } from "src/api/errors";
 import type { ClientUpdate } from "src/models";
 import type { ClientPayload } from "src/components/types";
 import { updateClient } from "src/services";
@@ -79,7 +78,7 @@ const clientFormPayload = computed((): ClientPayload => {
   };
 });
 
-async function handleClientNotFound(e: Error) {
+async function handleClientLoadError(e: Error) {
   $q.notify({
     type: "negative",
     message: e.message || "Cliente não encontrado",
@@ -100,7 +99,7 @@ watch(
 watch(error, async (err) => {
   if (!err) return;
 
-  await handleClientNotFound(err);
+  await handleClientLoadError(err);
 });
 
 async function toggleIsActive(nextValue: boolean) {
@@ -130,11 +129,13 @@ async function submit(formData: ClientPayload) {
     });
 
     await navigateTo(`/clients/${id.value}`);
-  } catch (error) {
-    $q.notify({
-      type: "negative",
-      message: (error as APIError).message ?? "Erro ao atualizar Cliente",
-    });
+  } catch (err) {
+    if (err instanceof Error) {
+      $q.notify({
+        type: "negative",
+        message: err.message ?? "Erro ao atualizar Cliente",
+      });
+    }
   }
 }
 </script>
