@@ -80,15 +80,19 @@
       </template>
     </q-input>
 
-    <q-btn
-      class="q-my-md q-mt-lg q-py-sm"
-      color="secondary"
-      type="submit"
-      :icon="submitIcon || 'person_add'"
-      :label="submitLabel"
-      :disable="!isFormValid"
-      :loading="submitting"
-    />
+    <div class="q-my-md">
+      <slot name="buttons-container"></slot>
+
+      <q-btn
+        class="q-py-sm"
+        color="secondary"
+        type="submit"
+        :icon="submitIcon || 'person_add'"
+        :label="submitLabel"
+        :disable="!isFormValid"
+        :loading="submitting"
+      />
+    </div>
   </q-form>
 </template>
 
