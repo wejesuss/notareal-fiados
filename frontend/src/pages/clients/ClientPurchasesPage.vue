@@ -158,8 +158,8 @@ const {
 const { purchasesWithUI } = usePurchasesUI(paginatedPurchases);
 
 const loadState = computed<LoadState>(() => {
-  if (loading.value) return "loading";
   if (clientError.value) return "client-error";
+  if (loading.value) return "loading";
   if (error.value) return "error";
   if (purchases.value.length === 0) return "empty";
   return "ready";
