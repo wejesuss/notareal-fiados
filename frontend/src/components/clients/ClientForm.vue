@@ -89,7 +89,7 @@
         type="submit"
         :icon="submitIcon || 'person_add'"
         :label="submitLabel"
-        :disable="!isFormValid"
+        :disable="!isFormValid || submitting"
         :loading="submitting"
       />
     </div>
@@ -105,6 +105,7 @@ interface ClientFormProps {
   payload?: ClientPayload;
   submitLabel: string;
   submitIcon?: string;
+  submitting: boolean;
 }
 
 const emit = defineEmits<{
@@ -112,7 +113,6 @@ const emit = defineEmits<{
 }>();
 const props = defineProps<ClientFormProps>();
 
-const submitting = ref(false);
 const formRef = ref<QForm | null>(null);
 const formData = ref<ClientPayload>({
   name: props.payload?.name || "",
@@ -166,23 +166,18 @@ const emailRule = (val?: string) =>
   !val || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) || "Email inválido";
 
 async function submit() {
-  try {
-    if (!formRef.value) return;
+  if (!formRef.value) return;
 
-    submitting.value = true;
-    const valid = await formRef.value.validate(false);
-    if (!valid) return;
+  const valid = await formRef.value.validate(false);
+  if (!valid) return;
 
-    const payload: ClientPayload = {
-      name: formData.value.name.trim().replace(/\s+/g, " "),
-      nickname: formData.value.nickname?.trim() || null,
-      phone: formData.value.phone || null,
-      email: formData.value.email || null,
-    };
+  const payload: ClientPayload = {
+    name: formData.value.name.trim().replace(/\s+/g, " "),
+    nickname: formData.value.nickname?.trim() || null,
+    phone: formData.value.phone || null,
+    email: formData.value.email || null,
+  };
 
-    emit("submit", payload);
-  } finally {
-    submitting.value = false;
-  }
+  emit("submit", payload);
 }
 </script>

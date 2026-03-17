@@ -16,7 +16,11 @@
 
       <q-card-section class="text-center q-pa-lg">
         <div class="form-container">
-          <ClientForm submit-label="Salvar" @submit="submit">
+          <ClientForm
+            submit-label="Salvar"
+            @submit="submit"
+            :submitting="submitting"
+          >
             <template #buttons-container>
               <q-btn
                 class="q-mr-md q-py-sm"
@@ -25,6 +29,7 @@
                 type="button"
                 label="Cancelar"
                 @click="navigateTo('/clients')"
+                :disable="submitting"
               />
             </template>
           </ClientForm>
@@ -35,6 +40,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue";
 import { useQuasar } from "quasar";
 import { createClient } from "src/services";
 import { useNavigation } from "src/composables/core/useNavigation";
@@ -43,9 +49,13 @@ import { ClientForm } from "src/components/clients";
 
 const { navigateTo } = useNavigation();
 const $q = useQuasar();
+const submitting = ref(false);
 
 async function submit(payload: ClientPayload) {
+  if (submitting.value) return;
+
   try {
+    submitting.value = true;
     const { client } = await createClient(payload);
 
     $q.notify({
@@ -61,6 +71,8 @@ async function submit(payload: ClientPayload) {
         message: err.message || "Erro ao criar Cliente",
       });
     }
+  } finally {
+    submitting.value = false;
   }
 }
 </script>

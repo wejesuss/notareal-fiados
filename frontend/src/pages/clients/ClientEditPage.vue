@@ -28,6 +28,7 @@
             :payload="clientFormPayload"
             submit-label="Salvar"
             @submit="submit"
+            :submitting="submitting"
           >
             <q-toggle
               :model-value="isActive"
@@ -46,6 +47,7 @@
                 type="button"
                 label="Cancelar"
                 @click="navigateTo(`/clients/${id}`)"
+                :disable="submitting"
               />
             </template>
           </ClientForm>
@@ -80,6 +82,7 @@ const id = computed(() => Number($route.params.id));
 const { loading, error, client } = useClientDetails(id);
 const { confirmDisable } = useDisableConfirmation();
 const isActive = ref(false);
+const submitting = ref(false);
 
 const clientFormPayload = computed((): ClientPayload => {
   return {
@@ -133,7 +136,11 @@ function isFormDirty(formData: ClientPayload) {
 }
 
 async function submit(formData: ClientPayload) {
+  if (submitting.value) return;
+
   try {
+    submitting.value = true;
+
     const isActiveChanged = client.value?.isActive !== isActive.value;
 
     if (!isActiveChanged && !isFormDirty(formData)) {
@@ -167,6 +174,8 @@ async function submit(formData: ClientPayload) {
         message: err.message || "Erro ao atualizar Cliente",
       });
     }
+  } finally {
+    submitting.value = false;
   }
 }
 </script>
