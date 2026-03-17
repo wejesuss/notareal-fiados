@@ -24,6 +24,11 @@
             class="text-primary text-subtitle2 letter-spaced client-name"
             >({{ clientDisplayName }})
           </span>
+          <span
+            v-else-if="loadState === 'client-error'"
+            class="text-grey text-subtitle2 client-name"
+            >(Erro ao carregar Cliente)
+          </span>
         </div>
       </q-card-section>
 
