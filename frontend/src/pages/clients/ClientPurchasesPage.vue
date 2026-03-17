@@ -37,13 +37,31 @@
         />
       </q-card-section>
 
-      <!-- Error state -->
+      <!-- Error states -->
+      <q-card-section v-else-if="loadState === 'client-error'">
+        <ContentState
+          :message="errorMessage"
+          icon-name="error_outline"
+          icon-color="amber-10"
+        />
+        <div class="q-mt-sm text-center">
+          <q-btn rounded outline color="grey-8" @click="reloadClient">
+            Tentar de novo
+          </q-btn>
+        </div>
+      </q-card-section>
+
       <q-card-section v-else-if="loadState === 'error'">
         <ContentState
           :message="errorMessage"
           icon-name="error_outline"
           icon-color="amber-10"
         />
+        <div class="q-mt-sm text-center">
+          <q-btn rounded outline color="grey-8" @click="reloadPurchases">
+            Tentar de novo
+          </q-btn>
+        </div>
       </q-card-section>
 
       <!-- Empty state -->
@@ -116,21 +134,33 @@ import { ContentState } from "src/components/common";
 import { PurchaseRow } from "src/components/purchases";
 import { APIError } from "src/api/errors";
 
-type LoadState = "loading" | "error" | "empty" | "ready";
+type LoadState = "loading" | "client-error" | "error" | "empty" | "ready";
 
 const $route = useRoute();
 const $q = useQuasar();
 const { navigateTo } = useNavigation();
 const clientId = computed(() => Number($route.params.id));
 
-const { client, error: clientError } = useClientDetails(toRef(clientId));
-const { loading, error, purchases, paginatedPurchases, page, totalPages } =
-  useClientPurchases(toRef(clientId));
+const {
+  client,
+  error: clientError,
+  reload: reloadClient,
+} = useClientDetails(toRef(clientId));
+const {
+  loading,
+  error,
+  purchases,
+  paginatedPurchases,
+  page,
+  totalPages,
+  reload: reloadPurchases,
+} = useClientPurchases(toRef(clientId));
 const { purchasesWithUI } = usePurchasesUI(paginatedPurchases);
 
 const loadState = computed<LoadState>(() => {
   if (loading.value) return "loading";
-  if (clientError.value || error.value) return "error";
+  if (clientError.value) return "client-error";
+  if (error.value) return "error";
   if (purchases.value.length === 0) return "empty";
   return "ready";
 });
