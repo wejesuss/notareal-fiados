@@ -40,7 +40,7 @@
       <!-- Error state -->
       <q-card-section v-else-if="loadState === 'error'">
         <ContentState
-          :message="error?.message || 'Erro ao carregar compras'"
+          :message="errorMessage"
           icon-name="error_outline"
           icon-color="amber-10"
         />
@@ -114,6 +114,7 @@ import {
 } from "src/composables";
 import { ContentState } from "src/components/common";
 import { PurchaseRow } from "src/components/purchases";
+import { APIError } from "src/api/errors";
 
 type LoadState = "loading" | "error" | "empty" | "ready";
 
@@ -134,10 +135,10 @@ const loadState = computed<LoadState>(() => {
   return "ready";
 });
 
-async function handleClientNotFound(e: Error, route = "/clients") {
+async function handleClientNotFound(e: Error) {
   $q.notify({ type: "negative", message: e.message });
 
-  await navigateTo(route);
+  await navigateTo("/clients");
 }
 
 const clientDisplayName = computed(() => {
@@ -146,13 +147,22 @@ const clientDisplayName = computed(() => {
     : null;
 });
 
+const errorMessage = computed(
+  () =>
+    clientError.value?.message ||
+    error.value?.message ||
+    "Erro ao carregar cliente com compras",
+);
+
 watch(
   clientError,
   async (err) => {
     if (!err) return;
-    await handleClientNotFound(
-      new Error(err.message || "Erro ao carregar cliente!"),
-    );
+    if (err instanceof APIError) {
+      if (err.status === 404) {
+        await handleClientNotFound(err);
+      }
+    }
   },
   { once: true },
 );
