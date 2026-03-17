@@ -28,7 +28,8 @@ export function useClientPurchases(
     loading.value = true;
     error.value = null;
     try {
-      purchases.value = await getClientPurchases(clientId.value);
+      const response = await getClientPurchases(clientId.value);
+      purchases.value = response.purchases;
     } catch (e) {
       console.error(e);
       error.value = e as Error;

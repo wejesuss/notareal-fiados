@@ -92,10 +92,17 @@ export async function updatePurchase(
 
 // Client related functions
 export async function getClientPurchases(
-  clientId: number
-): Promise<Purchase[]> {
-  await sleep(400);
-  return purchases.filter((p) => p.clientId === clientId);
+  clientId: number,
+  onlyActive: boolean = true
+): Promise<PurchasesWithMessageResponse> {
+  const { data } = await api.get<PurchasesWithMessageResponse>(
+    `/clients/${clientId}/purchases`,
+    {
+      params: { onlyActive },
+    }
+  );
+
+  return data;
 }
 
 export async function getClientRecentPurchases(
