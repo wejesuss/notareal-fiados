@@ -15,31 +15,36 @@ type NumberQueryConfig = {
    * @param ge - The minimum number `value` can be (greater/equal)
    */
   ge?: number;
+  resetPageOnChange: boolean;
 };
 
 type StringQueryConfig = {
   type: "string";
   default: string;
+  resetPageOnChange: boolean;
 };
 
 type BooleanQueryConfig = {
   type: "boolean";
   default: boolean;
+  resetPageOnChange: boolean;
 };
 
 type TriBooleanQueryConfig = {
   type: "tri-boolean";
   default: boolean | null;
+  resetPageOnChange: boolean;
 };
 
-type QueryParamConfig = (
+type QueryParamConfig =
   | NumberQueryConfig
   | StringQueryConfig
   | BooleanQueryConfig
-  | TriBooleanQueryConfig
-) & { resetPageOnChange: boolean };
+  | TriBooleanQueryConfig;
 
-type QuerySchema = Record<string, QueryParamConfig>;
+export type QuerySchema = Record<string, QueryParamConfig> & {
+  page: NumberQueryConfig;
+};
 
 type SnapshotFromSchema<T extends QuerySchema> = {
   [K in keyof T]: QueryTypeMap[T[K]["type"]];
@@ -111,9 +116,7 @@ function setComputedState<T extends QuerySchema>(
   return state;
 }
 
-export function useListQueryState<
-  T extends QuerySchema & { page: NumberQueryConfig },
->(schema: T) {
+export function useListQueryState<T extends QuerySchema>(schema: T) {
   const route = useRoute();
   const router = useRouter();
 
