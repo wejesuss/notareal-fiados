@@ -39,30 +39,18 @@
         <div class="text-subtitle1">Lista de clientes</div>
         <div class="row items-center q-gutter-sm q-gutter-x-md">
           <q-select
-            :model-value="onlyActive"
-            @update:model-value="
-              (vl: boolean) => schema.setField('onlyActive', vl)
-            "
-            :options="activeOptions"
+            v-bind="onlyActive.select"
             label="Filtro"
             dense
             outlined
-            emit-value
-            map-options
             style="min-width: 160px"
           ></q-select>
 
           <q-select
-            :model-value="rowsPerPage"
-            @update:model-value="
-              (vl: number) => schema.setField('rowsPerPage', vl)
-            "
-            :options="rowsOptions"
+            v-bind="rowsPerPage.select"
             label="Por página"
             dense
             outlined
-            emit-value
-            map-options
             style="min-width: 120px"
           ></q-select>
         </div>
@@ -148,8 +136,7 @@
       </q-list>
 
       <q-pagination
-        :model-value="page"
-        @update:model-value="(vl: number) => schema.setField('page', vl)"
+        v-bind="page.pagination"
         :max="totalPages"
         direction-links
         boundary-links
@@ -158,7 +145,7 @@
       >
       </q-pagination>
 
-      <div v-if="page === totalPages" class="text-center q-pb-sm">
+      <div v-if="page.value === totalPages" class="text-center q-pb-sm">
         <span class="text-caption text-grey-7 letter-spaced"
           >Todos os registros exibidos</span
         >
@@ -168,7 +155,11 @@
 </template>
 
 <script setup lang="ts">
-import { useNavigation, useClients, useListQueryState } from "src/composables";
+import {
+  useNavigation,
+  useClients,
+  useClientsQueryState,
+} from "src/composables";
 import { computed } from "vue";
 import { ContentState } from "src/components/common";
 
@@ -176,25 +167,7 @@ type LoadState = "loading" | "error" | "empty" | "ready";
 
 const { navigateTo } = useNavigation();
 
-const activeOptions = [
-  { label: "Todos", value: false },
-  { label: "Somente Ativos", value: true },
-];
-const rowsOptions = [
-  { label: "10", value: 10 },
-  { label: "20", value: 20 },
-  { label: "50", value: 50 },
-];
-
-const schema = useListQueryState({
-  page: { default: 1, type: "number", resetPageOnChange: false },
-  rowsPerPage: { default: 10, type: "number", resetPageOnChange: true },
-  onlyActive: { default: true, type: "boolean", resetPageOnChange: true },
-});
-
-const page = computed(() => schema.state.page.value);
-const rowsPerPage = computed(() => schema.state.rowsPerPage.value);
-const onlyActive = computed(() => schema.state.onlyActive.value);
+const { schema, page, rowsPerPage, onlyActive } = useClientsQueryState();
 const { loading, error, clients, totalPages, reload } = useClients(schema);
 
 const loadState = computed<LoadState>(() => {
