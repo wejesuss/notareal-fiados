@@ -35,7 +35,9 @@
 
     <!-- Content -->
     <q-card v-else>
-      <q-card-section class="row items-center justify-between">
+      <q-card-section
+        class="row items-center justify-between q-col-gutter-y-md"
+      >
         <div class="text-subtitle1">Lista de clientes</div>
         <div class="row items-center q-gutter-sm q-gutter-x-md">
           <q-select
