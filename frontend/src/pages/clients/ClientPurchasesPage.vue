@@ -214,10 +214,8 @@ watch(
   clientError,
   async (err) => {
     if (!err) return;
-    if (err instanceof APIError) {
-      if (err.status === 404) {
-        await handleClientNotFound(err);
-      }
+    if (err instanceof APIError && err.status === 404) {
+      await handleClientNotFound(err);
     }
   },
   { once: true },
