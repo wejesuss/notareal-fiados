@@ -62,7 +62,7 @@
         <q-icon name="people_outline" size="48px" color="grey-6"></q-icon>
 
         <div class="text-subtitle1 q-mt-md">
-          Nenhum cliente encontrado com este filtro
+          {{ emptyMessage }}
         </div>
         <div
           class="text-caption caption-medium letter-spaced text-grey-7 q-mt-xs"
@@ -181,6 +181,12 @@ const loadState = computed<LoadState>(() => {
 const errorMessage = computed(
   () => error.value?.message || "Erro ao carregar clientes",
 );
+const emptyMessage = computed(() => {
+  const isFiltered = schema.state.onlyActive.value === true;
+  return isFiltered
+    ? "Nenhum cliente ativo encontrado"
+    : "Nenhum cliente cadastrado ainda";
+});
 </script>
 
 <style lang="css" scoped>
