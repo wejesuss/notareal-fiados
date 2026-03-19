@@ -145,7 +145,7 @@
       >
       </q-pagination>
 
-      <div v-if="page.value === totalPages" class="text-center q-pb-sm">
+      <div v-if="page.stateValue === totalPages" class="text-center q-pb-sm">
         <span class="text-caption text-grey-7 letter-spaced"
           >Todos os registros exibidos</span
         >
@@ -182,7 +182,7 @@ const errorMessage = computed(
   () => error.value?.message || "Erro ao carregar clientes",
 );
 const emptyMessage = computed(() => {
-  const isFiltered = schema.state.onlyActive.value === true;
+  const isFiltered = onlyActive.value.stateValue === true;
   return isFiltered
     ? "Nenhum cliente ativo encontrado"
     : "Nenhum cliente cadastrado ainda";
