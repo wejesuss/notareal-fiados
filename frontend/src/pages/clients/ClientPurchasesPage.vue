@@ -14,7 +14,9 @@
 
     <!-- Content -->
     <q-card>
-      <q-card-section>
+      <q-card-section
+        class="row items-center justify-between q-col-gutter-y-md"
+      >
         <div
           class="text-subtitle1 row items-center q-gutter-x-sm q-col-gutter-y-xs"
         >
@@ -29,6 +31,24 @@
             class="text-grey text-subtitle2 client-name"
             >(Erro ao carregar Cliente)
           </span>
+        </div>
+
+        <div class="row items-center q-gutter-sm q-gutter-x-md">
+          <q-select
+            :model-value="true"
+            label="Filtro"
+            dense
+            outlined
+            style="min-width: 160px"
+          ></q-select>
+
+          <q-select
+            :model-value="10"
+            label="Por página"
+            dense
+            outlined
+            style="min-width: 120px"
+          ></q-select>
         </div>
       </q-card-section>
 
