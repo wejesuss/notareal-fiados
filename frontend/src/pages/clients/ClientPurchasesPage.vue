@@ -62,28 +62,16 @@
         />
       </q-card-section>
 
-      <!-- Error states -->
-      <q-card-section v-else-if="loadState === 'client-error'">
+      <!-- Error states - This catches 'client-error' and 'error' together -->
+      <q-card-section v-else-if="loadState.includes('error')">
         <ContentState
           :message="errorMessage"
           icon-name="error_outline"
           icon-color="amber-10"
         />
-        <div class="q-mt-sm text-center">
-          <q-btn rounded outline color="grey-8" @click="reloadClient">
-            Tentar de novo
-          </q-btn>
-        </div>
-      </q-card-section>
 
-      <q-card-section v-else-if="loadState === 'error'">
-        <ContentState
-          :message="errorMessage"
-          icon-name="error_outline"
-          icon-color="amber-10"
-        />
         <div class="q-mt-sm text-center">
-          <q-btn rounded outline color="grey-8" @click="reloadPurchases">
+          <q-btn rounded outline color="grey-8" @click="reload">
             Tentar de novo
           </q-btn>
         </div>
@@ -210,6 +198,17 @@ const errorMessage = computed(
     error.value?.message ||
     "Erro ao carregar cliente com compras",
 );
+
+const reload = async () => {
+  if (clientError.value && error.value) {
+    await reloadClient();
+    await reloadPurchases();
+  } else if (clientError.value) {
+    await reloadClient();
+  } else if (error.value) {
+    await reloadPurchases();
+  }
+};
 
 watch(
   clientError,
