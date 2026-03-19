@@ -29,15 +29,15 @@ export function useClientsQueryState() {
 
   const page = computed(() => ({
     value: schema.state.page.value,
-    pagination: bind("page"),
+    bind: bind("page"),
   }));
   const rowsPerPage = computed(() => ({
     value: schema.state.rowsPerPage.value,
-    select: bindSelect("rowsPerPage", rowsOptions),
+    bind: bindSelect("rowsPerPage", rowsOptions),
   }));
   const onlyActive = computed(() => ({
     value: schema.state.onlyActive.value,
-    select: bindSelect("onlyActive", activeOptions),
+    bind: bindSelect("onlyActive", activeOptions),
   }));
 
   /**

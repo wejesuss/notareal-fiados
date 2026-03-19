@@ -39,7 +39,7 @@
         <div class="text-subtitle1">Lista de clientes</div>
         <div class="row items-center q-gutter-sm q-gutter-x-md">
           <q-select
-            v-bind="onlyActive.select"
+            v-bind="onlyActive.bind"
             label="Filtro"
             dense
             outlined
@@ -47,7 +47,7 @@
           ></q-select>
 
           <q-select
-            v-bind="rowsPerPage.select"
+            v-bind="rowsPerPage.bind"
             label="Por página"
             dense
             outlined
@@ -136,7 +136,7 @@
       </q-list>
 
       <q-pagination
-        v-bind="page.pagination"
+        v-bind="page.bind"
         :max="totalPages"
         direction-links
         boundary-links
