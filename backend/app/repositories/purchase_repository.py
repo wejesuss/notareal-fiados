@@ -227,24 +227,50 @@ def deactivate_purchase(purchase_id: int) -> bool:
 
 # Client related functions
 def get_purchases_by_client_id(
-    client_id: int, limit: int = 3, only_active: bool = True
+    client_id: int,
+    limit: int | None = None,
+    offset: int = 0,
+    statuses: List[PurchaseStatus] | None = None,
+    is_active: bool | None = None,
 ) -> List[Purchase]:
     conn = None
     try:
         conn = get_connection()
         cursor = conn.cursor()
 
-        where_clause = "WHERE client_id = ?"
-        if only_active:
-            where_clause += " AND is_active = 1"
+        # Default limit if not provided (-1 means "no limit" in SQLite)
+        search_limit = -1 if limit is None else limit
 
-        cursor.execute(
-            f"""
-            SELECT * FROM purchases {where_clause} 
-            ORDER BY created_at DESC LIMIT ?
-            """,
-            (client_id, limit),
-        )
+        # Create WHERE clause based on status and is_active
+        # The semantics and group meaning of status and is_active being used together
+        # should be verified in the service-layer. Here it is considered "as is".
+        params = []
+        clauses = []
+
+        clauses.append("client_id = ?")
+        params.append(client_id)
+
+        if statuses:
+            placeholders = ", ".join(["?"] * len(statuses))
+            clauses.append(f"status IN ({placeholders})")
+            params.extend([s.value for s in statuses])
+
+        if is_active is not None:
+            clauses.append("is_active = ?")
+            params.append(int(is_active))
+
+        where_clause = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+
+        params.append((search_limit, offset))
+
+        query = f"""
+            SELECT * FROM purchases 
+            {where_clause} 
+            ORDER BY created_at DESC
+            LIMIT ? OFFSET ?
+        """
+
+        cursor.execute(query, params)
 
         rows = cursor.fetchall()
 
