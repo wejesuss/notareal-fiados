@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 
-# Store basic information about the client
+# Store basic information about the purchase
 @dataclass
 class Purchase:
     id: int
