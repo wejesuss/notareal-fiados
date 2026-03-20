@@ -2,6 +2,7 @@ from typing import List
 from datetime import datetime
 from app.database import get_connection, sqlite3
 from app.models import Purchase
+from app.common import PurchaseStatus
 from app.utils.exceptions import (
     BusinessRuleError,
     DatabaseError,
@@ -10,7 +11,10 @@ from app.utils.exceptions import (
 
 
 def get_purchases(
-    limit: int = None, offset: int = 0, only_pending: bool | None = None
+    limit: int | None = None,
+    offset: int = 0,
+    status: List[PurchaseStatus] | None = None,
+    is_active: bool | None = None,
 ) -> List[Purchase]:
     conn = None
     try:
@@ -20,19 +24,34 @@ def get_purchases(
         # Default limit if not provided (-1 means "no limit" in SQLite)
         search_limit = -1 if limit is None else limit
 
-        # Create WHERE clause if only pending (or partial) purchases is requested
-        where_clause = ""  # include inactive ones if only_pending is None
-        if only_pending is True:
-            where_clause = "WHERE status IN ('pending', 'partial') AND is_active = 1"
-        elif only_pending is False:
-            where_clause = "WHERE is_active = 1"
+        # Create WHERE clause based on status and is_active
+        # The semantics and group meaning of status and is_active being used together
+        # should be verified in the service-layer. Here it is considered "as is".
+        params = []
+
+        status_clause = ""
+        if status:
+            status_clause = f"status IN ({', '.join(['?'] * len(status))})"
+            params.extend([s.value for s in status])
+
+        active_clause = ""
+        if is_active is not None:
+            active_clause = "is_active = ?"
+            params.append(int(is_active))
+
+        where_clause = ""
+        if status_clause or active_clause:
+            clauses = filter(None, [status_clause, active_clause])
+            where_clause = f"WHERE {' AND '.join(clauses)}"
+
+        params.append((search_limit, offset))
 
         cursor.execute(
             f"""
             SELECT * FROM purchases {where_clause} ORDER BY created_at DESC
             LIMIT ? OFFSET ?
         """,
-            (search_limit, offset),
+            (list(params)),
         )
 
         rows = cursor.fetchall()
