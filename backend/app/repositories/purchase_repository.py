@@ -3,7 +3,6 @@ from datetime import datetime
 from app.database import get_connection, sqlite3
 from app.models import Purchase
 from app.utils.exceptions import (
-    ValidationError,
     BusinessRuleError,
     DatabaseError,
     error_messages,
@@ -54,6 +53,10 @@ def insert_purchase(data: dict) -> Purchase:
     try:
         conn = get_connection()
         cursor = conn.cursor()
+        client_id = data.get("client_id")
+
+        if client_id is None:
+            raise BusinessRuleError(error_messages.FOREIGN_KEY_ERROR)
 
         now = int(datetime.now().timestamp())
 
@@ -71,7 +74,7 @@ def insert_purchase(data: dict) -> Purchase:
             ) VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?);
         """,
             (
-                int(data.get("client_id")),
+                int(client_id),
                 data.get("description"),
                 data.get("total_cents"),
                 data.get("total_paid_cents"),
