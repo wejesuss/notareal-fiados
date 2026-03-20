@@ -13,7 +13,7 @@ from app.utils.exceptions import (
 def get_purchases(
     limit: int | None = None,
     offset: int = 0,
-    status: List[PurchaseStatus] | None = None,
+    statuses: List[PurchaseStatus] | None = None,
     is_active: bool | None = None,
 ) -> List[Purchase]:
     conn = None
@@ -28,31 +28,29 @@ def get_purchases(
         # The semantics and group meaning of status and is_active being used together
         # should be verified in the service-layer. Here it is considered "as is".
         params = []
+        clauses = []
 
-        status_clause = ""
-        if status:
-            status_clause = f"status IN ({', '.join(['?'] * len(status))})"
-            params.extend([s.value for s in status])
+        if statuses:
+            placeholders = ", ".join(["?"] * len(statuses))
+            clauses.append(f"status IN ({placeholders})")
+            params.extend([s.value for s in statuses])
 
-        active_clause = ""
         if is_active is not None:
-            active_clause = "is_active = ?"
+            clauses.append("is_active = ?")
             params.append(int(is_active))
 
-        where_clause = ""
-        if status_clause or active_clause:
-            clauses = filter(None, [status_clause, active_clause])
-            where_clause = f"WHERE {' AND '.join(clauses)}"
+        where_clause = f"WHERE {' AND '.join(clauses)}" if clauses else ""
 
         params.append((search_limit, offset))
 
-        cursor.execute(
-            f"""
-            SELECT * FROM purchases {where_clause} ORDER BY created_at DESC
+        query = f"""
+            SELECT * FROM purchases 
+            {where_clause} 
+            ORDER BY created_at DESC
             LIMIT ? OFFSET ?
-        """,
-            (list(params)),
-        )
+        """
+
+        cursor.execute(query, params)
 
         rows = cursor.fetchall()
 
