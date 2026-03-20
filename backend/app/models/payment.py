@@ -27,7 +27,7 @@ class Payment:
             description=row[5],
             receipt_number=row[6],
             is_active=row[7],
-            created_at=datetime.fromtimestamp(row[8]) if row[8] else None,
+            created_at=datetime.fromtimestamp(row[8]),
             updated_at=datetime.fromtimestamp(row[9]) if row[9] else None,
         )
 
@@ -40,6 +40,6 @@ class Payment:
             self.description,
             self.receipt_number,
             self.is_active,
-            int(self.created_at.timestamp()) if self.created_at else None,
-            int(self.updated_at.timestamp() if self.updated_at else None),
+            int(self.created_at.timestamp()),
+            int(self.updated_at.timestamp()) if self.updated_at else None,
         )
