@@ -3,6 +3,8 @@ from datetime import datetime
 from app.models import Purchase, Payment
 from app.services import payment_service, domain_validations
 from app.repositories import purchase_repository
+from app.common.purchase_status import PurchaseStatus
+
 from app.utils.helpers import filter_allowed, validate_amount_cents
 from app.utils.exceptions import (
     BusinessRuleError,
@@ -33,9 +35,14 @@ def get_purchase_by_note_number(note_number: str) -> Purchase:
 
 
 def get_purchases(
-    limit: int = None, offset: int = 0, only_pending: bool | None = None
+    limit: int = None,
+    offset: int = 0,
+    statuses: List[PurchaseStatus] | None = None,
+    is_active: bool | None = None,
 ) -> List[Purchase]:
-    purchases = purchase_repository.get_purchases(limit, offset, only_pending)
+    domain_validations.validate_status_with_is_active(is_active, statuses)
+
+    purchases = purchase_repository.get_purchases(limit, offset, statuses, is_active)
 
     return purchases or []
 
@@ -167,12 +174,20 @@ def deactivate_purchase(purchase_id: int) -> Purchase:
 
 # Client related services (business logic)
 def get_purchases_by_client(
-    client_id: int, limit: int = 3, only_active: bool = True
+    client_id: int,
+    limit: int | None = None,
+    offset: int = 0,
+    statuses: List[PurchaseStatus] | None = None,
+    is_active: bool | None = None,
 ) -> List[Purchase]:
+    domain_validations.validate_status_with_is_active(is_active, statuses)
+
     # Ensure client exists
     domain_validations.get_client_or_404(client_id)
 
-    return purchase_repository.get_purchases_by_client_id(client_id, limit, only_active)
+    return purchase_repository.get_purchases_by_client_id(
+        client_id, limit, offset, statuses, is_active
+    )
 
 
 def deactivate_purchases_by_client(client_id: int) -> bool:

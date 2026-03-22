@@ -13,9 +13,14 @@ PURCHASE_ALREADY_EXISTS = "Uma compra com esse número de nota já existe."
 PURCHASE_INVALID_TOTAL = "O valor total da compra deve ser maior que zero."
 PURCHASE_INVALID_STATUS = "Status inválido. Use 'pending', 'partial' ou 'paid'."
 PURCHASE_CLIENT_NOT_FOUND = "Um cliente com esse id não existe."
-PURCHASE_INVALID_ACTIVATION_ROUTE = "Chamada inválida. Utilize a rota correta para a ativação ou desativação da compra."
+PURCHASE_INVALID_ACTIVATION_ROUTE = (
+    "Chamada inválida. Utilize a rota correta para a ativação ou desativação da compra."
+)
 PURCHASE_ALREADY_ENABLED = "Compra já está ativa."
 PURCHASE_ALREADY_DISABLED = "Compra já está desativada."
+PURCHASE_INVALID_FILTER = (
+    "Não é possível filtrar compras desativadas junto com o campo 'status'."
+)
 
 # === Payments ===
 PAYMENT_NOT_FOUND = "Pagamento não encontrado."
@@ -27,7 +32,9 @@ PAYMENT_ALREADY_ENABLED = "Pagamento já está ativo."
 PAYMENT_ALREADY_DISABLED = "Pagamento já está desativado."
 PAYMENT_CREATION_FAILED = "Não é possível adicionar pagamento a uma compra desativada."
 PAYMENT_ACTIVATION_FAILED = "Não é possível ativar pagamento de uma compra desativada."
-PAYMENT_PURCHASE_CREATION_FAILED = "Não foi possível criar o pagamento junto com a compra."
+PAYMENT_PURCHASE_CREATION_FAILED = (
+    "Não foi possível criar o pagamento junto com a compra."
+)
 PAYMENT_INVALID_ACTIVATION_ROUTE = "Chamada inválida. Utilize a rota correta para a ativação ou desativação do pagamento."
 PAYMENT_EXCEEDS_PURCHASE_TOTAL = "O valor do pagamento excede o valor total da compra."
 
