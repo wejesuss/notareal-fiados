@@ -10,6 +10,49 @@ from app.utils.exceptions import (
 )
 
 
+def _build_purchases_query(
+    client_id: int | None,
+    statuses: List[PurchaseStatus] | None,
+    is_active: bool | None,
+    limit: int | None,
+    offset: int,
+) -> tuple[str, List]:
+    # Default limit if not provided (-1 means "no limit" in SQLite)
+    search_limit = -1 if limit is None else limit
+
+    # Create WHERE clause based on status and is_active
+    # The semantics and group meaning of status and is_active being used together
+    # should be verified in the service-layer. Here it is considered "as is".
+    params = []
+    clauses = []
+
+    if client_id:
+        clauses.append("client_id = ?")
+        params.append(client_id)
+
+    if statuses:
+        placeholders = ", ".join(["?"] * len(statuses))
+        clauses.append(f"status IN ({placeholders})")
+        params.extend([s.value for s in statuses])
+
+    if is_active is not None:
+        clauses.append("is_active = ?")
+        params.append(int(is_active))
+
+    where_clause = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+
+    params.append((search_limit, offset))
+
+    query = f"""
+        SELECT * FROM purchases 
+        {where_clause} 
+        ORDER BY created_at DESC
+        LIMIT ? OFFSET ?
+    """
+
+    return query, params
+
+
 def get_purchases(
     limit: int | None = None,
     offset: int = 0,
@@ -21,34 +64,7 @@ def get_purchases(
         conn = get_connection()
         cursor = conn.cursor()
 
-        # Default limit if not provided (-1 means "no limit" in SQLite)
-        search_limit = -1 if limit is None else limit
-
-        # Create WHERE clause based on status and is_active
-        # The semantics and group meaning of status and is_active being used together
-        # should be verified in the service-layer. Here it is considered "as is".
-        params = []
-        clauses = []
-
-        if statuses:
-            placeholders = ", ".join(["?"] * len(statuses))
-            clauses.append(f"status IN ({placeholders})")
-            params.extend([s.value for s in statuses])
-
-        if is_active is not None:
-            clauses.append("is_active = ?")
-            params.append(int(is_active))
-
-        where_clause = f"WHERE {' AND '.join(clauses)}" if clauses else ""
-
-        params.append((search_limit, offset))
-
-        query = f"""
-            SELECT * FROM purchases 
-            {where_clause} 
-            ORDER BY created_at DESC
-            LIMIT ? OFFSET ?
-        """
+        query, params = _build_purchases_query(None, statuses, is_active, limit, offset)
 
         cursor.execute(query, params)
 
@@ -238,37 +254,9 @@ def get_purchases_by_client_id(
         conn = get_connection()
         cursor = conn.cursor()
 
-        # Default limit if not provided (-1 means "no limit" in SQLite)
-        search_limit = -1 if limit is None else limit
-
-        # Create WHERE clause based on status and is_active
-        # The semantics and group meaning of status and is_active being used together
-        # should be verified in the service-layer. Here it is considered "as is".
-        params = []
-        clauses = []
-
-        clauses.append("client_id = ?")
-        params.append(client_id)
-
-        if statuses:
-            placeholders = ", ".join(["?"] * len(statuses))
-            clauses.append(f"status IN ({placeholders})")
-            params.extend([s.value for s in statuses])
-
-        if is_active is not None:
-            clauses.append("is_active = ?")
-            params.append(int(is_active))
-
-        where_clause = f"WHERE {' AND '.join(clauses)}" if clauses else ""
-
-        params.append((search_limit, offset))
-
-        query = f"""
-            SELECT * FROM purchases 
-            {where_clause} 
-            ORDER BY created_at DESC
-            LIMIT ? OFFSET ?
-        """
+        query, params = _build_purchases_query(
+            client_id, statuses, is_active, limit, offset
+        )
 
         cursor.execute(query, params)
 
