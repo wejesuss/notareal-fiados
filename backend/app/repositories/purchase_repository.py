@@ -41,7 +41,7 @@ def _build_purchases_query(
 
     where_clause = f"WHERE {' AND '.join(clauses)}" if clauses else ""
 
-    params.append((search_limit, offset))
+    params.extend([search_limit, offset])
 
     query = f"""
         SELECT * FROM purchases 
