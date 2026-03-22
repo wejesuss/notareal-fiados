@@ -4,8 +4,7 @@ from app.models import Purchase, Payment
 from app.services import payment_service, domain_validations
 from app.repositories import purchase_repository
 from app.common.purchase_status import PurchaseStatus
-
-from app.utils.helpers import filter_allowed, validate_amount_cents
+from app.utils.helpers import filter_allowed
 from app.utils.exceptions import (
     BusinessRuleError,
     NotFoundError,
@@ -53,7 +52,7 @@ def create_purchase(client_id: int, data: dict) -> Purchase:
     # Validate amount_cents if present
     amount_cents: int | None = data.get("amount_cents")
     if amount_cents is not None:
-        validate_amount_cents(amount_cents)
+        domain_validations.validate_amount_cents(amount_cents)
 
     if total_cents <= 0:
         raise ValidationError(error_messages.PURCHASE_INVALID_TOTAL)

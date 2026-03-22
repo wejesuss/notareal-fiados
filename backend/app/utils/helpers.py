@@ -21,9 +21,3 @@ def is_valid_name(name: str) -> bool:
         return False
 
     return True
-
-
-def validate_amount_cents(amount: int | None) -> int:
-    if amount is None or not isinstance(amount, int) or amount <= 0:
-        raise ValidationError(error_messages.PAYMENT_INVALID_AMOUNT)
-    return amount

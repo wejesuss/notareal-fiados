@@ -1,7 +1,8 @@
 from typing import List
 from app.models import Payment
 from app.repositories import payment_repository
-from app.utils.helpers import filter_allowed, validate_amount_cents
+from app.utils.helpers import filter_allowed
+from app.services.domain_validations import validate_amount_cents
 from app.utils.exceptions import ValidationError, NotFoundError, error_messages
 
 # fields that are allowed to be updated

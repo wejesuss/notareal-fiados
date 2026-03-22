@@ -5,6 +5,12 @@ from app.repositories.client_repository import get_client_by_id
 from app.utils.exceptions import NotFoundError, BusinessRuleError, error_messages
 
 
+def validate_amount_cents(amount: int | None) -> int:
+    if amount is None or not isinstance(amount, int) or amount <= 0:
+        raise ValidationError(error_messages.PAYMENT_INVALID_AMOUNT)
+    return amount
+
+
 def get_client_or_404(client_id: int) -> Client:
     client = get_client_by_id(client_id)
 
