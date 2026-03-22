@@ -3,6 +3,7 @@ from datetime import datetime
 from pydantic import BaseModel, Field
 from app.schemas.base import CamelModel
 from app.schemas.mixins import TotalsMixin
+from app.common.purchase_status import PurchaseStatus
 
 
 # ===== Base =====
@@ -54,7 +55,7 @@ class PurchaseResponseSchema(CamelModel, TotalsMixin):
     description: str
     total_cents: int
     total_paid_cents: int
-    status: str
+    status: PurchaseStatus
     note_number: str | None
     is_active: int
     created_at: datetime
@@ -81,7 +82,6 @@ class PurchaseListQuerySchema(CamelModel):
     offset: int = Field(
         default=0, ge=0, description="Número de compras para ignorar antes da listagem"
     )
-    only_pending: bool | None = Field(
-        default=None,
-        description="Filtrar somente compras ativas não quitadas. Se nulo, busca compras já desativadas.",
+    is_active: bool | None = Field(
+        None, description="Filtrar por compras ativas ou inativas"
     )

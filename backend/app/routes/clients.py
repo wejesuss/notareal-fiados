@@ -1,4 +1,6 @@
+from typing import List
 from fastapi import APIRouter, Depends, Query
+from app.common import PurchaseStatus
 from app.services.client_service import (
     get_client_by_id,
     get_clients,
@@ -20,7 +22,7 @@ from app.schemas.client import (
     ClientUpdateSchema,
     ClientSummaryResponseSchema,
 )
-from app.schemas.purchase import PurchaseListResponseSchema
+from app.schemas.purchase import PurchaseListResponseSchema, PurchaseListQuerySchema
 
 router = APIRouter(prefix="/clients", tags=["Clients"])
 
@@ -87,10 +89,16 @@ def remove_client(client_id: int):
 @router.get("/{client_id}/purchases", response_model=PurchaseListResponseSchema)
 @handle_service_exceptions
 def list_purchases_for_client(
-    client_id: int, limit: int = Query(3, ge=1, le=20), only_active: bool = True
+    client_id: int,
+    params: PurchaseListQuerySchema = Depends(),
+    statuses: List[PurchaseStatus] | None = Query(default=None),
 ):
     """List all purchases for a specific client."""
-    purchases = get_purchases_by_client(client_id, limit, only_active)
+
+    limit = params.limit
+    offset = params.offset
+    is_active = params.is_active
+    purchases = get_purchases_by_client(client_id, limit, offset, statuses, is_active)
 
     return {"message": "Compras encontradas.", "purchases": purchases}
 
