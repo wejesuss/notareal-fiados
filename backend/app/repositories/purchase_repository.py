@@ -30,7 +30,7 @@ def _build_purchases_query(
     params = []
     clauses = []
 
-    if client_id:
+    if client_id is not None:
         clauses.append("client_id = ?")
         params.append(client_id)
 
