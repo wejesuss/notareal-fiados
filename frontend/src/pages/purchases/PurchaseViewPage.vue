@@ -81,18 +81,7 @@ import {
 } from "src/composables";
 import { PurchaseDetailsCard } from "src/components/purchases";
 import { ContentState } from "src/components/common";
-
-const dialogConfig = {
-  title: "Tem certeza que deseja desativar esta compra?",
-  message:
-    "Esta compra não poderá receber novas operações e todos os pagamentos desta compra serão desativados.",
-  checkboxLabel: "Entendo e desejo desativar a compra",
-};
-const notifyConfig = {
-  disabledMessage: "Compra desativada com sucesso.",
-  enabledMessage: "Compra ativada. Pagamentos não serão ativados.",
-  errorMessage: "Erro ao atualizar status da compra.",
-};
+import { dialogConfig, notifyConfig } from "src/config/purchases/dialogs";
 
 const $route = useRoute();
 const purchaseId = computed(() => Number($route.params.id));
