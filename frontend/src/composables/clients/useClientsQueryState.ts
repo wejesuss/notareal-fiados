@@ -1,24 +1,9 @@
 import { computed } from "vue";
 import { useListQueryState, type QuerySchema } from "src/composables";
-
-interface Option<T = unknown> {
-  label: string;
-  value: T;
-}
-
-type Options<T = unknown> = readonly Option<T>[];
+import type { Options } from "src/types/options";
+import { activeOptions, rowsOptions } from "src/config/clients/options";
 
 export function useClientsQueryState() {
-  const rowsOptions: Options<number> = [
-    { label: "10", value: 10 },
-    { label: "20", value: 20 },
-    { label: "50", value: 50 },
-  ];
-  const activeOptions: Options<boolean> = [
-    { label: "Todos", value: false },
-    { label: "Somente Ativos", value: true },
-  ];
-
   const clientsQuery = {
     page: { default: 1, type: "number", resetPageOnChange: false },
     rowsPerPage: { default: 10, type: "number", resetPageOnChange: true },
