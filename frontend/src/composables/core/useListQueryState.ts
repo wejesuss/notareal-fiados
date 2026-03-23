@@ -21,6 +21,13 @@ type NumberQueryConfig = {
 type StringQueryConfig = {
   type: "string";
   default: string;
+  /**
+   * Is the param valid?
+   * @param value - The value retrieved from the route.query
+   * @returns If `value` is a valid string or not.
+   * If not this param fallback to `default`
+   */
+  isValid?: (value: string) => boolean;
   resetPageOnChange: boolean;
 };
 
@@ -85,6 +92,12 @@ function parseValue<T extends QueryParamConfig>(
       if (value === "true") return true;
       if (value === "false") return false;
       return null;
+
+    case "string":
+      if (!value || (config.isValid && !config.isValid(value))) {
+        return config.default;
+      }
+      return value;
 
     default:
       return value;
@@ -157,6 +170,14 @@ export function useListQueryState<T extends QuerySchema>(schema: T) {
 
     if (!config) {
       throw new Error(`Query schema does not contain the key: ${keyStr}`);
+    }
+
+    if (config.type === "string" && config.isValid) {
+      const valid = config.isValid(value as string);
+      if (!valid)
+        throw new Error(
+          "The value provided does not passes validation function"
+        );
     }
 
     const serialized = serializeValue(value, config);
