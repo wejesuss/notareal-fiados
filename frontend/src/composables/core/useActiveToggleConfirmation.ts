@@ -1,15 +1,10 @@
 import { ref, watch, type Ref } from "vue";
 import { useQuasar } from "quasar";
-import { useDisableConfirmation, type DialogConfig } from "src/composables";
+import { useDisableConfirmation } from "src/composables";
+import type { DialogConfig, NotifyConfig } from "src/types/dialog";
 
 interface ActiveResource {
   isActive: boolean;
-}
-
-export interface NotifyConfig {
-  disabledMessage: string;
-  enabledMessage: string;
-  errorMessage: string;
 }
 
 export function useActiveToggleConfirmation<T extends ActiveResource>(

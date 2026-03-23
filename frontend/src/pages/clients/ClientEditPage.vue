@@ -70,7 +70,7 @@ import {
   useClientDetails,
   useDisableConfirmation,
 } from "src/composables";
-import { dialogConfig } from "src/config/clientDialogs";
+import { dialogConfig } from "src/config/clients/dialogs";
 import { ContentState } from "src/components/common";
 import { isShallowEqual } from "src/utils/checkers/isShalowEqual";
 

@@ -1,4 +1,4 @@
-import type { DialogConfig, NotifyConfig } from "src/composables";
+import type { DialogConfig, NotifyConfig } from "src/types/dialog";
 
 export const dialogConfig: DialogConfig = {
   title: "Tem certeza que deseja desativar este cliente?",

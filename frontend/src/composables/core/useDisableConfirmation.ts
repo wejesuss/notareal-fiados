@@ -1,12 +1,5 @@
 import { type QDialogOptions, useQuasar } from "quasar";
-
-export interface DialogConfig {
-  title: string;
-  message: string;
-  checkboxLabel: string;
-  cancelLabel?: string;
-  confirmLabel?: string;
-}
+import type { DialogConfig } from "src/types/dialog";
 
 export function useDisableConfirmation() {
   const $q = useQuasar();

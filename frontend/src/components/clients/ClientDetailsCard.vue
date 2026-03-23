@@ -150,7 +150,7 @@ import {
   useActiveToggleConfirmation,
 } from "src/composables";
 import { ContentState } from "src/components/common";
-import { dialogConfig, notifyConfig } from "src/config/clientDialogs";
+import { dialogConfig, notifyConfig } from "src/config/clients/dialogs";
 
 interface ClientDetailsCardProps {
   clientId: number;
