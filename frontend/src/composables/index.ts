@@ -12,3 +12,4 @@ export * from "./clients/useClientsQueryState";
 
 export * from "./purchases/usePurchasesUI";
 export * from "./purchases/usePurchaseDetails";
+export * from "./purchases/usePurchasesQueryState";
