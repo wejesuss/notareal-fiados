@@ -1,20 +1,20 @@
 import { computed } from "vue";
 import { useListQueryState, type QuerySchema } from "src/composables";
 
-interface OptionType<T = unknown> {
+interface Option<T = unknown> {
   label: string;
   value: T;
 }
 
-type OptionsType<T = unknown> = OptionType<T>[];
+type Options<T = unknown> = readonly Option<T>[];
 
 export function useClientsQueryState() {
-  const rowsOptions: OptionsType<number> = [
+  const rowsOptions: Options<number> = [
     { label: "10", value: 10 },
     { label: "20", value: 20 },
     { label: "50", value: 50 },
   ];
-  const activeOptions: OptionsType<boolean> = [
+  const activeOptions: Options<boolean> = [
     { label: "Todos", value: false },
     { label: "Somente Ativos", value: true },
   ];
@@ -72,7 +72,7 @@ export function useClientsQueryState() {
    */
   function bindSelect<K extends keyof typeof clientsQuery, T = unknown>(
     key: K,
-    options?: OptionsType<T>
+    options?: Options<T>
   ) {
     return {
       ...bind(key),
