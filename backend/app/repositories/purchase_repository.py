@@ -16,13 +16,17 @@ def _build_purchases_query(
     is_active: bool | None,
     limit: int | None,
     offset: int,
-) -> tuple[str, List]:
+):
+    """This is a handy function that creates and prepare the query for purchases.
+    It returns a `count_pair`, `search_pair` and a `where_clause`
+    that makes it easy to manipulate the purchase and count queries.
+
+    `count_pair` and `search_pair` are tuples with query (str) and params (list).
+    """
     # Default limit if not provided (-1 means "no limit" in SQLite)
     search_limit = -1 if limit is None else limit
 
     # Create WHERE clause based on status and is_active
-    # The semantics and group meaning of status and is_active being used together
-    # should be verified in the service-layer. Here it is considered "as is".
     params = []
     clauses = []
 
@@ -41,16 +45,19 @@ def _build_purchases_query(
 
     where_clause = f"WHERE {' AND '.join(clauses)}" if clauses else ""
 
-    params.extend([search_limit, offset])
+    count_query = f"SELECT COUNT(*) FROM purchases {where_clause}"
 
-    query = f"""
+    search_query = f"""
         SELECT * FROM purchases 
         {where_clause} 
         ORDER BY created_at DESC
         LIMIT ? OFFSET ?
     """
 
-    return query, params
+    return {
+        "count": (count_query, params.copy()),
+        "search": (search_query, [*params, search_limit, offset]),
+    }
 
 
 def get_purchases(
@@ -64,9 +71,11 @@ def get_purchases(
         conn = get_connection()
         cursor = conn.cursor()
 
-        query, params = _build_purchases_query(None, statuses, is_active, limit, offset)
+        # The semantics and group meaning of status and is_active being used together
+        # should be verified in the service-layer. Here it is considered "as is".
+        queries = _build_purchases_query(None, statuses, is_active, limit, offset)
 
-        cursor.execute(query, params)
+        cursor.execute(*queries["search"])
 
         rows = cursor.fetchall()
 
@@ -254,11 +263,11 @@ def get_purchases_by_client_id(
         conn = get_connection()
         cursor = conn.cursor()
 
-        query, params = _build_purchases_query(
-            client_id, statuses, is_active, limit, offset
-        )
+        # The semantics and group meaning of status and is_active being used together
+        # should be verified in the service-layer. Here it is considered "as is".
+        queries = _build_purchases_query(client_id, statuses, is_active, limit, offset)
 
-        cursor.execute(query, params)
+        cursor.execute(*queries["search"])
 
         rows = cursor.fetchall()
 
