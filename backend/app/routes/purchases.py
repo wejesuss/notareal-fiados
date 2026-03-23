@@ -35,8 +35,12 @@ def list_purchases(
     offset = params.offset
     is_active = params.is_active
 
-    purchases = get_purchases(limit, offset, statuses, is_active)
-    return {"message": "Compras encontradas.", "purchases": purchases}
+    result = get_purchases(limit, offset, statuses, is_active)
+    return {
+        "message": "Compras encontradas.",
+        "total": result.total,
+        "purchases": result.items,
+    }
 
 
 @router.get("/{purchase_id}", response_model=PurchaseResponseSchema)

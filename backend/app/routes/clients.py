@@ -98,9 +98,13 @@ def list_purchases_for_client(
     limit = params.limit
     offset = params.offset
     is_active = params.is_active
-    purchases = get_purchases_by_client(client_id, limit, offset, statuses, is_active)
+    result = get_purchases_by_client(client_id, limit, offset, statuses, is_active)
 
-    return {"message": "Compras encontradas.", "purchases": purchases}
+    return {
+        "message": "Compras encontradas.",
+        "total": result.total,
+        "purchases": result.items,
+    }
 
 
 @router.get("/{client_id}/summary", response_model=ClientSummaryResponseSchema)

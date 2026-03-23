@@ -72,6 +72,7 @@ class PurchaseWithMessageResponseSchema(BaseModel):
 class PurchaseListResponseSchema(BaseModel):
     message: str
     purchases: List[PurchaseResponseSchema]
+    total: int
 
 
 # ===== LISTING =====

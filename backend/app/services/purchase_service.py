@@ -3,7 +3,7 @@ from datetime import datetime
 from app.models import Purchase, Payment
 from app.services import payment_service, domain_validations
 from app.repositories import purchase_repository
-from app.common.purchase_status import PurchaseStatus
+from app.common import PurchaseStatus, PaginatedResult
 from app.utils.helpers import filter_allowed
 from app.utils.exceptions import (
     BusinessRuleError,
@@ -38,12 +38,12 @@ def get_purchases(
     offset: int = 0,
     statuses: List[PurchaseStatus] | None = None,
     is_active: bool | None = None,
-) -> List[Purchase]:
+) -> PaginatedResult[Purchase]:
     domain_validations.validate_status_with_is_active(is_active, statuses)
 
-    purchases = purchase_repository.get_purchases(limit, offset, statuses, is_active)
+    result = purchase_repository.get_purchases(limit, offset, statuses, is_active)
 
-    return purchases or []
+    return result
 
 
 def create_purchase(client_id: int, data: dict) -> Purchase:
@@ -178,7 +178,7 @@ def get_purchases_by_client(
     offset: int = 0,
     statuses: List[PurchaseStatus] | None = None,
     is_active: bool | None = None,
-) -> List[Purchase]:
+) -> PaginatedResult[Purchase]:
     domain_validations.validate_status_with_is_active(is_active, statuses)
 
     # Ensure client exists

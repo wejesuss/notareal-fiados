@@ -2,7 +2,7 @@ from typing import List
 from datetime import datetime
 from app.database import get_connection, sqlite3
 from app.models import Purchase
-from app.common import PurchaseStatus
+from app.common import PurchaseStatus, PaginatedResult
 from app.utils.exceptions import (
     BusinessRuleError,
     DatabaseError,
@@ -65,7 +65,7 @@ def get_purchases(
     offset: int = 0,
     statuses: List[PurchaseStatus] | None = None,
     is_active: bool | None = None,
-) -> List[Purchase]:
+) -> PaginatedResult[Purchase]:
     conn = None
     try:
         conn = get_connection()
@@ -75,14 +75,18 @@ def get_purchases(
         # should be verified in the service-layer. Here it is considered "as is".
         queries = _build_purchases_query(None, statuses, is_active, limit, offset)
 
+        # Get total count for pagination
+        cursor.execute(*queries["count"])
+        total = cursor.fetchone()[0]
+
         cursor.execute(*queries["search"])
 
         rows = cursor.fetchall()
 
-        if not rows:
-            return []
-
-        return [Purchase.from_row(row) for row in rows]
+        return PaginatedResult(
+            items=[Purchase.from_row(row) for row in rows],
+            total=total,
+        )
     except sqlite3.Error as e:
         raise DatabaseError(error_messages.DATABASE_ERROR) from e
     finally:
@@ -257,7 +261,7 @@ def get_purchases_by_client_id(
     offset: int = 0,
     statuses: List[PurchaseStatus] | None = None,
     is_active: bool | None = None,
-) -> List[Purchase]:
+) -> PaginatedResult[Purchase]:
     conn = None
     try:
         conn = get_connection()
@@ -267,11 +271,18 @@ def get_purchases_by_client_id(
         # should be verified in the service-layer. Here it is considered "as is".
         queries = _build_purchases_query(client_id, statuses, is_active, limit, offset)
 
+        # Get total count for pagination
+        cursor.execute(*queries["count"])
+        total = cursor.fetchone()[0]
+
         cursor.execute(*queries["search"])
 
         rows = cursor.fetchall()
 
-        return [Purchase.from_row(row) for row in rows] if rows else []
+        return PaginatedResult(
+            items=[Purchase.from_row(row) for row in rows],
+            total=total,
+        )
     except sqlite3.IntegrityError as e:
         if "FOREIGN KEY constraint failed" in str(e):
             raise BusinessRuleError(error_messages.PURCHASE_CLIENT_NOT_FOUND)
