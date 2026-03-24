@@ -142,6 +142,7 @@ import {
   useClientDetails,
   useClientPurchases,
   usePurchasesUI,
+  usePurchasesQueryState,
 } from "src/composables";
 import { ContentState } from "src/components/common";
 import { PurchaseRow } from "src/components/purchases";
@@ -159,16 +160,17 @@ const {
   error: clientError,
   reload: reloadClient,
 } = useClientDetails(toRef(clientId));
+
+const { schema, page } = usePurchasesQueryState();
 const {
   loading,
   error,
   purchases,
-  paginatedPurchases,
-  page,
   totalPages,
   reload: reloadPurchases,
-} = useClientPurchases(toRef(clientId));
-const { purchasesWithUI } = usePurchasesUI(paginatedPurchases);
+} = useClientPurchases(toRef(clientId), schema);
+
+const { purchasesWithUI } = usePurchasesUI(purchases);
 
 const loadState = computed<LoadState>(() => {
   // loading is always false after successful fetching or error

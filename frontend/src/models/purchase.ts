@@ -25,7 +25,15 @@ export interface PurchaseUpdate {
 }
 
 // API models
+export type PurchaseListParams = {
+  limit?: number;
+  offset?: number;
+  isActive?: boolean;
+  statuses?: PurchaseStatus[];
+};
+
 export type PurchasesWithMessageResponse = {
   message: string;
+  total: number;
   purchases: Purchase[];
 };
