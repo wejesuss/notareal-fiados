@@ -1,7 +1,7 @@
 import { computed, type ComputedRef } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
-type QueryTypeMap = {
+export type QueryTypeMap = {
   number: number;
   string: string;
   boolean: boolean;
@@ -60,7 +60,8 @@ type ComputedFromSchema<T extends QuerySchema> = {
   [K in keyof T]: ComputedRef<QueryTypeMap[T[K]["type"]]>;
 };
 
-export type ListQueryReturnState = ReturnType<typeof useListQueryState>;
+export type ListQueryReturnState<T extends QuerySchema = QuerySchema> =
+  ReturnType<typeof useListQueryState<T>>;
 
 /**
  *
