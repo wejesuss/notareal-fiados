@@ -14,11 +14,38 @@ type ResponseErrorType =
       }[];
     };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function serializeQueryParams(params: Record<string, any>) {
+  const query: string[] = [];
+  for (const key in params) {
+    const value = params[key];
+    if (value === null || value === undefined) {
+      continue;
+    }
+
+    const encodedKey = encodeURIComponent(key);
+
+    if (Array.isArray(value)) {
+      value.forEach((v) => {
+        query.push(`${encodedKey}=${encodeURIComponent(v)}`);
+      });
+      continue;
+    }
+
+    query.push(`${encodedKey}=${encodeURIComponent(value)}`);
+  }
+
+  return query.join("&");
+}
+
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
+  },
+  paramsSerializer: {
+    serialize: serializeQueryParams,
   },
 });
 
