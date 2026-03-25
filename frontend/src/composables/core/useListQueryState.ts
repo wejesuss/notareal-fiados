@@ -147,6 +147,14 @@ export function useListQueryState<T extends QuerySchema>(schema: T) {
     value: QueryTypeMap[C["type"]],
     config: C
   ) {
+    if (config.type === "string" && config.isValid) {
+      const valid = config.isValid(value as string);
+      if (!valid) {
+        console.error("The value provided does not passes validation function");
+        return undefined;
+      }
+    }
+
     if (value === null || value === config.default || value === undefined) {
       return undefined;
     }
@@ -171,14 +179,6 @@ export function useListQueryState<T extends QuerySchema>(schema: T) {
 
     if (!config) {
       throw new Error(`Query schema does not contain the key: ${keyStr}`);
-    }
-
-    if (config.type === "string" && config.isValid) {
-      const valid = config.isValid(value as string);
-      if (!valid)
-        throw new Error(
-          "The value provided does not passes validation function"
-        );
     }
 
     const serialized = serializeValue(value, config);
