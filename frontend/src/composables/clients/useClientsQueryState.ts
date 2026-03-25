@@ -1,6 +1,5 @@
 import { computed } from "vue";
-import { useListQueryState, type QuerySchema } from "src/composables";
-import type { Options } from "src/types/options";
+import { useBind, useListQueryState, type QuerySchema } from "src/composables";
 import { activeOptions, rowsOptions } from "src/config/clients/options";
 
 export function useClientsQueryState() {
@@ -11,65 +10,20 @@ export function useClientsQueryState() {
   } satisfies QuerySchema;
 
   const schema = useListQueryState(clientsQuery);
+  const { bind, bindSelect } = useBind();
 
   const page = computed(() => ({
     stateValue: schema.state.page.value,
-    bind: bind("page"),
+    bind: bind("page", schema),
   }));
   const rowsPerPage = computed(() => ({
     stateValue: schema.state.rowsPerPage.value,
-    bind: bindSelect("rowsPerPage", rowsOptions),
+    bind: bindSelect("rowsPerPage", schema, rowsOptions),
   }));
   const onlyActive = computed(() => ({
     stateValue: schema.state.onlyActive.value,
-    bind: bindSelect("onlyActive", activeOptions),
+    bind: bindSelect("onlyActive", schema, activeOptions),
   }));
-
-  /**
-   * This functions makes it easy to configure q-select or any input-like
-   * components from vue/quasar that has a `v-model` configuration
-   * It returns an object you can `bind` using `v-bind` directive.
-   * This makes the query configuration easy and automatic
-   *
-   * @param key Name of the query field
-   * @returns Model value with setted listener for any q-input or form-like field
-   */
-  function bind<K extends keyof typeof clientsQuery>(key: K) {
-    const model = schema.state[key].value;
-    const onModelUpdate = (value: typeof model) => {
-      void schema.setField(key, value);
-      return;
-    };
-
-    return {
-      modelValue: model,
-      "onUpdate:modelValue": onModelUpdate,
-    };
-  }
-
-  /**
-   * This functions makes it easy to configure q-select components
-   * from vue/quasar.
-   * It returns an object you can `bind` using `v-bind` directive.
-   * This makes the query configuration easy and automatic
-   *
-   * @param key Name of the query field
-   * @param options Optional options Array to map label/value into q-select component.
-   * Must be set manually on the q-select input if not set here
-   * @returns Model value with setted listener for any q-input or form-like field.
-   * Also this function sets the `emitValue` and `mapOptions` properties as `true`
-   */
-  function bindSelect<K extends keyof typeof clientsQuery, T = unknown>(
-    key: K,
-    options?: Options<T>
-  ) {
-    return {
-      ...bind(key),
-      emitValue: true,
-      mapOptions: true,
-      ...(options && { options }),
-    };
-  }
 
   return {
     schema,
