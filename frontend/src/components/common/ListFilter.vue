@@ -13,16 +13,15 @@
 </template>
 
 <script lang="ts" setup>
-type ModelBind<T = unknown> = {
+import type { QSelectProps } from "quasar";
+
+type SelectBind<T> = {
   modelValue: T;
   "onUpdate:modelValue": (value: T) => void;
-};
+} & Partial<QSelectProps>;
 
-type SelectBind<T = unknown> = ModelBind<T> & {
-  [key: string]: unknown; // extra props for q-select component
-};
-
-interface ListFilterProps<T = unknown> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+interface ListFilterProps<T = any> {
   bind: SelectBind<T>;
   label: string;
   minWidth?: number;
