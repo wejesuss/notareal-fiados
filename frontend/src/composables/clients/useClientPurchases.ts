@@ -81,6 +81,17 @@ export function useClientPurchases(
   }
 
   watch(clientId, fetchPurchases, { immediate: true });
+  watch(
+    [
+      queryState.state.page,
+      queryState.state.rowsPerPage,
+      queryState.state.status,
+    ],
+    async () => {
+      await fetchPurchases();
+    },
+    { immediate: true }
+  );
 
   return {
     loading,
