@@ -15,14 +15,15 @@ export function useBind() {
    * @param key Name of the query field
    * @returns Model value with setted listener for any q-input or form-like field
    */
-  function bind<
-    U extends QuerySchema,
-    K extends keyof U,
-    T extends QueryTypeMap[U[K]["type"]],
-  >(key: K, schema: ListQueryReturnState<U>) {
+  function bind<U extends QuerySchema, K extends keyof U>(
+    key: K,
+    schema: ListQueryReturnState<U>
+  ) {
+    type Value = QueryTypeMap[U[K]["type"]];
+
     const model = schema.state[key].value;
 
-    const onModelUpdate = (value: T) => {
+    const onModelUpdate = (value: Value) => {
       void schema.setField(key, value);
       return;
     };
@@ -45,15 +46,13 @@ export function useBind() {
    * @returns Model value with setted listener for any q-input or form-like field.
    * Also this function sets the `emitValue` and `mapOptions` properties as `true`
    */
-  function bindSelect<
-    U extends QuerySchema,
-    K extends string,
-    S extends QueryTypeMap[U[K]["type"]],
-    T,
-  >(key: K, schema: ListQueryReturnState<U>, options?: Options<T>) {
-    const modelBind = bind<U, K, S>(key, schema);
+  function bindSelect<U extends QuerySchema, K extends keyof U>(
+    key: K,
+    schema: ListQueryReturnState<U>,
+    options?: Options<QueryTypeMap[U[K]["type"]]>
+  ) {
     return {
-      ...modelBind,
+      ...bind<U, K>(key, schema),
       emitValue: true,
       mapOptions: true,
       ...(options && { options }),
