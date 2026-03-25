@@ -55,10 +55,10 @@ export function useClientPurchases(
       const response = await getClientPurchases(clientId.value, {
         limit: rowsPerPage,
         offset,
-        ...(mappedStatus.isActive && {
+        ...(mappedStatus.isActive !== undefined && {
           isActive: mappedStatus.isActive,
         }),
-        ...(mappedStatus.statuses && {
+        ...(mappedStatus.statuses !== undefined && {
           statuses: mappedStatus.statuses,
         }),
       });
