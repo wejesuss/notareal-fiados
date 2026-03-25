@@ -39,23 +39,7 @@
         class="row items-center justify-between q-col-gutter-y-md"
       >
         <div class="text-subtitle1">Lista de clientes</div>
-        <div class="row items-center q-gutter-sm q-gutter-x-md">
-          <q-select
-            v-bind="onlyActive.bind"
-            label="Filtro"
-            dense
-            outlined
-            style="min-width: 160px"
-          ></q-select>
-
-          <q-select
-            v-bind="rowsPerPage.bind"
-            label="Por página"
-            dense
-            outlined
-            style="min-width: 120px"
-          ></q-select>
-        </div>
+        <ListFilter :filters="clientFilters"></ListFilter>
       </q-card-section>
 
       <q-separator />
@@ -163,7 +147,7 @@ import {
   useClientsQueryState,
 } from "src/composables";
 import { computed } from "vue";
-import { ContentState } from "src/components/common";
+import { ContentState, ListFilter } from "src/components/common";
 
 type LoadState = "loading" | "error" | "empty" | "ready";
 
@@ -179,6 +163,11 @@ const loadState = computed<LoadState>(() => {
 
   return "ready";
 });
+
+const clientFilters = computed(() => [
+  { bind: onlyActive.value.bind, label: "Filtro" },
+  { bind: rowsPerPage.value.bind, label: "Por página", minWidth: 120 },
+]);
 
 const errorMessage = computed(
   () => error.value?.message || "Erro ao carregar clientes",
