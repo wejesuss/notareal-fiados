@@ -36,10 +36,14 @@ export function useClientsQueryState() {
    */
   function bind<K extends keyof typeof clientsQuery>(key: K) {
     const model = schema.state[key].value;
+    const onModelUpdate = (value: typeof model) => {
+      void schema.setField(key, value);
+      return;
+    };
+
     return {
       modelValue: model,
-      "onUpdate:modelValue": (value: typeof model) =>
-        schema.setField(key, value),
+      "onUpdate:modelValue": onModelUpdate,
     };
   }
 
