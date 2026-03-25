@@ -34,21 +34,7 @@
         </div>
 
         <div class="row items-center q-gutter-sm q-gutter-x-md">
-          <q-select
-            :model-value="true"
-            label="Filtro"
-            dense
-            outlined
-            style="min-width: 160px"
-          ></q-select>
-
-          <q-select
-            :model-value="10"
-            label="Por página"
-            dense
-            outlined
-            style="min-width: 120px"
-          ></q-select>
+          <ListFilter :filters="purchasesFilters"></ListFilter>
         </div>
       </q-card-section>
 
@@ -114,7 +100,7 @@
         </q-list>
 
         <q-pagination
-          v-model="page"
+          v-model="page.stateValue"
           :max="totalPages"
           direction-links
           boundary-links
@@ -123,7 +109,7 @@
         >
         </q-pagination>
 
-        <div v-if="page === totalPages" class="text-center q-pb-sm">
+        <div v-if="page.stateValue === totalPages" class="text-center q-pb-sm">
           <span class="text-caption text-grey-7 letter-spaced"
             >Todos os registros exibidos</span
           >
@@ -144,7 +130,7 @@ import {
   usePurchasesUI,
   usePurchasesQueryState,
 } from "src/composables";
-import { ContentState } from "src/components/common";
+import { ContentState, ListFilter } from "src/components/common";
 import { PurchaseRow } from "src/components/purchases";
 import { APIError } from "src/api/errors";
 
@@ -161,7 +147,7 @@ const {
   reload: reloadClient,
 } = useClientDetails(toRef(clientId));
 
-const { schema, page } = usePurchasesQueryState();
+const { schema, page, rowsPerPage, status } = usePurchasesQueryState();
 const {
   loading,
   error,
@@ -193,6 +179,18 @@ const clientDisplayName = computed(() => {
     ? [client.value.name, client.value.nickname].filter(Boolean).join(" - ")
     : null;
 });
+
+const purchasesFilters = computed(() => [
+  {
+    bind: status.value.bind,
+    label: "Filtro",
+  },
+  {
+    bind: rowsPerPage.value.bind,
+    label: "Por página",
+    minWidth: 120,
+  },
+]);
 
 const errorMessage = computed(
   () =>

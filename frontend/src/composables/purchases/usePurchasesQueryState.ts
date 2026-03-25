@@ -1,6 +1,8 @@
 import { computed } from "vue";
+import { useBind } from "../core/useBind";
 import { type PurchaseStatusOptions } from "src/types/purchases";
 import { type QuerySchema, useListQueryState } from "../core/useListQueryState";
+import { rowsOptions, statusOptions } from "src/config/purchases/options";
 
 function isStatusValid(value: string): boolean {
   const keys = ["all", "open", "pending", "partial", "paid", "inactive"];
@@ -21,12 +23,20 @@ export function usePurchasesQueryState() {
   } satisfies QuerySchema;
 
   const schema = useListQueryState(purchasesQuery);
+  const { bind, bindSelect } = useBind();
 
-  const page = computed(() => schema.state.page.value);
-  const rowsPerPage = computed(() => schema.state.rowsPerPage.value);
-  const status = computed(
-    () => schema.state.status.value as PurchaseStatusOptions
-  );
+  const page = computed(() => ({
+    stateValue: schema.state.page.value,
+    bind: bind("page", schema),
+  }));
+  const rowsPerPage = computed(() => ({
+    stateValue: schema.state.rowsPerPage.value,
+    bind: bindSelect("rowsPerPage", schema, rowsOptions),
+  }));
+  const status = computed(() => ({
+    stateValue: schema.state.status.value as PurchaseStatusOptions,
+    bind: bindSelect("status", schema, statusOptions),
+  }));
 
   return {
     schema,
