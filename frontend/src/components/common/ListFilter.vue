@@ -7,7 +7,7 @@
       :label="filter.label"
       dense
       outlined
-      :style="{ minWidth: filter.minWidth || 160 + 'px' }"
+      :style="{ minWidth: `${filter.minWidth || 160}px` }"
     ></q-select>
   </div>
 </template>
