@@ -100,6 +100,30 @@ export async function getClientPurchases(
     `/clients/${clientId}/purchases`,
     {
       params: params,
+      paramsSerializer: {
+        serialize: (params) => {
+          const query: string[] = [];
+          for (const key in params) {
+            const value = params[key];
+            if (value === null || value === undefined) {
+              continue;
+            }
+
+            const encodedKey = encodeURIComponent(key);
+
+            if (Array.isArray(value)) {
+              value.forEach((v) => {
+                query.push(`${encodedKey}=${encodeURIComponent(v)}`);
+              });
+              continue;
+            }
+
+            query.push(`${encodedKey}=${encodeURIComponent(value)}`);
+          }
+
+          return query.join("&");
+        },
+      },
     }
   );
 
