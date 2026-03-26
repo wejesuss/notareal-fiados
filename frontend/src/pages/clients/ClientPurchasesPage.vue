@@ -178,9 +178,10 @@ async function handleClientNotFound(e: Error) {
 }
 
 const clientDisplayName = computed(() => {
-  return client.value
-    ? [client.value.name, client.value.nickname].filter(Boolean).join(" - ")
-    : null;
+  if (!client.value) return null;
+
+  const { name, nickname } = client.value;
+  return [name, nickname].filter(Boolean).join(" - ");
 });
 
 const purchasesFilters = computed(() => [
