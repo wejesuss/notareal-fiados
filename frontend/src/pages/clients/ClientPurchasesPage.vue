@@ -50,7 +50,9 @@
       </q-card-section>
 
       <!-- Error states - This catches 'client-error' and 'error' together -->
-      <q-card-section v-else-if="loadState.includes('error')">
+      <q-card-section
+        v-else-if="loadState === 'client-error' || loadState === 'error'"
+      >
         <ContentState
           :message="errorMessage"
           icon-name="error_outline"
@@ -201,14 +203,8 @@ const errorMessage = computed(
 );
 
 const reload = async () => {
-  if (clientError.value && error.value) {
-    await reloadClient();
-    await reloadPurchases();
-  } else if (clientError.value) {
-    await reloadClient();
-  } else if (error.value) {
-    await reloadPurchases();
-  }
+  if (clientError.value) await reloadClient();
+  if (error.value) await reloadPurchases();
 };
 
 watch(
