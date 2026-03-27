@@ -107,14 +107,12 @@ export async function getClientPurchases(
 }
 
 export async function getClientRecentPurchases(
-  clientId: number,
-  onlyActive: boolean = true
+  clientId: number
 ): Promise<PurchasesWithMessageResponse> {
-  // TEMP: temporary convert onlyActive -> isActive
   const { data } = await api.get<PurchasesWithMessageResponse>(
     `/clients/${clientId}/purchases`,
     {
-      params: { limit: 3, isActive: onlyActive ? true : null },
+      params: { limit: 3, isActive: true },
     }
   );
 
