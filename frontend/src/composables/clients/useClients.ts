@@ -1,15 +1,11 @@
 import { ref, watch } from "vue";
 import type { Client } from "src/models";
 import { getClients } from "src/services/client";
-import { type ListQueryReturnState } from "src/composables";
+import { type useClientsQueryState } from "src/composables";
 
-type ClientsQuerySnapshot = {
-  page: number;
-  rowsPerPage: number;
-  onlyActive: boolean;
-};
+type ClientsQuerySchema = ReturnType<typeof useClientsQueryState>["schema"];
 
-export function useClients(queryState: ListQueryReturnState) {
+export function useClients(queryState: ClientsQuerySchema) {
   const loading = ref(false);
   const error = ref<Error | null>(null);
   const clients = ref<Client[]>([]);
@@ -25,8 +21,7 @@ export function useClients(queryState: ListQueryReturnState) {
 
     try {
       // Get updated query state
-      const { page, rowsPerPage, onlyActive } =
-        queryState.getSnapshot() as ClientsQuerySnapshot;
+      const { page, rowsPerPage, onlyActive } = queryState.getSnapshot();
 
       const offset = (page - 1) * rowsPerPage;
       const response = await getClients({
