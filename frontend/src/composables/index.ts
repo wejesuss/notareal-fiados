@@ -7,10 +7,10 @@ export * from "./core/useBind";
 export * from "./clients/useClients";
 export * from "./clients/useClientDetails";
 export * from "./clients/useClientSummary";
-export * from "./clients/useClientRecentPurchases";
-export * from "./clients/useClientPurchases";
 export * from "./clients/useClientsQueryState";
 
 export * from "./purchases/usePurchasesUI";
 export * from "./purchases/usePurchaseDetails";
 export * from "./purchases/usePurchasesQueryState";
+export * from "./purchases/useClientRecentPurchases";
+export * from "./purchases/useClientPurchases";

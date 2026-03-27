@@ -2,7 +2,7 @@ import { type Ref, ref, watch } from "vue";
 import type { Purchase, PurchaseStatus } from "src/models";
 import { getClientPurchases } from "src/services/purchase";
 import type { PurchaseStatusOptions } from "src/types/purchases";
-import { type usePurchasesQueryState } from "../purchases/usePurchasesQueryState";
+import { type usePurchasesQueryState } from "./usePurchasesQueryState";
 
 type PurchasesQuerySchema = ReturnType<typeof usePurchasesQueryState>["schema"];
 
