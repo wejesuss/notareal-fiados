@@ -38,7 +38,9 @@ export function useClientPurchases(
 
   async function fetchPurchases() {
     if (!Number.isInteger(clientId.value) || clientId.value <= 0) {
+      error.value = new Error("Identificador do cliente inválido!");
       purchases.value = [];
+      totalPages.value = 1;
       return;
     }
 
