@@ -94,7 +94,7 @@ export async function updatePurchase(
 // Client related functions
 export async function getClientPurchases(
   clientId: number,
-  params: PurchaseListParams
+  params?: PurchaseListParams
 ): Promise<PurchasesWithMessageResponse> {
   const { data } = await api.get<PurchasesWithMessageResponse>(
     `/clients/${clientId}/purchases`,
