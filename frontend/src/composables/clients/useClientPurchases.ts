@@ -1,15 +1,17 @@
 import { type Ref, ref, watch } from "vue";
 import type { Purchase, PurchaseStatus } from "src/models";
 import { getClientPurchases } from "src/services/purchase";
-import type { ListQueryReturnState } from "../core/useListQueryState";
 import type { PurchaseStatusOptions } from "src/types/purchases";
+import { type usePurchasesQueryState } from "../purchases/usePurchasesQueryState";
+
+type PurchasesQuerySchema = ReturnType<typeof usePurchasesQueryState>["schema"];
 
 type StatusObject = {
   statuses?: PurchaseStatus[];
   isActive?: boolean;
 };
 
-function mapPurchaseStatus(status: PurchaseStatusOptions): StatusObject {
+function mapPurchaseStatus(status: string): StatusObject {
   const mapper: Record<PurchaseStatusOptions, StatusObject> = {
     all: {},
     open: { statuses: ["partial", "pending"], isActive: true },
@@ -19,7 +21,7 @@ function mapPurchaseStatus(status: PurchaseStatusOptions): StatusObject {
     inactive: { isActive: false },
   };
 
-  const mapped = mapper[status];
+  const mapped = mapper[status as PurchaseStatusOptions];
   if (!mapped) return mapper.all;
 
   return mapped;
@@ -27,7 +29,7 @@ function mapPurchaseStatus(status: PurchaseStatusOptions): StatusObject {
 
 export function useClientPurchases(
   clientId: Ref<number>,
-  queryState: ListQueryReturnState
+  queryState: PurchasesQuerySchema
 ) {
   const loading = ref(false);
   const error = ref<Error | null>(null);
@@ -43,11 +45,7 @@ export function useClientPurchases(
     loading.value = true;
     error.value = null;
     try {
-      const { page, rowsPerPage, status } = queryState.getSnapshot() as {
-        page: number;
-        rowsPerPage: number;
-        status: PurchaseStatusOptions;
-      };
+      const { page, rowsPerPage, status } = queryState.getSnapshot();
 
       const offset = (page - 1) * rowsPerPage;
       const mappedStatus = mapPurchaseStatus(status);
