@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 
+
 # Store basic information about the client
 @dataclass
 class Client:
@@ -9,21 +10,21 @@ class Client:
     nickname: str | None
     phone: str | None
     email: str | None
-    is_active: int
+    is_active: bool
     created_at: datetime
     updated_at: datetime
 
     @staticmethod
     def from_row(row):
         return Client(
-            id = row[0],
-            name = row[1],
-            nickname = row[2],
-            phone = row[3],
-            email = row[4],
-            is_active = row[5],
-            created_at = datetime.fromtimestamp(row[6]),
-            updated_at = datetime.fromtimestamp(row[7]),
+            id=row[0],
+            name=row[1],
+            nickname=row[2],
+            phone=row[3],
+            email=row[4],
+            is_active=bool(row[5]),
+            created_at=datetime.fromtimestamp(row[6]),
+            updated_at=datetime.fromtimestamp(row[7]),
         )
 
     def to_tuple(self):
@@ -34,5 +35,5 @@ class Client:
             self.email,
             self.is_active,
             int(self.created_at.timestamp()),
-            int(self.updated_at.timestamp())
+            int(self.updated_at.timestamp()),
         )

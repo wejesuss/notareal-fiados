@@ -2,12 +2,12 @@ from typing import List
 from datetime import datetime
 from app.database import get_connection, sqlite3
 from app.models import Payment
-from app.utils.exceptions import (
-    BusinessRuleError, DatabaseError,
-    error_messages
-)
+from app.utils.exceptions import BusinessRuleError, DatabaseError, error_messages
 
-def get_payments(limit: int = None, offset: int = 0, purchase_id: int = None) -> List[Payment]:
+
+def get_payments(
+    limit: int = None, offset: int = 0, purchase_id: int = None
+) -> List[Payment]:
     conn = None
     try:
         conn = get_connection()
@@ -21,15 +21,18 @@ def get_payments(limit: int = None, offset: int = 0, purchase_id: int = None) ->
         if purchase_id:
             where_clause = "WHERE purchase_id = ?"
             values.append(purchase_id)
-        
+
         # add search_limit and offset to query parameters (values list)
         values.append(search_limit)
         values.append(offset)
 
-        cursor.execute(f"""
+        cursor.execute(
+            f"""
             SELECT * FROM payments {where_clause} ORDER BY created_at DESC
             LIMIT ? OFFSET ?
-        """, tuple(values))
+        """,
+            tuple(values),
+        )
 
         rows = cursor.fetchall()
 
@@ -44,6 +47,7 @@ def get_payments(limit: int = None, offset: int = 0, purchase_id: int = None) ->
         if conn:
             conn.close()
 
+
 def insert_payment(data: dict) -> Payment:
     conn = None
     try:
@@ -52,9 +56,10 @@ def insert_payment(data: dict) -> Payment:
 
         now = int(datetime.now().timestamp())
 
-        cursor.execute("""INSERT INTO payments (
+        cursor.execute(
+            """INSERT INTO payments (
             purchase_id,
-            amount,
+            amount_cents,
             payment_date,
             method,
             description,
@@ -63,16 +68,18 @@ def insert_payment(data: dict) -> Payment:
             created_at,
             updated_at
           ) VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?);
-        """, (
-            int(data.get("purchase_id")),
-            data.get("amount"),
-            int(data.get("payment_date")) if data.get("payment_date") else None,
-            data.get("method"),
-            data.get("description"),
-            data.get("receipt_number"),
-            now,
-            now
-        ))
+        """,
+            (
+                int(data.get("purchase_id")),
+                data.get("amount_cents"),
+                int(data.get("payment_date")) if data.get("payment_date") else None,
+                data.get("method"),
+                data.get("description"),
+                data.get("receipt_number"),
+                now,
+                now,
+            ),
+        )
 
         conn.commit()
         payment_id = cursor.lastrowid
@@ -90,6 +97,7 @@ def insert_payment(data: dict) -> Payment:
         if conn:
             conn.close()
 
+
 def get_payment_by_id(payment_id: int) -> Payment | None:
     conn = None
     try:
@@ -106,6 +114,7 @@ def get_payment_by_id(payment_id: int) -> Payment | None:
     finally:
         if conn:
             conn.close()
+
 
 def update_payment(payment_id: int, data: dict) -> Payment | None:
     """Update a payment."""
@@ -148,6 +157,7 @@ def update_payment(payment_id: int, data: dict) -> Payment | None:
         if conn:
             conn.close()
 
+
 def deactivate_payment(payment_id: int) -> bool:
     """Deactivate (soft delete) a payment."""
     conn = None
@@ -158,10 +168,13 @@ def deactivate_payment(payment_id: int) -> bool:
         conn = get_connection()
         cursor = conn.cursor()
 
-        cursor.execute("""
+        cursor.execute(
+            """
             UPDATE payments SET is_active = 0, updated_at = ?
             WHERE id = ? AND is_active = 1
-        """, (now, payment_id))
+        """,
+            (now, payment_id),
+        )
 
         conn.commit()
 
@@ -172,6 +185,7 @@ def deactivate_payment(payment_id: int) -> bool:
         if conn:
             conn.close()
 
+
 # Purchase related functions
 def deactivate_payments_by_purchase_id(purchase_id: int) -> bool:
     conn = None
@@ -181,10 +195,13 @@ def deactivate_payments_by_purchase_id(purchase_id: int) -> bool:
 
         now = int(datetime.now().timestamp())
 
-        cursor.execute("""
+        cursor.execute(
+            """
             UPDATE payments SET is_active = 0, updated_at = ?
             WHERE purchase_id = ? AND is_active = 1
-        """, (now, purchase_id))
+        """,
+            (now, purchase_id),
+        )
 
         conn.commit()
 

@@ -80,15 +80,19 @@
       </template>
     </q-input>
 
-    <q-btn
-      class="q-my-md q-mt-lg q-py-sm"
-      color="secondary"
-      type="submit"
-      :icon="submitIcon || 'person_add'"
-      :label="submitLabel"
-      :disable="!isFormValid"
-      :loading="submitting"
-    />
+    <div class="q-my-md">
+      <slot name="buttons-container"></slot>
+
+      <q-btn
+        class="q-py-sm"
+        color="secondary"
+        type="submit"
+        :icon="submitIcon || 'person_add'"
+        :label="submitLabel"
+        :disable="!isFormValid || submitting"
+        :loading="submitting"
+      />
+    </div>
   </q-form>
 </template>
 
@@ -101,12 +105,14 @@ interface ClientFormProps {
   payload?: ClientPayload;
   submitLabel: string;
   submitIcon?: string;
+  submitting: boolean;
 }
 
-const emit = defineEmits(["submit"]);
+const emit = defineEmits<{
+  submit: [payload: ClientPayload];
+}>();
 const props = defineProps<ClientFormProps>();
 
-const submitting = ref(false);
 const formRef = ref<QForm | null>(null);
 const formData = ref<ClientPayload>({
   name: props.payload?.name || "",
@@ -160,22 +166,18 @@ const emailRule = (val?: string) =>
   !val || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) || "Email inválido";
 
 async function submit() {
-  try {
-    if (!formRef.value) return;
+  if (!formRef.value) return;
 
-    submitting.value = true;
-    const valid = await formRef.value.validate(false);
-    if (!valid) return;
+  const valid = await formRef.value.validate(false);
+  if (!valid) return;
 
-    const payload = {
-      ...formData.value,
-      name: formData.value.name.trim().replace(/\s+/g, " "),
-      nickname: formData.value.nickname?.trim() || null,
-    };
+  const payload: ClientPayload = {
+    name: formData.value.name.trim().replace(/\s+/g, " "),
+    nickname: formData.value.nickname?.trim() || null,
+    phone: formData.value.phone || null,
+    email: formData.value.email || null,
+  };
 
-    emit("submit", payload);
-  } finally {
-    submitting.value = false;
-  }
+  emit("submit", payload);
 }
 </script>

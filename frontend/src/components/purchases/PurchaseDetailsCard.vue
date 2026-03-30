@@ -39,7 +39,7 @@
           <div class="row items-center justify-between text-grey-9">
             <div class="text-subtitle1">Total</div>
             <div class="text-h6 text-weight-bold text-blue-grey-7">
-              {{ formatCurrency(purchase.totalValue) }}
+              {{ formatCurrency(purchase.total) }}
             </div>
           </div>
 
@@ -49,7 +49,7 @@
               class="text-h6 text-weight-bold"
               :class="purchaseStatusUI.textColor"
             >
-              {{ formatCurrency(purchase.totalPaidValue) }}
+              {{ formatCurrency(purchase.totalPaid) }}
             </div>
           </div>
         </div>

@@ -150,21 +150,12 @@ import {
   useActiveToggleConfirmation,
 } from "src/composables";
 import { ContentState } from "src/components/common";
+import { dialogConfig, notifyConfig } from "src/config/clients/dialogs";
 
 interface ClientDetailsCardProps {
   clientId: number;
 }
 type LoadState = "loading" | "error" | "empty" | "ready";
-const dialogConfig = {
-  title: "Tem certeza que deseja desativar este cliente?",
-  message: `Este cliente não poderá ser usado para novas operações e todas as suas compras e pagamentos serão desativadas.`,
-  checkboxLabel: "Entendo e desejo desativar o cliente",
-};
-const notifyConfig = {
-  disabledMessage: "Cliente desativado com sucesso.",
-  enabledMessage: "Cliente ativado. Compras e pagamentos não serão ativadas.",
-  errorMessage: "Erro ao atualizar status do cliente.",
-};
 
 const props = defineProps<ClientDetailsCardProps>();
 const { navigateTo } = useNavigation();
@@ -198,14 +189,13 @@ watch(error, (err) => {
 
 async function submit(nextValue: boolean) {
   const payload: ClientUpdate = {
-    ...client.value,
     isActive: nextValue,
   };
 
-  await updateClient(props.clientId, payload);
+  const response = await updateClient(props.clientId, payload);
 
   // Keep local client snapshot in sync after successful update
-  if (client.value) client.value.isActive = nextValue;
+  client.value = response.client;
 }
 </script>
 

@@ -1,20 +1,10 @@
 import { ref, watch, type Ref } from "vue";
-import { type QDialogOptions, useQuasar } from "quasar";
+import { useQuasar } from "quasar";
+import { useDisableConfirmation } from "src/composables";
+import type { DialogConfig, NotifyConfig } from "src/types/dialog";
 
 interface ActiveResource {
   isActive: boolean;
-}
-
-interface DialogConfig {
-  title: string;
-  message: string;
-  checkboxLabel: string;
-}
-
-interface NotifyConfig {
-  disabledMessage: string;
-  enabledMessage: string;
-  errorMessage: string;
 }
 
 export function useActiveToggleConfirmation<T extends ActiveResource>(
@@ -27,34 +17,14 @@ export function useActiveToggleConfirmation<T extends ActiveResource>(
   const isActive = ref(false);
   const $q = useQuasar();
 
-  async function confirmDisable(): Promise<boolean> {
-    const dialog: QDialogOptions = {
-      title: dialogConfig.title,
-      message: dialogConfig.message,
-      options: {
-        model: [""],
-        type: "checkbox",
-        isValid: (model) => model.includes("opt1"),
-        items: [{ label: dialogConfig.checkboxLabel, value: "opt1" }],
-      },
-      cancel: "Cancelar",
-      ok: "Desativar",
-      noBackdropDismiss: true,
-    };
-
-    return new Promise((resolve) => {
-      $q.dialog(dialog)
-        .onCancel(() => resolve(false))
-        .onOk(() => resolve(true));
-    });
-  }
+  const { confirmDisable } = useDisableConfirmation();
 
   async function submitDialog(nextValue: boolean) {
     if (submitting.value || !resource.value) return;
     const previousIsActive = isActive.value;
 
     if (nextValue === false) {
-      const confirmed = await confirmDisable();
+      const confirmed = await confirmDisable(dialogConfig);
       if (!confirmed) return;
     }
 
@@ -87,7 +57,6 @@ export function useActiveToggleConfirmation<T extends ActiveResource>(
     (newValue) => {
       if (!newValue) return;
 
-      submitting.value = false;
       isActive.value = newValue.isActive;
     },
     { immediate: true }

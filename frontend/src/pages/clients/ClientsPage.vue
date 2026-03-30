@@ -12,18 +12,44 @@
       />
     </div>
 
+    <q-card v-if="loadState === 'loading'" class="q-my-xl q-pa-md">
+      <ContentState
+        message="Carregando clientes..."
+        icon-name="person_search"
+      ></ContentState>
+    </q-card>
+
+    <q-card v-else-if="loadState === 'error'" class="q-my-xl q-pa-md">
+      <ContentState
+        :message="errorMessage"
+        message-color="text-amber-8"
+        icon-name="error_outline"
+        icon-color="amber-10"
+      ></ContentState>
+      <div class="q-mt-sm text-center">
+        <q-btn rounded outline color="grey-8" @click="reload">
+          Tentar de novo
+        </q-btn>
+      </div>
+    </q-card>
+
     <!-- Content -->
-    <q-card>
-      <q-card-section>
+    <q-card v-else>
+      <q-card-section
+        class="row items-center justify-between q-col-gutter-y-md"
+      >
         <div class="text-subtitle1">Lista de clientes</div>
+        <ListFilter :filters="clientFilters"></ListFilter>
       </q-card-section>
 
       <q-separator />
 
-      <q-card-section v-if="clients.length === 0" class="text-center q-py-xl">
+      <q-card-section v-if="loadState === 'empty'" class="text-center q-py-xl">
         <q-icon name="people_outline" size="48px" color="grey-6"></q-icon>
 
-        <div class="text-subtitle1 q-mt-md">Nenhum cliente ainda</div>
+        <div class="text-subtitle1 q-mt-md">
+          {{ emptyMessage }}
+        </div>
         <div
           class="text-caption caption-medium letter-spaced text-grey-7 q-mt-xs"
         >
@@ -41,7 +67,7 @@
 
       <q-list v-else class="q-pb-sm">
         <q-item
-          v-for="client in paginatedClients"
+          v-for="client in clients"
           :key="client.id"
           clickable
           v-ripple
@@ -96,7 +122,7 @@
       </q-list>
 
       <q-pagination
-        v-model="page"
+        v-bind="page.bind"
         :max="totalPages"
         direction-links
         boundary-links
@@ -105,7 +131,7 @@
       >
       </q-pagination>
 
-      <div v-else class="text-center q-pb-sm">
+      <div v-if="page.stateValue === totalPages" class="text-center q-pb-sm">
         <span class="text-caption text-grey-7 letter-spaced"
           >Todos os registros exibidos</span
         >
@@ -115,29 +141,43 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
-import { useNavigation } from "src/composables/core/useNavigation";
-import { getClients } from "src/services";
+import {
+  useNavigation,
+  useClients,
+  useClientsQueryState,
+} from "src/composables";
+import { computed } from "vue";
+import { ContentState, ListFilter } from "src/components/common";
 
-const page = ref(1);
-const rowsPerPage = 10;
+type LoadState = "loading" | "error" | "empty" | "ready";
 
-const clients = computed(() => getClients());
-const totalPages = computed(() =>
-  Math.ceil(clients.value.length / rowsPerPage),
-);
-const paginatedClients = computed(() => {
-  const start = (page.value - 1) * rowsPerPage;
-  return clients.value.slice(start, start + rowsPerPage);
+const { navigateTo } = useNavigation();
+
+const { schema, page, rowsPerPage, onlyActive } = useClientsQueryState();
+const { loading, error, clients, totalPages, reload } = useClients(schema);
+
+const loadState = computed<LoadState>(() => {
+  if (loading.value) return "loading";
+  if (error.value) return "error";
+  if (clients.value.length === 0) return "empty";
+
+  return "ready";
 });
 
-watch(
-  () => clients.value.length,
-  () => {
-    page.value = 1;
-  },
+const clientFilters = computed(() => [
+  { bind: onlyActive.value.bind, label: "Filtro" },
+  { bind: rowsPerPage.value.bind, label: "Por página", minWidth: 120 },
+]);
+
+const errorMessage = computed(
+  () => error.value?.message || "Erro ao carregar clientes",
 );
-const { navigateTo } = useNavigation();
+const emptyMessage = computed(() => {
+  const isFiltered = onlyActive.value.stateValue === true;
+  return isFiltered
+    ? "Nenhum cliente ativo encontrado"
+    : "Nenhum cliente cadastrado ainda";
+});
 </script>
 
 <style lang="css" scoped>
@@ -149,6 +189,10 @@ const { navigateTo } = useNavigation();
   border: 1px solid #e0e0e0;
   border-radius: 12px;
   background-color: #fafafa;
+
+  max-width: 560px;
+  margin-inline: auto;
+  width: 100%;
 }
 
 .client-row:active {

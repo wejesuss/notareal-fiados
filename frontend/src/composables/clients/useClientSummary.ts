@@ -13,7 +13,6 @@ export function useClientSummary(clientId: Ref<number>) {
     try {
       summary.value = await getClientSummary(clientId.value);
     } catch (e) {
-      console.error(e);
       error.value = e as Error;
       summary.value = null;
     } finally {

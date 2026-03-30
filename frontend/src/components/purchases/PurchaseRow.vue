@@ -24,8 +24,8 @@
         class="text-grey-9 purchase-amount-label text-weight-medium"
       >
         <PurchaseAmounts
-          :total="purchase.totalValue"
-          :paid="purchase.totalPaidValue"
+          :total="purchase.total"
+          :paid="purchase.totalPaid"
           :compact="isCompact"
         ></PurchaseAmounts>
       </q-item-label>

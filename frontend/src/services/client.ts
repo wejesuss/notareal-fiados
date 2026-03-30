@@ -1,105 +1,79 @@
+import { api } from "src/api/api";
+import { APIError, ErrorMessages } from "src/api/errors";
 import type {
   Client,
   ClientCreate,
   ClientSummary,
   ClientUpdate,
+  ClientListParams,
+  ClientListResponse,
+  ClientWithMessageResponse,
 } from "src/models";
-import { sleep } from "src/utils/timing/sleep";
 
-const clients: Client[] = [
-  {
-    id: 1,
-    name: "José Augusto",
-    nickname: null,
-    email: "joseaugusto32@example.com",
-    isActive: false,
-    createdAt: "2025-12-15T22:36:31.000Z",
-    updatedAt: "2025-12-15T22:36:31.000Z",
-  },
-  {
-    id: 2,
-    name: "João Carlos",
-    nickname: "joaocarlos",
-    phone: "(99) 9900-9879",
-    isActive: true,
-    createdAt: "2025-12-15T22:36:31.000Z",
-    updatedAt: "2025-12-15T22:36:31.000Z",
-  },
-];
+export async function getClients(
+  params?: ClientListParams
+): Promise<ClientListResponse> {
+  const { data } = await api.get<ClientListResponse>("/clients", {
+    params: params,
+  });
 
-const summaries: ClientSummary[] = [
-  { clientId: 1, totalPurchases: 15, totalPaid: 360, outstandingBalance: 450 },
-  { clientId: 2, totalPurchases: 7, totalPaid: 0, outstandingBalance: 130.7 },
-];
-
-export function getClients(): Client[] {
-  return clients;
+  return data;
 }
 
-export function getRecentClients(limit: number = 5): Client[] {
-  return clients.slice(0, limit);
+export async function getRecentClients(
+  limit: number = 5
+): Promise<ClientListResponse> {
+  const { data } = await api.get<ClientListResponse>("/clients", {
+    params: { limit },
+  });
+
+  return data;
 }
 
 export async function getClientById(id: number): Promise<Client> {
-  return new Promise((res, rej) => {
-    const found = clients.find((client) => client.id === id);
+  const { data } = await api.get<Client>(`/clients/${id}`);
 
-    if (found) {
-      res(found);
-    } else {
-      rej(new Error("Cliente não encontrado!"));
-    }
-  });
+  return data;
 }
 
-export function createClient(payload: ClientCreate) {
-  clients.unshift({
-    id: clients.length + 1,
-    isActive: true,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+export async function createClient(payload: ClientCreate) {
+  const { data } = await api.post<ClientWithMessageResponse>(`/clients/`, {
     ...payload,
   });
+
+  return data;
 }
 
 export async function updateClient(
   id: number,
   payload: ClientUpdate
-): Promise<Client> {
-  await sleep(300);
+): Promise<ClientWithMessageResponse> {
+  const { isActive, ...clientData } = payload;
+  let response: ClientWithMessageResponse | null = null;
 
-  return new Promise((res, rej) => {
-    const index = clients.findIndex((client) => client.id === id);
-    if (index === -1) {
-      return rej(new Error(`Cliente de id ${id} não encontrado!`));
-    }
+  // Update client only if fields exist
+  if (Object.keys(clientData).length > 0) {
+    response = (await api.put(`/clients/${id}`, clientData)).data;
+  }
 
-    const client = clients[index];
-    if (!client) {
-      return rej(new Error(`Cliente de id ${id} não encontrado!`));
-    }
+  // Only change client status if status was provided
+  if (isActive === true) {
+    response = (await api.put(`/clients/${id}/activate`)).data;
+  } else if (isActive === false) {
+    response = (await api.delete(`/clients/${id}`)).data;
+  }
 
-    const updatedClient: Client = {
-      ...client,
-      ...payload,
-      updatedAt: new Date().toISOString(),
-    };
+  if (!response) {
+    throw new APIError(ErrorMessages.UnexpectedError);
+  }
 
-    clients[index] = updatedClient;
-
-    res(updatedClient);
-  });
+  return response;
 }
 
 export async function getClientSummary(
   clientId: number
 ): Promise<ClientSummary> {
-  return new Promise((res, rej) => {
-    const found = summaries.find((summary) => summary.clientId === clientId);
-    if (found) {
-      res(found);
-    } else {
-      rej(new Error("Resumo do cliente não encontrado!"));
-    }
-  });
+  const { data } = await api.get<ClientSummary>(`/clients/${clientId}/summary`);
+
+  return data;
 }

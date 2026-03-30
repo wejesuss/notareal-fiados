@@ -2,10 +2,7 @@ import { type Ref, ref, watch } from "vue";
 import type { Purchase } from "src/models";
 import { getClientRecentPurchases } from "src/services/purchase";
 
-export function useClientRecentPurchases(
-  clientId: Ref<number>,
-  limit: number = 3
-) {
+export function useClientRecentPurchases(clientId: Ref<number>) {
   const loading = ref(false);
   const error = ref<Error | null>(null);
   const recentPurchases = ref<Purchase[]>([]);
@@ -14,12 +11,9 @@ export function useClientRecentPurchases(
     loading.value = true;
     error.value = null;
     try {
-      recentPurchases.value = await getClientRecentPurchases(
-        clientId.value,
-        limit
-      );
+      const response = await getClientRecentPurchases(clientId.value);
+      recentPurchases.value = response.purchases;
     } catch (e) {
-      console.error(e);
       error.value = e as Error;
       recentPurchases.value = [];
     } finally {

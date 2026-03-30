@@ -6,11 +6,13 @@ DATA_DIR = BASE_DIR / "data"
 DB_PATH = DATA_DIR / "notareal.db"
 DB_PATH.parent.mkdir(exist_ok=True)
 
+
 def init_database():
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS clients (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
@@ -21,15 +23,17 @@ def init_database():
             created_at INTEGER,
             updated_at INTEGER
         );
-    """)
+    """
+    )
 
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS purchases (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             client_id INTEGER NOT NULL,
             description TEXT,
-            total_value REAL NOT NULL,
-            total_paid_value REAL DEFAULT 0.0,
+            total_cents INTEGER NOT NULL,
+            total_paid_cents INTEGER DEFAULT 0,
             status TEXT DEFAULT 'pending',
             note_number TEXT UNIQUE,
             is_active INTEGER DEFAULT 1,
@@ -38,13 +42,15 @@ def init_database():
 
             FOREIGN KEY (client_id) REFERENCES clients (id)
         );
-    """)
-    
-    cursor.execute("""
+    """
+    )
+
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS payments (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             purchase_id INTEGER NOT NULL,
-            amount REAL NOT NULL,
+            amount_cents INTEGER NOT NULL,
             payment_date INTEGER, -- can be NULL
             method TEXT,
             description TEXT,
@@ -55,16 +61,27 @@ def init_database():
 
             FOREIGN KEY (purchase_id) REFERENCES purchases (id)
         );
-    """)
+    """
+    )
 
     cursor.execute("""CREATE INDEX IF NOT EXISTS idx_clients_name ON clients(name)""")
-    cursor.execute("""CREATE INDEX IF NOT EXISTS idx_clients_nickname ON clients(nickname)""")
-    cursor.execute("""CREATE INDEX IF NOT EXISTS idx_purchases_client ON purchases(client_id)""")
-    cursor.execute("""CREATE INDEX IF NOT EXISTS idx_payments_purchase ON payments(purchase_id)""")
+    cursor.execute(
+        """CREATE INDEX IF NOT EXISTS idx_clients_nickname ON clients(nickname)"""
+    )
+    cursor.execute(
+        """CREATE INDEX IF NOT EXISTS idx_purchases_client ON purchases(client_id)"""
+    )
+    cursor.execute(
+        """CREATE INDEX IF NOT EXISTS idx_payments_purchase ON payments(purchase_id)"""
+    )
+    cursor.execute(
+        """CREATE INDEX IF NOT EXISTS idx_purchases_client_created ON purchases(client_id, created_at DESC)"""
+    )
 
     conn.commit()
     # cursor.close()
     conn.close()
+
 
 def get_connection():
     conn = sqlite3.connect(DB_PATH)

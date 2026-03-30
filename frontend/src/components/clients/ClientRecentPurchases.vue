@@ -78,12 +78,10 @@ interface ClientRecentPurchasesProps {
   clientId: number;
 }
 
-const fetchLimit = 3;
 const props = defineProps<ClientRecentPurchasesProps>();
 const { navigateTo } = useNavigation();
 const { loading, error, recentPurchases } = useClientRecentPurchases(
   toRef(props, "clientId"),
-  fetchLimit,
 );
 
 type LoadState = "loading" | "error" | "empty" | "ready";
@@ -110,7 +108,7 @@ const recentRegistries = computed<RecentRegistry[]>(() =>
     return {
       id: p.id,
       name: p.description,
-      value: formatCurrency(p.totalValue),
+      value: formatCurrency(p.total),
       valueComplement: label,
       ...(paid && {
         iconColor: color,
@@ -125,7 +123,9 @@ const clientPurchases = computed<RegistryCardProps>(() => ({
   title: "Últimas compras",
   titleVariant: "emphasis",
   subtitle:
-    recentPurchases.value.length === 0 ? "" : `Últimas ${fetchLimit} compras`,
+    recentPurchases.value.length <= 1
+      ? ""
+      : `Últimas ${recentPurchases.value.length} compras`,
   nameColor: "text-blue-8",
   valueColor: "text-amber-10",
   route: purchasesRoute.value,

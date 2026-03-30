@@ -1,17 +1,21 @@
-from builtins import isinstance
 from typing import List
 from datetime import datetime
-from app.models import (Purchase, Payment)
-from app.services import payment_service
-from app.repositories import (purchase_repository)
+from app.models import Purchase, Payment
+from app.services import payment_service, domain_validations
+from app.repositories import purchase_repository
+from app.common import PurchaseStatus, PaginatedResult
 from app.utils.helpers import filter_allowed
 from app.utils.exceptions import (
-    BusinessRuleError, NotFoundError, ValidationError, BaseClassError,
-    error_messages
+    BusinessRuleError,
+    NotFoundError,
+    ValidationError,
+    BaseClassError,
+    error_messages,
 )
 
 # fields that are allowed to be updated
-PURCHASE_ALLOWED_UPDATE_FIELDS = {"client_id", "description", "total_value"}
+PURCHASE_ALLOWED_UPDATE_FIELDS = {"client_id", "description", "total_cents"}
+
 
 def get_purchase_by_id(purchase_id: int) -> Purchase:
     purchase = purchase_repository.get_purchase_by_id(purchase_id)
@@ -20,6 +24,7 @@ def get_purchase_by_id(purchase_id: int) -> Purchase:
 
     return purchase
 
+
 def get_purchase_by_note_number(note_number: str) -> Purchase:
     purchase = purchase_repository.get_purchase_by_note_number(note_number)
     if not purchase:
@@ -27,54 +32,64 @@ def get_purchase_by_note_number(note_number: str) -> Purchase:
 
     return purchase
 
-def get_purchases(limit: int = None, offset: int = 0, only_pending: bool | None = None) -> List[Purchase]:
-    purchases = purchase_repository.get_purchases(limit, offset, only_pending)
-    if not purchases:
-        return []
-    
-    return purchases
+
+def get_purchases(
+    limit: int = None,
+    offset: int = 0,
+    statuses: List[PurchaseStatus] | None = None,
+    is_active: bool | None = None,
+) -> PaginatedResult[Purchase]:
+    domain_validations.validate_status_with_is_active(is_active, statuses)
+
+    result = purchase_repository.get_purchases(limit, offset, statuses, is_active)
+
+    return result
+
 
 def create_purchase(client_id: int, data: dict) -> Purchase:
-    try:
-        total_value = float(data.get("total_value", 0))
+    total_cents: int = data.get("total_cents", 0)
 
-        # Attempt to get and convert amount to float
-        amount = data.get("amount")
-        if amount is not None:
-            amount = float(amount)  # Convert only if it's not None
-            if amount <= 0:
-                raise ValidationError(error_messages.PAYMENT_INVALID_AMOUNT)
-    except ValueError:
-        raise ValidationError(error_messages.RESOURCE_CREATION_VALUE_ERROR)
+    # Validate amount_cents if present
+    amount_cents: int | None = data.get("amount_cents")
+    if amount_cents is not None:
+        domain_validations.validate_amount_cents(amount_cents)
 
-    if total_value <= 0:
+    if total_cents <= 0:
         raise ValidationError(error_messages.PURCHASE_INVALID_TOTAL)
 
     create_new_payment = False
     status = "pending"
-    total_paid_value = 0.0
+    total_paid_cents: int = 0
 
-    if amount is not None:
-        if amount >= total_value:
+    if amount_cents is not None:
+        if amount_cents > total_cents:
+            raise BusinessRuleError(error_messages.PAYMENT_EXCEEDS_PURCHASE_TOTAL)
+
+        if amount_cents == total_cents:
             create_new_payment = True
-            total_paid_value = total_value
+            total_paid_cents = total_cents
             status = "paid"
-        elif amount > 0:
+        elif amount_cents > 0:
             create_new_payment = True
-            total_paid_value = amount
+            total_paid_cents = amount_cents
             status = "partial"
 
-    data.update({"client_id": client_id, "status": status, "total_paid_value": total_paid_value})
+    # Ensure client exists
+    domain_validations.get_client_or_404(client_id)
+
+    data.update(
+        {"client_id": client_id, "status": status, "total_paid_cents": total_paid_cents}
+    )
     purchase = purchase_repository.insert_purchase(data)
 
     if create_new_payment:
         payment_data: dict = {
             "purchase_id": purchase.id,
-            "amount": amount,
+            "amount_cents": amount_cents,
             "payment_date": data.get("payment_date"),
             "method": data.get("method"),
             "description": data.get("payment_description"),
-            "receipt_number": data.get("receipt_number")
+            "receipt_number": data.get("receipt_number"),
         }
 
         try:
@@ -91,18 +106,23 @@ def create_purchase(client_id: int, data: dict) -> Purchase:
 
     return purchase
 
+
 def update_purchase(purchase_id: int, data: dict) -> Purchase:
     if "is_active" in data:
         raise ValidationError(error_messages.PURCHASE_INVALID_ACTIVATION_ROUTE)
 
-    total_value = data.get("total_value")
-    if total_value is not None and total_value <= 0:
+    total_cents = data.get("total_cents")
+    if total_cents is not None and total_cents <= 0:
         raise ValidationError(error_messages.PURCHASE_INVALID_TOTAL)
 
     # filter data fields
     validated_data = filter_allowed(data, PURCHASE_ALLOWED_UPDATE_FIELDS)
     if not validated_data:
         raise ValidationError(error_messages.DATA_FIELDS_EMPTY)
+
+    if "client_id" in validated_data:
+        # Ensure client exists
+        domain_validations.get_client_or_404(validated_data.get("client_id"))
 
     original = purchase_repository.get_purchase_by_id(purchase_id)
     if not original:
@@ -111,11 +131,14 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase:
     purchase = purchase_repository.update_purchase(purchase_id, validated_data)
 
     # Recalculate totals if relevant fields changed
-    relevant_fields_changed = "total_value" in data or "client_id" in data
+    relevant_fields_changed = (
+        "total_cents" in validated_data or "client_id" in validated_data
+    )
     if relevant_fields_changed:
         purchase = recalculate_purchase_totals(purchase_id)
 
     return purchase
+
 
 def activate_purchase(purchase_id: int) -> Purchase:
     original = purchase_repository.get_purchase_by_id(purchase_id)
@@ -128,6 +151,7 @@ def activate_purchase(purchase_id: int) -> Purchase:
     purchase = recalculate_purchase_totals(purchase_id)
 
     return purchase
+
 
 def deactivate_purchase(purchase_id: int) -> Purchase:
     """Deactivate a purchase."""
@@ -146,9 +170,24 @@ def deactivate_purchase(purchase_id: int) -> Purchase:
 
     return purchase
 
+
 # Client related services (business logic)
-def get_purchases_by_client(client_id: int, only_active: bool = True) -> List[Purchase]:
-    return purchase_repository.get_purchases_by_client_id(client_id, only_active)
+def get_purchases_by_client(
+    client_id: int,
+    limit: int | None = None,
+    offset: int = 0,
+    statuses: List[PurchaseStatus] | None = None,
+    is_active: bool | None = None,
+) -> PaginatedResult[Purchase]:
+    domain_validations.validate_status_with_is_active(is_active, statuses)
+
+    # Ensure client exists
+    domain_validations.get_client_or_404(client_id)
+
+    return purchase_repository.get_purchases_by_client_id(
+        client_id, limit, offset, statuses, is_active
+    )
+
 
 def deactivate_purchases_by_client(client_id: int) -> bool:
     """Deactivate all purchases (and related payments) for a given client."""
@@ -162,15 +201,17 @@ def deactivate_purchases_by_client(client_id: int) -> bool:
     if success:
         for purchase_id in purchases_ids:
             payment_service.deactivate_payments_by_purchase(purchase_id)
-            purchase_repository.update_purchase(purchase_id, {
-                "total_paid_value": 0,
-                "status": "pending"
-            })
+            purchase_repository.update_purchase(
+                purchase_id, {"total_paid_cents": 0, "status": "pending"}
+            )
 
     return success
 
+
 # Payment related services (business logic)
-def get_payments_for_purchase(purchase_id: int, limit: int = None, offset: int = 0) -> List[Payment]:
+def get_payments_for_purchase(
+    purchase_id: int, limit: int = None, offset: int = 0
+) -> List[Payment]:
     """List payments for a specific purchase."""
     # Special case: purchase_id = 0 -> returns all active payments
     if purchase_id == 0:
@@ -185,8 +226,10 @@ def get_payments_for_purchase(purchase_id: int, limit: int = None, offset: int =
 
     return payment_service.get_payments(limit, offset, purchase_id)
 
+
 def get_payment_by_id(payment_id: int) -> Payment | None:
     return payment_service.get_payment_by_id(payment_id)
+
 
 def create_payment(purchase_id: int, data: dict) -> Payment:
     """Create a new payment and update purchase totals."""
@@ -200,6 +243,7 @@ def create_payment(purchase_id: int, data: dict) -> Payment:
 
     return payment
 
+
 def update_payment(purchase_id: int, payment_id: int, data: dict) -> Payment:
     """Update a payment and recalculate the related purchase totals."""
     payment = payment_service.get_payment_by_id(payment_id)
@@ -210,10 +254,11 @@ def update_payment(purchase_id: int, payment_id: int, data: dict) -> Payment:
         raise BusinessRuleError(error_messages.PAYMENT_NOT_LINKED)
 
     updated = payment_service.update_payment(payment_id, data)
-    if updated and "amount" in data:
+    if updated and "amount_cents" in data:
         recalculate_purchase_totals(purchase_id)
 
     return updated or payment
+
 
 def activate_payment(purchase_id: int, payment_id: int) -> Payment:
     """Activate a payment that belongs to the given purchase and update totals."""
@@ -237,6 +282,7 @@ def activate_payment(purchase_id: int, payment_id: int) -> Payment:
 
     return payment
 
+
 def deactivate_payment(purchase_id: int, payment_id: int) -> Payment:
     """Deactivate a payment that belongs to the given purchase and update totals."""
     payment = payment_service.get_payment_by_id(payment_id)
@@ -258,26 +304,25 @@ def deactivate_payment(purchase_id: int, payment_id: int) -> Payment:
     recalculate_purchase_totals(purchase_id)
     return payment
 
+
 def compute_purchase_totals(purchase: Purchase, payments: list[Payment]):
     """Pure function: given a purchase + payments, returns the recalculated fields."""
     active_payments = [p for p in payments if p.is_active]
-    total_paid = sum(p.amount for p in active_payments)
+    total_paid_cents = sum(p.amount_cents for p in active_payments)
 
-    if total_paid >= purchase.total_value:
+    if total_paid_cents >= purchase.total_cents:
         new_status = "paid"
-    elif total_paid > 0:
+    elif total_paid_cents > 0:
         new_status = "partial"
     else:
         new_status = "pending"
 
-    return {
-        "total_paid_value": total_paid,
-        "status": new_status
-    }
+    return {"total_paid_cents": total_paid_cents, "status": new_status}
+
 
 def recalculate_purchase_totals(purchase_id: int) -> Purchase:
     """
-    Recalculate purchase total_paid_value and status based on active payments.
+    Recalculate purchase total_paid_cents and status based on active payments.
 
     Returns:
         Purchase: The updated Puchase after recalculation
@@ -289,7 +334,9 @@ def recalculate_purchase_totals(purchase_id: int) -> Purchase:
     if not purchase:
         raise NotFoundError(error_messages.PURCHASE_NOT_FOUND)
 
-    payments = payment_service.get_payments(limit = None, offset = 0, purchase_id = purchase_id)
+    payments = payment_service.get_payments(
+        limit=None, offset=0, purchase_id=purchase_id
+    )
     updates = compute_purchase_totals(purchase, payments)
 
     updated = purchase_repository.update_purchase(purchase_id, updates)

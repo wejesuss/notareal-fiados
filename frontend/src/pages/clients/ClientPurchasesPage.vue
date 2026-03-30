@@ -14,17 +14,31 @@
 
     <!-- Content -->
     <q-card>
-      <q-card-section>
+      <q-card-section
+        class="row items-center justify-between q-col-gutter-y-md"
+      >
         <div
           class="text-subtitle1 row items-center q-gutter-x-sm q-col-gutter-y-xs"
         >
           <span>Lista de compras</span>
-          <span
+          <router-link
             v-if="clientDisplayName"
-            class="text-primary text-subtitle2 letter-spaced client-name"
-            >({{ clientDisplayName }})
+            :to="clientLink"
+            class="client-link"
+          >
+            <span class="text-primary text-subtitle2 letter-spaced client-name">
+              ({{ clientDisplayName }})
+            </span>
+          </router-link>
+          <span
+            v-else-if="loadState === 'client-error'"
+            class="text-grey text-subtitle2 client-name"
+            >(Erro ao carregar Cliente)
           </span>
         </div>
+
+        <!-- Filtering components (select inputs) -->
+        <ListFilter :filters="purchasesFilters"></ListFilter>
       </q-card-section>
 
       <q-separator />
@@ -37,13 +51,21 @@
         />
       </q-card-section>
 
-      <!-- Error state -->
-      <q-card-section v-else-if="loadState === 'error'">
+      <!-- Error states - This catches 'client-error' and 'error' together -->
+      <q-card-section
+        v-else-if="loadState === 'client-error' || loadState === 'error'"
+      >
         <ContentState
-          :message="error?.message || 'Erro ao carregar compras'"
+          :message="errorMessage"
           icon-name="error_outline"
           icon-color="amber-10"
         />
+
+        <div class="q-mt-sm text-center">
+          <q-btn rounded outline color="grey-8" @click="reload">
+            Tentar de novo
+          </q-btn>
+        </div>
       </q-card-section>
 
       <!-- Empty state -->
@@ -83,7 +105,7 @@
         </q-list>
 
         <q-pagination
-          v-model="page"
+          v-model="page.stateValue"
           :max="totalPages"
           direction-links
           boundary-links
@@ -92,7 +114,7 @@
         >
         </q-pagination>
 
-        <div v-if="page === totalPages" class="text-center q-pb-sm">
+        <div v-if="page.stateValue === totalPages" class="text-center q-pb-sm">
           <span class="text-caption text-grey-7 letter-spaced"
             >Todos os registros exibidos</span
           >
@@ -111,48 +133,91 @@ import {
   useClientDetails,
   useClientPurchases,
   usePurchasesUI,
+  usePurchasesQueryState,
 } from "src/composables";
-import { ContentState } from "src/components/common";
+import { ContentState, ListFilter } from "src/components/common";
 import { PurchaseRow } from "src/components/purchases";
+import { APIError } from "src/api/errors";
 
-type LoadState = "loading" | "error" | "empty" | "ready";
+type LoadState = "loading" | "client-error" | "error" | "empty" | "ready";
 
 const $route = useRoute();
 const $q = useQuasar();
 const { navigateTo } = useNavigation();
 const clientId = computed(() => Number($route.params.id));
 
-const { client, error: clientError } = useClientDetails(toRef(clientId));
-const { loading, error, purchases, paginatedPurchases, page, totalPages } =
-  useClientPurchases(toRef(clientId));
-const { purchasesWithUI } = usePurchasesUI(paginatedPurchases);
+const {
+  client,
+  error: clientError,
+  reload: reloadClient,
+} = useClientDetails(toRef(clientId));
+
+const { schema, page, rowsPerPage, status } = usePurchasesQueryState();
+const {
+  loading,
+  error,
+  purchases,
+  totalPages,
+  reload: reloadPurchases,
+} = useClientPurchases(toRef(clientId), schema);
+
+const { purchasesWithUI } = usePurchasesUI(purchases);
 
 const loadState = computed<LoadState>(() => {
+  // loading is always false after successful fetching or error
+  if (clientError.value) return "client-error";
   if (loading.value) return "loading";
-  if (clientError.value || error.value) return "error";
+  if (error.value) return "error";
+  // purchases is set as empty on error, so check is made after error check
   if (purchases.value.length === 0) return "empty";
   return "ready";
 });
 
-async function handleClientNotFound(e: Error, route = "/clients") {
+async function handleClientNotFound(e: Error) {
   $q.notify({ type: "negative", message: e.message });
 
-  await navigateTo(route);
+  await navigateTo("/clients");
 }
 
 const clientDisplayName = computed(() => {
-  return client.value
-    ? [client.value.name, client.value.nickname].filter(Boolean).join(" - ")
-    : null;
+  if (!client.value) return null;
+
+  const { name, nickname } = client.value;
+  return [name, nickname].filter(Boolean).join(" - ");
 });
+const clientLink = computed(() => `/clients/${clientId.value}`);
+
+const purchasesFilters = computed(() => [
+  {
+    bind: status.value.bind,
+    label: "Filtro",
+  },
+  {
+    bind: rowsPerPage.value.bind,
+    label: "Por página",
+    minWidth: 120,
+  },
+]);
+
+const errorMessage = computed(
+  () =>
+    clientError.value?.message ||
+    error.value?.message ||
+    "Erro ao carregar cliente com compras",
+);
+
+const reload = async () => {
+  if (clientError.value) await reloadClient();
+  if (error.value) await reloadPurchases();
+};
 
 watch(
   clientError,
   async (err) => {
     if (!err) return;
-    await handleClientNotFound(
-      new Error(err.message || "Erro ao carregar cliente!"),
-    );
+    if (err instanceof APIError && err.status === 404) {
+      await handleClientNotFound(err);
+    }
   },
   { once: true },
 );
@@ -161,5 +226,13 @@ watch(
 <style lang="css" scoped>
 .client-name {
   min-width: 0;
+}
+
+.client-link {
+  text-decoration: none;
+}
+
+.client-link:hover {
+  text-decoration: underline;
 }
 </style>

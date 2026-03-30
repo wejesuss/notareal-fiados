@@ -16,7 +16,23 @@
 
       <q-card-section class="text-center q-pa-lg">
         <div class="form-container">
-          <ClientForm submit-label="Salvar" @submit="submit"></ClientForm>
+          <ClientForm
+            submit-label="Salvar"
+            @submit="submit"
+            :submitting="submitting"
+          >
+            <template #buttons-container>
+              <q-btn
+                class="q-mr-md q-py-sm"
+                color="grey-8"
+                outline
+                type="button"
+                label="Cancelar"
+                @click="navigateTo('/clients')"
+                :disable="submitting"
+              />
+            </template>
+          </ClientForm>
         </div>
       </q-card-section>
     </q-card>
@@ -24,6 +40,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue";
 import { useQuasar } from "quasar";
 import { createClient } from "src/services";
 import { useNavigation } from "src/composables/core/useNavigation";
@@ -32,16 +49,31 @@ import { ClientForm } from "src/components/clients";
 
 const { navigateTo } = useNavigation();
 const $q = useQuasar();
+const submitting = ref(false);
 
 async function submit(payload: ClientPayload) {
-  createClient(payload);
+  if (submitting.value) return;
 
-  $q.notify({
-    type: "positive",
-    message: "Cliente criado com sucesso",
-  });
+  try {
+    submitting.value = true;
+    const { client } = await createClient(payload);
 
-  await navigateTo("/clients");
+    $q.notify({
+      type: "positive",
+      message: "Cliente criado com sucesso",
+    });
+
+    await navigateTo(`/clients/${client.id}`);
+  } catch (err) {
+    if (err instanceof Error) {
+      $q.notify({
+        type: "negative",
+        message: err.message || "Erro ao criar Cliente",
+      });
+    }
+  } finally {
+    submitting.value = false;
+  }
 }
 </script>
 

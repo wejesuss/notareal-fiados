@@ -1,9 +1,12 @@
 import unicodedata
+from app.utils.exceptions import ValidationError, error_messages
 
 ALLOWED_EXTRA = set(" .'-")
 
+
 def filter_allowed(data: dict, allowed: set[str]) -> dict:
     return {k: v for k, v in data.items() if k in allowed}
+
 
 def is_valid_name(name: str) -> bool:
     for ch in name:

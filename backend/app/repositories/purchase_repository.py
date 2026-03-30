@@ -2,73 +2,134 @@ from typing import List
 from datetime import datetime
 from app.database import get_connection, sqlite3
 from app.models import Purchase
+from app.common import PurchaseStatus, PaginatedResult
 from app.utils.exceptions import (
-    ValidationError, BusinessRuleError, DatabaseError,
-    error_messages
+    BusinessRuleError,
+    DatabaseError,
+    error_messages,
 )
 
-def get_purchases(limit: int = None, offset: int = 0, only_pending: bool | None = None) -> List[Purchase]:
+
+def _build_purchases_query(
+    client_id: int | None,
+    statuses: List[PurchaseStatus] | None,
+    is_active: bool | None,
+    limit: int | None,
+    offset: int,
+):
+    """This is a handy function that creates and prepare the query for purchases.
+    It returns a `count_pair`, `search_pair` and a `where_clause`
+    that makes it easy to manipulate the purchase and count queries.
+
+    `count_pair` and `search_pair` are tuples with query (str) and params (list).
+    """
+    # Default limit if not provided (-1 means "no limit" in SQLite)
+    search_limit = -1 if limit is None else limit
+
+    # Create WHERE clause based on status and is_active
+    params = []
+    clauses = []
+
+    if client_id is not None:
+        clauses.append("client_id = ?")
+        params.append(client_id)
+
+    if statuses:
+        placeholders = ", ".join(["?"] * len(statuses))
+        clauses.append(f"status IN ({placeholders})")
+        params.extend([s.value for s in statuses])
+
+    if is_active is not None:
+        clauses.append("is_active = ?")
+        params.append(int(is_active))
+
+    where_clause = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+
+    count_query = f"SELECT COUNT(*) FROM purchases {where_clause}"
+
+    search_query = f"""
+        SELECT * FROM purchases 
+        {where_clause} 
+        ORDER BY created_at DESC
+        LIMIT ? OFFSET ?
+    """
+
+    return {
+        "count": (count_query, params.copy()),
+        "search": (search_query, [*params, search_limit, offset]),
+    }
+
+
+def get_purchases(
+    limit: int | None = None,
+    offset: int = 0,
+    statuses: List[PurchaseStatus] | None = None,
+    is_active: bool | None = None,
+) -> PaginatedResult[Purchase]:
     conn = None
     try:
         conn = get_connection()
         cursor = conn.cursor()
 
-        # Default limit if not provided (-1 means "no limit" in SQLite)
-        search_limit = -1 if limit is None else limit
+        # The semantics and group meaning of status and is_active being used together
+        # should be verified in the service-layer. Here it is considered "as is".
+        queries = _build_purchases_query(None, statuses, is_active, limit, offset)
 
-        # Create WHERE clause if only pending (or partial) purchases is requested
-        where_clause = "" # include inactive ones if only_pending is None
-        if only_pending is True:
-            where_clause = "WHERE status IN ('pending', 'partial') AND is_active = 1"
-        elif only_pending is False:
-            where_clause = "WHERE is_active = 1"
+        # Get total count for pagination
+        cursor.execute(*queries["count"])
+        total = cursor.fetchone()[0]
 
-        cursor.execute(f"""
-            SELECT * FROM purchases {where_clause} ORDER BY created_at DESC
-            LIMIT ? OFFSET ?
-        """, (search_limit, offset))
+        cursor.execute(*queries["search"])
 
         rows = cursor.fetchall()
 
-        if not rows:
-            return []
-
-        return [Purchase.from_row(row) for row in rows]
+        return PaginatedResult(
+            items=[Purchase.from_row(row) for row in rows],
+            total=total,
+        )
     except sqlite3.Error as e:
         raise DatabaseError(error_messages.DATABASE_ERROR) from e
     finally:
         if conn:
             conn.close()
 
+
 def insert_purchase(data: dict) -> Purchase:
     conn = None
     try:
         conn = get_connection()
         cursor = conn.cursor()
+        client_id = data.get("client_id")
+
+        if client_id is None:
+            raise BusinessRuleError(error_messages.FOREIGN_KEY_ERROR)
 
         now = int(datetime.now().timestamp())
 
-        cursor.execute("""INSERT INTO purchases (
+        cursor.execute(
+            """INSERT INTO purchases (
                 client_id,
                 description,
-                total_value,
-                total_paid_value,
+                total_cents,
+                total_paid_cents,
                 status,
                 note_number,
                 is_active,
                 created_at,
                 updated_at
             ) VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?);
-        """, (
-            int(data.get("client_id")),
-            data.get("description"),
-            data.get("total_value"),
-            data.get("total_paid_value"),
-            data.get("status"),
-            data.get("note_number"),
-            now,
-            now
-        ))
+        """,
+            (
+                int(client_id),
+                data.get("description"),
+                data.get("total_cents"),
+                data.get("total_paid_cents"),
+                data.get("status"),
+                data.get("note_number"),
+                now,
+                now,
+            ),
+        )
 
         conn.commit()
         purchase_id = cursor.lastrowid
@@ -85,6 +146,7 @@ def insert_purchase(data: dict) -> Purchase:
     finally:
         if conn:
             conn.close()
+
 
 def get_purchase_by_id(purchase_id: int) -> Purchase | None:
     conn = None
@@ -105,6 +167,7 @@ def get_purchase_by_id(purchase_id: int) -> Purchase | None:
         if conn:
             conn.close()
 
+
 def get_purchase_by_note_number(note_number: str) -> Purchase | None:
     conn = None
     try:
@@ -123,6 +186,7 @@ def get_purchase_by_note_number(note_number: str) -> Purchase | None:
     finally:
         if conn:
             conn.close()
+
 
 def update_purchase(purchase_id: int, data: dict) -> Purchase | None:
     conn = None
@@ -162,6 +226,7 @@ def update_purchase(purchase_id: int, data: dict) -> Purchase | None:
         if conn:
             conn.close()
 
+
 def deactivate_purchase(purchase_id: int) -> bool:
     """Deactivate a purchase."""
     conn = None
@@ -171,10 +236,13 @@ def deactivate_purchase(purchase_id: int) -> bool:
         now = int(datetime.now().timestamp())
 
         # disable purchase with the given ID
-        cursor.execute("""
+        cursor.execute(
+            """
             UPDATE purchases SET is_active = 0, updated_at = ?
             WHERE id = ? AND is_active = 1
-        """, (now, purchase_id))
+        """,
+            (now, purchase_id),
+        )
 
         conn.commit()
 
@@ -185,22 +253,36 @@ def deactivate_purchase(purchase_id: int) -> bool:
         if conn:
             conn.close()
 
+
 # Client related functions
-def get_purchases_by_client_id(client_id: int, only_active: bool = True) -> List[Purchase]:
+def get_purchases_by_client_id(
+    client_id: int,
+    limit: int | None = None,
+    offset: int = 0,
+    statuses: List[PurchaseStatus] | None = None,
+    is_active: bool | None = None,
+) -> PaginatedResult[Purchase]:
     conn = None
     try:
         conn = get_connection()
         cursor = conn.cursor()
 
-        where_clause = "WHERE client_id = ?"
-        if only_active:
-            where_clause += " AND is_active = 1"
+        # The semantics and group meaning of status and is_active being used together
+        # should be verified in the service-layer. Here it is considered "as is".
+        queries = _build_purchases_query(client_id, statuses, is_active, limit, offset)
 
-        cursor.execute(f"SELECT * FROM purchases {where_clause} ORDER BY created_at DESC", (client_id,))
+        # Get total count for pagination
+        cursor.execute(*queries["count"])
+        total = cursor.fetchone()[0]
+
+        cursor.execute(*queries["search"])
 
         rows = cursor.fetchall()
 
-        return [Purchase.from_row(row) for row in rows] if rows else []
+        return PaginatedResult(
+            items=[Purchase.from_row(row) for row in rows],
+            total=total,
+        )
     except sqlite3.IntegrityError as e:
         if "FOREIGN KEY constraint failed" in str(e):
             raise BusinessRuleError(error_messages.PURCHASE_CLIENT_NOT_FOUND)
@@ -210,6 +292,7 @@ def get_purchases_by_client_id(client_id: int, only_active: bool = True) -> List
         if conn:
             conn.close()
 
+
 def get_purchases_ids_by_client_id(client_id: int) -> List[int]:
     """Get all purchases ids for a given client."""
     conn = None
@@ -218,9 +301,12 @@ def get_purchases_ids_by_client_id(client_id: int) -> List[int]:
         cursor = conn.cursor()
 
         # get all purchases ids for that client
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT id FROM purchases WHERE client_id = ? AND is_active = 1
-        """, (client_id,))
+        """,
+            (client_id,),
+        )
         purchase_ids = [row[0] for row in cursor.fetchall()]
 
         return purchase_ids
@@ -233,6 +319,7 @@ def get_purchases_ids_by_client_id(client_id: int) -> List[int]:
         if conn:
             conn.close()
 
+
 def deactivate_purchases_by_client_id(client_id: int) -> bool:
     """Deactivate all purchases for a given client."""
     conn = None
@@ -242,10 +329,13 @@ def deactivate_purchases_by_client_id(client_id: int) -> bool:
         now = int(datetime.now().timestamp())
 
         # disable all purchases related to that client
-        cursor.execute("""
+        cursor.execute(
+            """
             UPDATE purchases SET is_active = 0, updated_at = ?
             WHERE client_id = ? AND is_active = 1
-        """, (now, client_id))
+        """,
+            (now, client_id),
+        )
 
         conn.commit()
 
