@@ -8,9 +8,14 @@
   >
     <!-- Main content -->
     <q-item-section>
-      <q-item-label class="text-body1 text-weight-medium text-blue-8">
-        {{ purchase.description }}
-      </q-item-label>
+      <div class="row items-center q-gutter-x-sm q-col-gutter-y-xs">
+        <q-item-label class="text-body1 text-weight-medium text-blue-8">
+          {{ purchase.description }}
+        </q-item-label>
+        <span class="text-primary letter-spaced">
+          ({{ purchase.noteNumber }})
+        </span>
+      </div>
 
       <q-item-label v-if="isCompact">
         <!-- Status chip inlined for small screens -->
