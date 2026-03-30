@@ -21,11 +21,15 @@
           class="text-subtitle1 row items-center q-gutter-x-sm q-col-gutter-y-xs"
         >
           <span>Lista de compras</span>
-          <span
+          <router-link
             v-if="clientDisplayName"
-            class="text-primary text-subtitle2 letter-spaced client-name"
-            >({{ clientDisplayName }})
-          </span>
+            :to="clientLink"
+            class="client-link"
+          >
+            <span class="text-primary text-subtitle2 letter-spaced client-name">
+              ({{ clientDisplayName }})
+            </span>
+          </router-link>
           <span
             v-else-if="loadState === 'client-error'"
             class="text-grey text-subtitle2 client-name"
@@ -183,6 +187,7 @@ const clientDisplayName = computed(() => {
   const { name, nickname } = client.value;
   return [name, nickname].filter(Boolean).join(" - ");
 });
+const clientLink = computed(() => `/clients/${clientId.value}`);
 
 const purchasesFilters = computed(() => [
   {
@@ -223,5 +228,13 @@ watch(
 <style lang="css" scoped>
 .client-name {
   min-width: 0;
+}
+
+.client-link {
+  text-decoration: none;
+}
+
+.client-link:hover {
+  text-decoration: underline;
 }
 </style>
