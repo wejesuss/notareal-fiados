@@ -37,10 +37,8 @@
           </span>
         </div>
 
-        <div class="row items-center q-gutter-sm q-gutter-x-md">
-          <!-- Filtering components (select inputs) -->
-          <ListFilter :filters="purchasesFilters"></ListFilter>
-        </div>
+        <!-- Filtering components (select inputs) -->
+        <ListFilter :filters="purchasesFilters"></ListFilter>
       </q-card-section>
 
       <q-separator />
