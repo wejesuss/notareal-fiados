@@ -37,7 +37,7 @@ export type PurchaseWithMessageResponse = {
   purchase: Purchase;
 };
 
-export type PurchasesWithMessageResponse = {
+export type PurchaseListResponse = {
   message: string;
   total: number;
   purchases: Purchase[];

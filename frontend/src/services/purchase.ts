@@ -3,7 +3,7 @@ import type {
   PurchaseUpdate,
   Payment,
   PurchaseWithMessageResponse,
-  PurchasesWithMessageResponse,
+  PurchaseListResponse,
   PurchaseListParams,
 } from "src/models";
 import { sleep } from "src/utils/timing/sleep";
@@ -112,8 +112,8 @@ export async function updatePurchase(
 export async function getClientPurchases(
   clientId: number,
   params?: PurchaseListParams
-): Promise<PurchasesWithMessageResponse> {
-  const { data } = await api.get<PurchasesWithMessageResponse>(
+): Promise<PurchaseListResponse> {
+  const { data } = await api.get<PurchaseListResponse>(
     `/clients/${clientId}/purchases`,
     {
       params: params,
@@ -125,8 +125,8 @@ export async function getClientPurchases(
 
 export async function getClientRecentPurchases(
   clientId: number
-): Promise<PurchasesWithMessageResponse> {
-  const { data } = await api.get<PurchasesWithMessageResponse>(
+): Promise<PurchaseListResponse> {
+  const { data } = await api.get<PurchaseListResponse>(
     `/clients/${clientId}/purchases`,
     {
       params: { limit: 3, isActive: true },
