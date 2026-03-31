@@ -21,7 +21,6 @@ export interface PurchaseUpdate {
   clientId?: number;
   description?: string;
   totalCents?: number;
-  isActive?: boolean;
 }
 
 // API models
