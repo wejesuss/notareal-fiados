@@ -57,7 +57,7 @@ class PurchaseResponseSchema(CamelModel, TotalsMixin):
     total_paid_cents: int
     status: PurchaseStatus
     note_number: str | None
-    is_active: int
+    is_active: bool
     created_at: datetime
     updated_at: datetime
 

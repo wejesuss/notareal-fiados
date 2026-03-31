@@ -35,7 +35,7 @@ class PaymentResponseSchema(CamelModel, AmountMixin):
     method: str | None
     description: str | None
     receipt_number: str | None
-    is_active: int
+    is_active: bool
     created_at: datetime
     updated_at: datetime | None
 
