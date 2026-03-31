@@ -1,6 +1,6 @@
 import { type Ref, ref, watch } from "vue";
 import type { Purchase } from "src/models";
-import { getClientRecentPurchases } from "src/services/purchase";
+import { getClientPurchases } from "src/services/purchase";
 
 export function useClientRecentPurchases(clientId: Ref<number>) {
   const loading = ref(false);
@@ -11,7 +11,11 @@ export function useClientRecentPurchases(clientId: Ref<number>) {
     loading.value = true;
     error.value = null;
     try {
-      const response = await getClientRecentPurchases(clientId.value);
+      const response = await getClientPurchases(clientId.value, {
+        limit: 3,
+        isActive: true,
+      });
+
       recentPurchases.value = response.purchases;
     } catch (e) {
       error.value = e as Error;

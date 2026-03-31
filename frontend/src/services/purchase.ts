@@ -123,19 +123,6 @@ export async function getClientPurchases(
   return data;
 }
 
-export async function getClientRecentPurchases(
-  clientId: number
-): Promise<PurchaseListResponse> {
-  const { data } = await api.get<PurchaseListResponse>(
-    `/clients/${clientId}/purchases`,
-    {
-      params: { limit: 3, isActive: true },
-    }
-  );
-
-  return data;
-}
-
 // Payment related functions
 export async function getPurchasePayments(
   purchaseId: number
