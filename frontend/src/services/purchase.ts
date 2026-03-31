@@ -56,12 +56,9 @@ const purchases: Purchase[] = [
 ];
 
 export async function getPurchaseById(purchaseId: number): Promise<Purchase> {
-  await sleep(300);
-  const found = purchases.find((p) => p.id === purchaseId);
+  const { data } = await api.get<Purchase>(`/purchases/${purchaseId}`);
 
-  if (!found) throw new Error("Compra não encontrada!");
-
-  return { ...found };
+  return data;
 }
 
 export async function updatePurchase(
