@@ -54,23 +54,14 @@
           </div>
         </div>
 
-        <div
-          class="row items-center justify-between q-mt-md text-grey-7 q-gutter-x-lg"
-        >
-          <div class="text-subtitle2">
-            Criado Em:
-            <span class="text-subtitle1 text-weight-bold">
-              {{ formatDate(purchase.createdAt) }}
-            </span>
-          </div>
-
-          <div class="text-subtitle2">
-            Atualizado Em:
-            <span class="text-subtitle1 text-weight-bold">
-              {{ formatDate(purchase.updatedAt) }}
-            </span>
-          </div>
-        </div>
+        <PurchaseTimeStamps
+          class="q-mt-md text-grey-7"
+          :created-at="purchase.createdAt"
+          :updated-at="purchase.updatedAt"
+          :compact="false"
+          label-style="text-subtitle2"
+          date-style="text-subtitle1 text-weight-bold"
+        />
 
         <q-separator class="q-mt-md" />
 
@@ -130,12 +121,12 @@ import { computed } from "vue";
 import type { Purchase } from "src/models";
 import {
   formatCurrency,
-  formatDate,
   getPurchaseActiveStatusUI,
   getPurchaseStatusUI,
 } from "src/utils/formatters";
 import { useNavigation } from "src/composables";
 import { PurchaseStatusChip } from "src/components/purchases";
+import PurchaseTimeStamps from "./PurchaseTimeStamps.vue";
 
 const props = defineProps<{
   purchase: Purchase;
