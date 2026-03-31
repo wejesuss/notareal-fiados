@@ -4,7 +4,7 @@ import type { Purchase } from "src/models";
 import { getPurchaseById } from "src/services";
 
 export function usePurchaseDetails(purchaseId: Ref<number>) {
-  const loading = ref(true);
+  const loading = ref(false);
   const error = ref<Error | null>(null);
   const purchase = ref<Purchase | null>(null);
 
