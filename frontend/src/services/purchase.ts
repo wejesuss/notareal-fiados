@@ -1,12 +1,10 @@
 import type {
   Purchase,
   PurchaseUpdate,
-  Payment,
   PurchaseWithMessageResponse,
   PurchaseListResponse,
   PurchaseListParams,
 } from "src/models";
-import { getPayments } from "./payment";
 import { api } from "src/api/api";
 
 export async function getPurchaseById(purchaseId: number): Promise<Purchase> {
@@ -59,12 +57,4 @@ export async function getClientPurchases(
   );
 
   return data;
-}
-
-// Payment related functions
-export async function getPurchasePayments(
-  purchaseId: number
-): Promise<Payment[]> {
-  const payments = await getPayments();
-  return payments.filter((p) => p.purchaseId === purchaseId);
 }

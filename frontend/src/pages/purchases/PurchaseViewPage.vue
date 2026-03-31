@@ -71,7 +71,7 @@
 <script setup lang="ts">
 import { computed, ref, toRef, watch } from "vue";
 import { useRoute } from "vue-router";
-import { getPurchasePayments, updatePurchaseActiveStatus } from "src/services";
+import { updatePurchaseActiveStatus, getPurchasePayments } from "src/services";
 import type { Payment } from "src/models";
 import { formatCurrency, formatDate } from "src/utils/formatters";
 import {
@@ -102,7 +102,9 @@ const payments = ref<Payment[]>([]);
 watch(
   purchaseId,
   async (newPurchaseId) => {
-    payments.value = await getPurchasePayments(newPurchaseId);
+    const response = await getPurchasePayments(newPurchaseId);
+
+    payments.value = response.payments;
   },
   { immediate: true },
 );
