@@ -34,7 +34,7 @@
       :is-active="isActive"
       :submitting="submitting"
       :client-name="clientName"
-      @toggle-is-active="handleToggle"
+      @toggle-is-active="submitDialog"
     />
 
     <!-- Payments list -->
@@ -121,10 +121,6 @@ const clientName = computed(() => {
 const errorMessage = computed(
   () => error.value?.message || "Erro inesperado ao carregar compra",
 );
-
-async function handleToggle(nextValue: boolean) {
-  await submitDialog(nextValue);
-}
 
 async function submit(nextValue: boolean) {
   if (!purchase.value) return;
