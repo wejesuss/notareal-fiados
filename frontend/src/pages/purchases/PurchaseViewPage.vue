@@ -85,8 +85,8 @@ import { dialogConfig, notifyConfig } from "src/config/purchases/dialogs";
 
 const $route = useRoute();
 const purchaseId = computed(() => Number($route.params.id));
-const clientId = computed(() => purchase.value?.clientId || 0);
 const { loading, error, purchase } = usePurchaseDetails(toRef(purchaseId));
+const clientId = computed(() => purchase.value?.clientId || 0);
 const {
   loading: clientLoading,
   error: clientError,
