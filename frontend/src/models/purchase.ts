@@ -32,6 +32,11 @@ export type PurchaseListParams = {
   statuses?: PurchaseStatus[];
 };
 
+export type PurchaseWithMessageResponse = {
+  message: string;
+  purchase: Purchase;
+};
+
 export type PurchasesWithMessageResponse = {
   message: string;
   total: number;

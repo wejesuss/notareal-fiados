@@ -71,8 +71,8 @@
 <script setup lang="ts">
 import { computed, ref, toRef, watch } from "vue";
 import { useRoute } from "vue-router";
-import { getPurchasePayments, updatePurchase } from "src/services";
-import type { Payment, PurchaseUpdate } from "src/models";
+import { getPurchasePayments, updatePurchaseActiveStatus } from "src/services";
+import type { Payment } from "src/models";
 import { formatCurrency, formatDate } from "src/utils/formatters";
 import {
   useActiveToggleConfirmation,
@@ -125,15 +125,13 @@ const errorMessage = computed(
 async function submit(nextValue: boolean) {
   if (!purchase.value) return;
 
-  const payload: PurchaseUpdate = {
-    ...purchase.value,
-    isActive: nextValue,
-  };
-
-  const updated = await updatePurchase(purchaseId.value, payload);
+  const response = await updatePurchaseActiveStatus(
+    purchaseId.value,
+    nextValue,
+  );
 
   // Keep local purchase snapshot in sync after successful update
-  purchase.value = updated;
+  purchase.value = response.purchase;
 }
 </script>
 

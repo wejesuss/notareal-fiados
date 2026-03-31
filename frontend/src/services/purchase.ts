@@ -2,6 +2,7 @@ import type {
   Purchase,
   PurchaseUpdate,
   Payment,
+  PurchaseWithMessageResponse,
   PurchasesWithMessageResponse,
   PurchaseListParams,
 } from "src/models";
@@ -59,6 +60,25 @@ export async function getPurchaseById(purchaseId: number): Promise<Purchase> {
   const { data } = await api.get<Purchase>(`/purchases/${purchaseId}`);
 
   return data;
+}
+
+export async function updatePurchaseActiveStatus(
+  id: number,
+  isActive: boolean
+): Promise<PurchaseWithMessageResponse> {
+  let response: PurchaseWithMessageResponse;
+
+  if (isActive === true) {
+    response = (
+      await api.put<PurchaseWithMessageResponse>(`/purchases/${id}/activate`)
+    ).data;
+  } else {
+    response = (
+      await api.delete<PurchaseWithMessageResponse>(`/purchases/${id}`)
+    ).data;
+  }
+
+  return response;
 }
 
 export async function updatePurchase(
