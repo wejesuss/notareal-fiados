@@ -211,16 +211,12 @@ const reload = async () => {
   if (error.value) await reloadPurchases();
 };
 
-watch(
-  clientError,
-  async (err) => {
-    if (!err) return;
-    if (err instanceof APIError && err.status === 404) {
-      await handleClientNotFound(err);
-    }
-  },
-  { once: true },
-);
+watch(clientError, async (err) => {
+  if (!err) return;
+  if (err instanceof APIError && err.status === 404) {
+    await handleClientNotFound(err);
+  }
+});
 </script>
 
 <style lang="css" scoped>
