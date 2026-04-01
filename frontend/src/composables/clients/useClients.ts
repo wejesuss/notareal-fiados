@@ -43,7 +43,6 @@ export function useClients(queryState: ClientsQuerySchema) {
 
       clients.value = response.clients;
     } catch (e) {
-      console.error(e);
       error.value = e as Error;
       clients.value = [];
       totalPages.value = 1;
@@ -60,9 +59,7 @@ export function useClients(queryState: ClientsQuerySchema) {
       queryState.state.rowsPerPage,
       queryState.state.onlyActive,
     ],
-    async () => {
-      await fetchClients();
-    },
+    fetchClients,
     { immediate: true }
   );
 

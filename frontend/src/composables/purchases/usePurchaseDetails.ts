@@ -20,7 +20,6 @@ export function usePurchaseDetails(purchaseId: Ref<number>) {
     try {
       purchase.value = await getPurchaseById(purchaseId.value);
     } catch (e) {
-      console.error(e);
       error.value = e as Error;
       purchase.value = null;
     } finally {
