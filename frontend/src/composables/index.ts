@@ -1,3 +1,4 @@
+export * from "./core/useResource";
 export * from "./core/useNavigation";
 export * from "./core/useDisableConfirmation";
 export * from "./core/useActiveToggleConfirmation";
