@@ -1,8 +1,10 @@
+import type { UIError } from "src/types/errors";
+import { mapAPIError } from "src/utils/mappers/errors";
 import { ref } from "vue";
 
 export function useResource<T, P>(initial: T | null = null) {
   const loading = ref(false);
-  const error = ref<Error | null>(null);
+  const error = ref<UIError | null>(null);
   const data = ref<T | null>(initial);
 
   let requestId = 0;
@@ -27,7 +29,7 @@ export function useResource<T, P>(initial: T | null = null) {
       // prevent wrong error catching for outdated result
       if (currentId !== requestId) return;
 
-      error.value = e as Error;
+      error.value = mapAPIError(e);
       data.value = initial;
     } finally {
       if (currentId === requestId) {
