@@ -114,7 +114,14 @@ watch(
 watch(error, async (err) => {
   if (!err) return;
 
-  await handleClientLoadError(err);
+  if (err.type === "not_found") {
+    await handleClientLoadError(err);
+  } else {
+    $q.notify({
+      type: err.type === "validation" ? "negative" : "warning",
+      message: err.message,
+    });
+  }
 });
 
 async function toggleIsActive(nextValue: boolean) {
