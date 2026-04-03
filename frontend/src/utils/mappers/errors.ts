@@ -7,7 +7,7 @@ export function mapAPIError(error: unknown): UIError {
       return new UIError(error.message, "not_found", error);
     }
 
-    if (error.status === 422) {
+    if (error.status === 422 || error.status === 400) {
       return new UIError(error.message, "validation", error);
     }
 
