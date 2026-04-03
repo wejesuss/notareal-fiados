@@ -8,7 +8,7 @@ type ClientsQuerySchema = ReturnType<typeof useClientsQueryState>["schema"];
 export function useClients(queryState: ClientsQuerySchema) {
   const clients = ref<Client[]>([]);
   const totalPages = ref(1);
-  const resource = useResource<ClientListResponse, ClientListParams>();
+  const resource = useResource<ClientListResponse>();
 
   async function fetchClients() {
     // Get updated query state
