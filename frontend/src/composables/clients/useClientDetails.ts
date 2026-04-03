@@ -2,32 +2,31 @@ import type { Ref } from "vue";
 import { ref, watch } from "vue";
 import type { Client } from "src/models";
 import { getClientById } from "src/services";
+import { useResource } from "../core/useResource";
 
 export function useClientDetails(clientId: Ref<number>) {
-  const loading = ref(false);
-  const error = ref<Error | null>(null);
   const client = ref<Client | null>(null);
+  const resource = useResource<Client>();
 
   async function load() {
     if (!Number.isInteger(clientId.value) || clientId.value <= 0) {
-      error.value = new Error("Identificador do cliente inválido!");
+      resource.setError("Identificador do cliente inválido!", "validation");
       client.value = null;
       return;
     }
 
-    loading.value = true;
-    error.value = null;
-    try {
-      client.value = await getClientById(clientId.value);
-    } catch (e) {
-      error.value = e as Error;
-      client.value = null;
-    } finally {
-      loading.value = false;
-    }
+    const response = await resource.load(clientId.value, getClientById);
+    if (!response) return;
+
+    client.value = await getClientById(clientId.value);
   }
 
   watch(clientId, load, { immediate: true });
 
-  return { loading, error, client, reload: load };
+  return {
+    loading: resource.loading,
+    error: resource.error,
+    client,
+    reload: load,
+  };
 }

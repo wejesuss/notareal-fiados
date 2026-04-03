@@ -13,6 +13,30 @@ export function useResource<T>(initial: T | null = null) {
 
   let requestId = 0;
 
+  /**
+   * Sets a new UIError and resets the current data state.
+   *
+   * This should be used when you need to:
+   * - Validate something **before** a fetch request
+   * - Force the composable into an error state
+   * - Keep `error` and `data` in sync
+   *
+   * Behavior:
+   * - Accepts either a string or an Error-like object
+   * - Normalizes the input into a proper Error instance
+   * - Updates `error` with a UIError
+   * - Resets `data` back to its initial value
+   *
+   * @param err The error to set (string message or Error-like object)
+   * @param type The UI error type (used for display/handling)
+   */
+  function setError(err: string | Error, type: UIErrorType): void {
+    const normalizedError = typeof err === "string" ? new Error(err) : err;
+
+    error.value = new UIError(normalizedError.message, type, normalizedError);
+    data.value = initial;
+  }
+
   async function load<L extends CallableFunction>(
     params: GetLoaderParams<L, T>,
     loader: L
@@ -46,6 +70,7 @@ export function useResource<T>(initial: T | null = null) {
     loading,
     error,
     data,
+    setError,
     load,
   };
 }
