@@ -137,7 +137,6 @@ import {
 } from "src/composables";
 import { ContentState, ListFilter } from "src/components/common";
 import { PurchaseRow } from "src/components/purchases";
-import { APIError } from "src/api/errors";
 
 type LoadState = "loading" | "client-error" | "error" | "empty" | "ready";
 
@@ -213,7 +212,7 @@ const reload = async () => {
 
 watch(clientError, async (err) => {
   if (!err) return;
-  if (err instanceof APIError && err.status === 404) {
+  if (err.type === "not_found") {
     await handleClientNotFound(err);
   }
 });
