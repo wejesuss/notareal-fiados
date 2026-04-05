@@ -15,10 +15,10 @@ export function useClientDetails(clientId: Ref<number>) {
       return;
     }
 
-    const response = await resource.load(clientId.value, getClientById);
+    const response = await resource.load(getClientById, clientId.value);
     if (!response) return;
 
-    client.value = await getClientById(clientId.value);
+    client.value = response;
   }
 
   watch(clientId, load, { immediate: true });

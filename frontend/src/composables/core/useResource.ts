@@ -2,10 +2,6 @@ import { UIError, type UIErrorType } from "src/types/errors";
 import { mapAPIError } from "src/utils/mappers/errors";
 import { ref } from "vue";
 
-type GetLoaderParams<L, T> = L extends (params: infer P) => Promise<T>
-  ? P
-  : unknown;
-
 export function useResource<T>(initial: T | null = null) {
   const loading = ref(false);
   const error = ref<UIError | null>(null);
@@ -37,16 +33,23 @@ export function useResource<T>(initial: T | null = null) {
     data.value = initial;
   }
 
-  async function load<L extends CallableFunction>(
-    params: GetLoaderParams<L, T>,
-    loader: L
+  async function load(loader: () => Promise<T>): Promise<T | undefined>;
+
+  async function load<P>(
+    loader: (params: P) => Promise<T>,
+    params: P
+  ): Promise<T | undefined>;
+
+  async function load<P>(
+    loader: (params?: P) => Promise<T>,
+    params?: P
   ): Promise<T | undefined> {
     const currentId = ++requestId;
 
     loading.value = true;
     error.value = null;
     try {
-      const result = await loader(params);
+      const result = await loader(params as P);
 
       // Ignore outdated result
       if (currentId !== requestId) return;

@@ -20,7 +20,7 @@ export function useClients(queryState: ClientsQuerySchema) {
       onlyActive: onlyActive,
     };
 
-    const response = await resource.load(params, getClients);
+    const response = await resource.load(getClients, params);
 
     // outdated response was ignored (race condition)
     if (!response) {
