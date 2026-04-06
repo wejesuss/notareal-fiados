@@ -1,14 +1,14 @@
-import { ref, watch } from "vue";
-import type { Client, ClientListParams, ClientListResponse } from "src/models";
+import { computed, ref, watch } from "vue";
+import type { ClientListParams, ClientListResponse } from "src/models";
 import { getClients } from "src/services/client";
 import { type useClientsQueryState, useResource } from "src/composables";
 
 type ClientsQuerySchema = ReturnType<typeof useClientsQueryState>["schema"];
 
 export function useClients(queryState: ClientsQuerySchema) {
-  const clients = ref<Client[]>([]);
-  const totalPages = ref(1);
   const resource = useResource<ClientListResponse>();
+  const totalPages = ref(1);
+  const clients = computed(() => resource.data.value?.clients ?? []);
 
   async function fetchClients() {
     // Get updated query state
@@ -32,8 +32,6 @@ export function useClients(queryState: ClientsQuerySchema) {
       await queryState.setField("page", totalPages.value);
       return;
     }
-
-    clients.value = response.clients;
   }
 
   watch(
