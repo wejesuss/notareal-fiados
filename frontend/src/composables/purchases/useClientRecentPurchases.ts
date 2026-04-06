@@ -11,9 +11,12 @@ export function useClientRecentPurchases(clientId: Ref<number>) {
     loading.value = true;
     error.value = null;
     try {
-      const response = await getClientPurchases(clientId.value, {
-        limit: 3,
-        isActive: true,
+      const response = await getClientPurchases({
+        clientId: clientId.value,
+        params: {
+          limit: 3,
+          isActive: true,
+        },
       });
 
       recentPurchases.value = response.purchases;

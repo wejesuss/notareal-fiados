@@ -1,8 +1,9 @@
-import { type Ref, ref, watch } from "vue";
-import type { Purchase, PurchaseStatus } from "src/models";
+import { computed, type Ref, ref, watch } from "vue";
+import type { PurchaseListResponse, PurchaseStatus } from "src/models";
 import { getClientPurchases } from "src/services/purchase";
 import type { PurchaseStatusOptions } from "src/types/purchases";
 import { type usePurchasesQueryState } from "./usePurchasesQueryState";
+import { useResource } from "../core/useResource";
 
 type PurchasesQuerySchema = ReturnType<typeof usePurchasesQueryState>["schema"];
 
@@ -31,71 +32,60 @@ export function useClientPurchases(
   clientId: Ref<number>,
   queryState: PurchasesQuerySchema
 ) {
-  const loading = ref(false);
-  const error = ref<Error | null>(null);
-  const purchases = ref<Purchase[]>([]);
+  const resource = useResource<PurchaseListResponse>();
   const totalPages = ref(1);
+  const purchases = computed(() => resource.data.value?.purchases ?? []);
 
   async function fetchPurchases() {
     if (!Number.isInteger(clientId.value) || clientId.value <= 0) {
-      error.value = new Error("Identificador do cliente inválido!");
-      purchases.value = [];
-      totalPages.value = 1;
+      resource.setError("Identificador do cliente inválido!", "validation");
       return;
     }
 
-    loading.value = true;
-    error.value = null;
-    try {
-      const { page, rowsPerPage, status } = queryState.getSnapshot();
+    const { page, rowsPerPage, status } = queryState.getSnapshot();
 
-      const offset = (page - 1) * rowsPerPage;
-      const mappedStatus = mapPurchaseStatus(status);
+    const offset = (page - 1) * rowsPerPage;
+    const mappedStatus = mapPurchaseStatus(status);
+    const params = {
+      limit: rowsPerPage,
+      offset,
+      ...(mappedStatus.isActive !== undefined && {
+        isActive: mappedStatus.isActive,
+      }),
+      ...(mappedStatus.statuses !== undefined && {
+        statuses: mappedStatus.statuses,
+      }),
+    };
 
-      const response = await getClientPurchases(clientId.value, {
-        limit: rowsPerPage,
-        offset,
-        ...(mappedStatus.isActive !== undefined && {
-          isActive: mappedStatus.isActive,
-        }),
-        ...(mappedStatus.statuses !== undefined && {
-          statuses: mappedStatus.statuses,
-        }),
-      });
+    const response = await resource.load(getClientPurchases, {
+      clientId: clientId.value,
+      params,
+    });
 
-      totalPages.value = Math.max(1, Math.ceil(response.total / rowsPerPage));
-      if (page && page > totalPages.value && totalPages.value > 0) {
-        await queryState.setField("page", totalPages.value);
-        return;
-      }
+    // Ignore outdated response
+    if (!response) return;
 
-      purchases.value = response.purchases;
-    } catch (e) {
-      console.error(e);
-      error.value = e as Error;
-      purchases.value = [];
-      totalPages.value = 1;
-    } finally {
-      loading.value = false;
+    totalPages.value = Math.max(1, Math.ceil(response.total / rowsPerPage));
+    if (page > totalPages.value) {
+      await queryState.setField("page", totalPages.value);
+      return;
     }
   }
 
-  watch(clientId, fetchPurchases, { immediate: true });
   watch(
     [
+      clientId,
       queryState.state.page,
       queryState.state.rowsPerPage,
       queryState.state.status,
     ],
-    async () => {
-      await fetchPurchases();
-    },
+    fetchPurchases,
     { immediate: true }
   );
 
   return {
-    loading,
-    error,
+    loading: resource.loading,
+    error: resource.error,
     totalPages,
     purchases,
     reload: fetchPurchases,

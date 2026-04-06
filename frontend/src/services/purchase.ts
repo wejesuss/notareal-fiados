@@ -45,10 +45,13 @@ export async function updatePurchase(
 }
 
 // Client related functions
-export async function getClientPurchases(
-  clientId: number,
-  params?: PurchaseListParams
-): Promise<PurchaseListResponse> {
+export async function getClientPurchases({
+  clientId,
+  params,
+}: {
+  clientId: number;
+  params?: PurchaseListParams;
+}): Promise<PurchaseListResponse> {
   const { data } = await api.get<PurchaseListResponse>(
     `/clients/${clientId}/purchases`,
     {
