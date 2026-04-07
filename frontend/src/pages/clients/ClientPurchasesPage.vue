@@ -105,7 +105,7 @@
         </q-list>
 
         <q-pagination
-          v-model="page.stateValue"
+          v-bind="page.bind"
           :max="totalPages"
           direction-links
           boundary-links
