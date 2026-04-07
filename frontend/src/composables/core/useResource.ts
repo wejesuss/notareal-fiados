@@ -27,6 +27,9 @@ export function useResource<T>(initial: T | null = null) {
    * @param type The UI error type (used for display/handling)
    */
   function setError(err: string | Error, type: UIErrorType): void {
+    // Invalidate any pending request that may be in processing
+    requestId++;
+
     const normalizedError = typeof err === "string" ? new Error(err) : err;
 
     error.value = new UIError(normalizedError.message, type, normalizedError);
