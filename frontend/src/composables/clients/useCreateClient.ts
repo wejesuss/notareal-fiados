@@ -1,10 +1,12 @@
 import { type ClientPayload } from "src/components/types";
 import { createClient } from "src/services";
+import { type UIError } from "src/types/errors";
+import { mapAPIError } from "src/utils/mappers/errors";
 import { ref } from "vue";
 
 export function useCreateClient() {
   const submitting = ref(false);
-  const error = ref<Error | null>(null);
+  const error = ref<UIError | null>(null);
 
   async function create(payload: ClientPayload) {
     if (submitting.value) return;
@@ -16,9 +18,7 @@ export function useCreateClient() {
 
       return client;
     } catch (err) {
-      if (err instanceof Error) {
-        error.value = err;
-      }
+      error.value = mapAPIError(err);
     } finally {
       submitting.value = false;
     }
