@@ -14,5 +14,9 @@ export function mapAPIError(error: unknown): UIError {
     return new UIError(error.message, "unknown", error);
   }
 
+  if (error instanceof Error) {
+    return new UIError(error.message, "unknown", error);
+  }
+
   return new UIError("Erro inesperado", "unknown", error);
 }
