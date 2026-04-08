@@ -9,7 +9,7 @@
     <ClientDetailsCard
       v-if="id"
       :client-id="id"
-      @load-error="handleClientNotFound"
+      @load-error="handleClientError"
     ></ClientDetailsCard>
 
     <ClientSummaryCard v-if="id" :client-id="id"></ClientSummaryCard>
@@ -17,28 +17,35 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, watch } from "vue";
 import { useQuasar } from "quasar";
 import { useRoute } from "vue-router";
 import { useNavigation } from "src/composables/core/useNavigation";
 import { ClientDetailsCard, ClientSummaryCard } from "src/components/clients";
+import { UIError } from "src/types/errors";
 
 const $route = useRoute();
 const { navigateTo } = useNavigation();
 const $q = useQuasar();
 
-async function handleClientNotFound(e: Error) {
+async function handleClientError(e: UIError) {
   $q.notify({ type: "negative", message: e.message });
-
   await navigateTo("/clients");
 }
 const id = computed(() => {
-  const pathId = Number($route.params.id);
-  if (!Number.isInteger(pathId) || pathId <= 0) {
-    void handleClientNotFound(new Error("Identificador de cliente inválido!"));
-    return 0;
-  }
+  const clientId = Number($route.params.id);
+  return !Number.isInteger(clientId) || clientId <= 0 ? 0 : clientId;
+});
 
-  return pathId;
+watch(id, async (clientId) => {
+  if (clientId <= 0) {
+    const error = new UIError(
+      "Identificador de cliente inválido!",
+      "validation",
+      null,
+    );
+
+    await handleClientError(error);
+  }
 });
 </script>

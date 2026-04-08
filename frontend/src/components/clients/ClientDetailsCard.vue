@@ -141,6 +141,7 @@
 
 <script setup lang="ts">
 import { computed, toRef, watch } from "vue";
+import { type UIError } from "src/types/errors";
 import type { ClientUpdate } from "src/models";
 import { updateClient } from "src/services";
 import { formatDate } from "src/utils/formatters/date";
@@ -168,7 +169,7 @@ const { submitting, isActive, submitDialog } = useActiveToggleConfirmation(
 );
 
 const emit = defineEmits<{
-  (e: "load-error", error: Error): void;
+  (e: "load-error", error: UIError): void;
 }>();
 
 const clientEditRoute = computed(() => `/clients/${props.clientId}/edit`);
@@ -183,9 +184,13 @@ const loadState = computed<LoadState>(() => {
   return "ready";
 });
 
-watch(error, (err) => {
-  if (err) emit("load-error", new Error(errorMessage.value));
-});
+watch(
+  error,
+  (err) => {
+    if (err) emit("load-error", err);
+  },
+  { once: true },
+);
 
 async function submit(nextValue: boolean) {
   const payload: ClientUpdate = {
