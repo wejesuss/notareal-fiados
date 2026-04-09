@@ -102,11 +102,11 @@ async function handleClientLoadError(e: Error) {
 }
 
 watch(
-  client,
-  (newClient) => {
-    if (!newClient) return;
-
-    isActive.value = newClient.isActive;
+  () => client.value?.isActive,
+  (clientIsActive) => {
+    if (clientIsActive !== undefined) {
+      isActive.value = clientIsActive;
+    }
   },
   { immediate: true },
 );
