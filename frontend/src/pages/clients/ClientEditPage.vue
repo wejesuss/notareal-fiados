@@ -134,10 +134,8 @@ async function toggleIsActive(nextValue: boolean) {
   isActive.value = nextValue;
 }
 
-function isFormDirty(formData: ClientPayload) {
+function isFormDirty(formData: ClientPayload, original: ClientPayload) {
   if (!client.value) return false;
-
-  const original: ClientPayload = clientFormPayload.value;
 
   return !isShallowEqual(original, formData);
 }
@@ -150,7 +148,7 @@ async function submit(formData: ClientPayload) {
 
     const isActiveChanged = client.value?.isActive !== isActive.value;
 
-    if (!isActiveChanged && !isFormDirty(formData)) {
+    if (!isActiveChanged && !isFormDirty(formData, clientFormPayload.value)) {
       $q.notify({
         type: "info",
         message: "Nenhuma alteração para salvar",
