@@ -10,6 +10,7 @@ export * from "./clients/useClientDetails";
 export * from "./clients/useClientSummary";
 export * from "./clients/useClientsQueryState";
 export * from "./clients/useCreateClient";
+export * from "./clients/useUpdateClient";
 
 export * from "./purchases/usePurchasesUI";
 export * from "./purchases/usePurchaseDetails";
