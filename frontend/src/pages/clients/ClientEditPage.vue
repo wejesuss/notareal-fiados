@@ -78,7 +78,10 @@ const $route = useRoute();
 const { navigateTo } = useNavigation();
 const $q = useQuasar();
 
-const id = computed(() => Number($route.params.id));
+const id = computed(() => {
+  const value = Number($route.params.id);
+  return Number.isInteger(value) && value > 0 ? value : 0;
+});
 const { loading, error, client } = useClientDetails(id);
 const { confirmDisable } = useDisableConfirmation();
 const isActive = ref(false);
@@ -114,7 +117,7 @@ watch(
 watch(error, async (err) => {
   if (!err) return;
 
-  if (err.type === "not_found") {
+  if (err.type === "not_found" || id.value <= 0) {
     await handleClientLoadError(err);
   } else {
     $q.notify({
