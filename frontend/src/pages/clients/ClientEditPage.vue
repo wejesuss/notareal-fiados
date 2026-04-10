@@ -155,6 +155,7 @@ async function submit(formData: ClientPayload) {
       $q.notify({
         type: "info",
         message: "Nenhuma alteração para salvar",
+        color: "light-blue-8",
       });
 
       return;
