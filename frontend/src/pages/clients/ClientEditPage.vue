@@ -148,7 +148,7 @@ function isFormDirty(formData: ClientPayload, original: ClientPayload) {
 }
 
 async function submit(formData: ClientPayload) {
-  if (submitting.value) return;
+  if (submitting.value || !client.value) return;
 
   try {
     submitting.value = true;
