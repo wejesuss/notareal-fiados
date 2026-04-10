@@ -154,8 +154,10 @@ async function submit(formData: ClientPayload) {
     submitting.value = true;
 
     const isActiveChanged = client.value?.isActive !== isActive.value;
+    const hasChanges =
+      isActiveChanged || isFormDirty(formData, clientFormPayload.value);
 
-    if (!isActiveChanged && !isFormDirty(formData, clientFormPayload.value)) {
+    if (!hasChanges) {
       $q.notify({
         type: "info",
         message: "Nenhuma alteração para salvar",
