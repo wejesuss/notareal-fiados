@@ -97,13 +97,23 @@ const clientFormPayload = computed((): ClientPayload => {
   };
 });
 
-async function handleClientLoadError(e: Error) {
+async function handleClientError(message: string) {
   $q.notify({
     type: "negative",
-    message: e.message || "Cliente não encontrado",
+    message,
   });
   await navigateTo("/clients");
 }
+
+watch(
+  id,
+  async (clientId) => {
+    if (clientId <= 0) {
+      await handleClientError("Identificador do cliente inválido!");
+    }
+  },
+  { immediate: true },
+);
 
 watch(
   () => client.value?.isActive,
@@ -118,14 +128,7 @@ watch(
 watch(error, async (err) => {
   if (!err) return;
 
-  if (err.type === "not_found" || id.value <= 0) {
-    await handleClientLoadError(err);
-  } else {
-    $q.notify({
-      type: err.type === "validation" ? "negative" : "warning",
-      message: err.message,
-    });
-  }
+  await handleClientError(err.message || "Cliente não encontrado");
 });
 
 async function toggleIsActive(nextValue: boolean) {

@@ -9,7 +9,6 @@ export function useClientDetails(clientId: Ref<number>) {
 
   async function load() {
     if (!Number.isInteger(clientId.value) || clientId.value <= 0) {
-      resource.setError("Identificador do cliente inválido!", "validation");
       return;
     }
 
