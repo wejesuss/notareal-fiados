@@ -61,19 +61,16 @@
 import { computed, ref, watch } from "vue";
 import { useQuasar } from "quasar";
 import { useRoute } from "vue-router";
-import type { ClientUpdate } from "src/models";
 import type { ClientPayload } from "src/components/types";
-import { updateClient } from "src/services";
 import { ClientForm } from "src/components/clients";
 import {
   useNavigation,
   useClientDetails,
   useDisableConfirmation,
+  useUpdateClient,
 } from "src/composables";
 import { dialogConfig } from "src/config/clients/dialogs";
 import { ContentState } from "src/components/common";
-import { isShallowEqual } from "src/utils/checkers/isShalowEqual";
-import { mapAPIError } from "src/utils/mappers/errors";
 
 const $route = useRoute();
 const { navigateTo } = useNavigation();
@@ -85,8 +82,8 @@ const id = computed(() => {
 });
 const { loading, error, client } = useClientDetails(id);
 const { confirmDisable } = useDisableConfirmation();
+const { submitting, update } = useUpdateClient();
 const isActive = ref(false);
-const submitting = ref(false);
 
 const clientFormPayload = computed((): ClientPayload => {
   return {
@@ -141,57 +138,42 @@ async function toggleIsActive(nextValue: boolean) {
   isActive.value = nextValue;
 }
 
-function isFormDirty(formData: ClientPayload, original: ClientPayload) {
-  if (!client.value) return false;
-
-  return !isShallowEqual(original, formData);
-}
-
 async function submit(formData: ClientPayload) {
-  if (submitting.value || !client.value) return;
+  if (!client.value) return;
 
-  try {
-    submitting.value = true;
+  const response = await update(
+    id.value,
+    { data: clientFormPayload.value, isActive: client.value.isActive },
+    { data: formData, isActive: isActive.value },
+  );
 
-    const isActiveChanged = client.value?.isActive !== isActive.value;
-    const hasChanges =
-      isActiveChanged || isFormDirty(formData, clientFormPayload.value);
+  if (!response) return;
 
-    if (!hasChanges) {
-      $q.notify({
-        type: "info",
-        message: "Nenhuma alteração para salvar",
-        color: "light-blue-8",
-      });
-
-      return;
-    }
-
-    const payload: ClientUpdate = {
-      ...formData,
-      ...(isActiveChanged && {
-        isActive: isActive.value,
-      }),
-    };
-
-    await updateClient(id.value, payload);
-
+  if (response.skipped) {
     $q.notify({
-      type: "positive",
-      message: "Cliente atualizado com sucesso",
+      type: "info",
+      message: "Nenhuma alteração para salvar",
+      color: "light-blue-8",
     });
 
-    await navigateTo(`/clients/${id.value}`);
-  } catch (err) {
-    const uiError = mapAPIError(err);
-
-    $q.notify({
-      type: uiError.type === "validation" ? "negative" : "warning",
-      message: uiError.message || "Erro ao atualizar Cliente",
-    });
-  } finally {
-    submitting.value = false;
+    return;
   }
+
+  if (response.error) {
+    $q.notify({
+      type: response.error.type === "validation" ? "negative" : "warning",
+      message: response.error.message || "Erro ao atualizar Cliente",
+    });
+
+    return;
+  }
+
+  $q.notify({
+    type: "positive",
+    message: "Cliente atualizado com sucesso",
+  });
+
+  await navigateTo(`/clients/${id.value}`);
 }
 </script>
 
