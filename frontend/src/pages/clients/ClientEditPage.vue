@@ -73,6 +73,7 @@ import {
 import { dialogConfig } from "src/config/clients/dialogs";
 import { ContentState } from "src/components/common";
 import { isShallowEqual } from "src/utils/checkers/isShalowEqual";
+import { mapAPIError } from "src/utils/mappers/errors";
 
 const $route = useRoute();
 const { navigateTo } = useNavigation();
@@ -177,12 +178,12 @@ async function submit(formData: ClientPayload) {
 
     await navigateTo(`/clients/${id.value}`);
   } catch (err) {
-    if (err instanceof Error) {
-      $q.notify({
-        type: "negative",
-        message: err.message || "Erro ao atualizar Cliente",
-      });
-    }
+    const uiError = mapAPIError(err);
+
+    $q.notify({
+      type: uiError.type === "validation" ? "negative" : "warning",
+      message: uiError.message || "Erro ao atualizar Cliente",
+    });
   } finally {
     submitting.value = false;
   }
