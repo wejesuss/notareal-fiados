@@ -53,11 +53,14 @@ const { submitting, error, create } = useCreateClient();
 async function submit(payload: ClientPayload) {
   const response = await create(payload);
 
+  // skipped or error
   if (!response) {
-    notify({
-      type: "negative",
-      message: error.value?.message || "Erro ao criar Cliente",
-    });
+    if (error.value) {
+      notify({
+        type: "negative",
+        message: error.value.message || "Erro ao criar Cliente",
+      });
+    }
     return;
   }
 
