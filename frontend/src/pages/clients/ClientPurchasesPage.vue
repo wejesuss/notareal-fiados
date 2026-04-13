@@ -149,6 +149,7 @@ const clientId = computed(() => {
 });
 
 const {
+  loading: clientLoading,
   client,
   error: clientError,
   reload: reloadClient,
@@ -167,8 +168,8 @@ const { purchasesWithUI } = usePurchasesUI(purchases);
 
 const loadState = computed<LoadState>(() => {
   // loading is always false after successful fetching or error
+  if (clientLoading.value || loading.value) return "loading";
   if (clientError.value) return "client-error";
-  if (loading.value) return "loading";
   if (error.value) return "error";
   // purchases is set as empty on error, so check is made after error check
   if (purchases.value.length === 0) return "empty";
