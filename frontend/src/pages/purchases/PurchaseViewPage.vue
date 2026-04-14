@@ -99,7 +99,9 @@ const {
   error: clientError,
   client,
 } = useClientDetails(toRef(clientId));
-const { payments } = usePurchasePayments(toRef(purchaseId));
+const { payments, reload: reloadPayments } = usePurchasePayments(
+  toRef(purchaseId),
+);
 const { submitting, isActive, submitDialog } = useActiveToggleConfirmation(
   toRef(purchase),
   dialogConfig,
@@ -144,6 +146,7 @@ async function submit(nextValue: boolean) {
 
   // Keep local purchase snapshot in sync after successful update
   purchase.value = response.purchase;
+  await reloadPayments();
 }
 </script>
 
