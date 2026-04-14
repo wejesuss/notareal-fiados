@@ -106,16 +106,29 @@ const { submitting, isActive, submitDialog } = useActiveToggleConfirmation(
 );
 
 watch(
-  [purchaseId, error],
-  async ([id, err]) => {
-    if (id <= 0 || err) {
-      const message = err?.message || "Erro ao carregar compra!";
-      notify({ type: "negative", message });
-      await navigateTo("");
+  purchaseId,
+  async (id) => {
+    if (id <= 0) {
+      notify({
+        type: "negative",
+        message: "Identificador da compra inválido!",
+      });
+      await navigateTo("/purchases");
     }
   },
   { immediate: true },
 );
+
+watch(error, async (err) => {
+  if (!err) return;
+
+  notify({
+    type: err.type === "validation" ? "negative" : "warning",
+    message: err.message,
+  });
+
+  await navigateTo("/purchases");
+});
 
 const loadState = computed(() => {
   if (loading.value) return "loading";

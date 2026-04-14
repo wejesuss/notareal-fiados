@@ -8,7 +8,6 @@ export function usePurchaseDetails(purchaseId: Ref<number>) {
 
   async function load() {
     if (!Number.isInteger(purchaseId.value) || purchaseId.value <= 0) {
-      resource.setError("Identificador da compra inválido!", "validation");
       return;
     }
 
