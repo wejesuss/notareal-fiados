@@ -43,7 +43,7 @@
 
       <q-separator />
 
-      <q-list>
+      <q-list v-if="purchase">
         <q-item v-for="payment in payments" :key="payment.id" class="q-py-md">
           <q-item-section
             class="payment-item"
@@ -69,6 +69,7 @@
 </template>
 
 <script setup lang="ts">
+import { useQuasar } from "quasar";
 import { computed, ref, toRef, watch } from "vue";
 import { useRoute } from "vue-router";
 import { updatePurchaseActiveStatus, getPurchasePayments } from "src/services";
@@ -77,6 +78,7 @@ import { formatCurrency, formatDate } from "src/utils/formatters";
 import {
   useActiveToggleConfirmation,
   useClientDetails,
+  useNavigation,
   usePurchaseDetails,
 } from "src/composables";
 import { PurchaseDetailsCard } from "src/components/purchases";
@@ -84,7 +86,12 @@ import { ContentState } from "src/components/common";
 import { dialogConfig, notifyConfig } from "src/config/purchases/dialogs";
 
 const $route = useRoute();
-const purchaseId = computed(() => Number($route.params.id));
+const { notify } = useQuasar();
+const { navigateTo } = useNavigation();
+const purchaseId = computed(() => {
+  const id = Number($route.params.id);
+  return Number.isInteger(id) && id > 0 ? id : 0;
+});
 const { loading, error, purchase } = usePurchaseDetails(toRef(purchaseId));
 const clientId = computed(() => purchase.value?.clientId || 0);
 const {
@@ -99,15 +106,25 @@ const { submitting, isActive, submitDialog } = useActiveToggleConfirmation(
   submit,
 );
 const payments = ref<Payment[]>([]);
-watch(
-  purchaseId,
-  async (newPurchaseId) => {
-    const response = await getPurchasePayments(newPurchaseId);
 
-    payments.value = response.payments;
+watch(
+  [purchaseId, error],
+  async ([id, err]) => {
+    if (id <= 0 || err) {
+      const message = err?.message || "Erro ao carregar compra!";
+      notify({ type: "negative", message });
+      await navigateTo("");
+    }
   },
   { immediate: true },
 );
+
+watch(purchaseId, async (newPurchaseId) => {
+  if (purchaseId.value <= 0) return;
+  const response = await getPurchasePayments(newPurchaseId);
+
+  payments.value = response.payments;
+});
 
 const loadState = computed(() => {
   if (loading.value) return "loading";
