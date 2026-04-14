@@ -130,14 +130,24 @@ const errorMessage = computed(
 async function submit(nextValue: boolean) {
   if (!purchase.value) return;
 
-  const response = await updatePurchaseActiveStatus(
-    purchaseId.value,
-    nextValue,
-  );
+  try {
+    const response = await updatePurchaseActiveStatus(
+      purchaseId.value,
+      nextValue,
+    );
 
-  // Keep local purchase snapshot in sync after successful update
-  purchase.value = response.purchase;
-  await reloadPayments();
+    // Keep local purchase snapshot in sync after successful update
+    purchase.value = response.purchase;
+    await reloadPayments();
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : "Erro ao atualizar compra!";
+
+    notify({
+      type: "negative",
+      message,
+    });
+  }
 }
 </script>
 
