@@ -33,7 +33,7 @@
       :purchase="purchase"
       :is-active="isActive"
       :submitting="submitting"
-      :client-name="clientName"
+      :client-name="client?.name"
       @toggle-is-active="submitDialog"
     />
 
@@ -94,11 +94,7 @@ const purchaseId = computed(() => {
 });
 const { loading, error, purchase } = usePurchaseDetails(toRef(purchaseId));
 const clientId = computed(() => purchase.value?.clientId || 0);
-const {
-  loading: clientLoading,
-  error: clientError,
-  client,
-} = useClientDetails(toRef(clientId));
+const { client } = useClientDetails(toRef(clientId));
 const { payments, reload: reloadPayments } = usePurchasePayments(
   toRef(purchaseId),
 );
@@ -126,11 +122,6 @@ const loadState = computed(() => {
   if (error.value || !purchase.value) return "error";
 
   return "ready";
-});
-const clientName = computed(() => {
-  if (clientLoading.value || clientError.value) return undefined;
-
-  return client.value?.name;
 });
 const errorMessage = computed(
   () => error.value?.message || "Erro inesperado ao carregar compra",
