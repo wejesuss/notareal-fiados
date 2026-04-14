@@ -17,3 +17,5 @@ export * from "./purchases/usePurchaseDetails";
 export * from "./purchases/usePurchasesQueryState";
 export * from "./purchases/useClientRecentPurchases";
 export * from "./purchases/useClientPurchases";
+
+export * from "./payments/usePurchasePayments";

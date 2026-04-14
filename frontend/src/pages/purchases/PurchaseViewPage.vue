@@ -70,16 +70,16 @@
 
 <script setup lang="ts">
 import { useQuasar } from "quasar";
-import { computed, ref, toRef, watch } from "vue";
+import { computed, toRef, watch } from "vue";
 import { useRoute } from "vue-router";
-import { updatePurchaseActiveStatus, getPurchasePayments } from "src/services";
-import type { Payment } from "src/models";
+import { updatePurchaseActiveStatus } from "src/services";
 import { formatCurrency, formatDate } from "src/utils/formatters";
 import {
   useActiveToggleConfirmation,
   useClientDetails,
   useNavigation,
   usePurchaseDetails,
+  usePurchasePayments,
 } from "src/composables";
 import { PurchaseDetailsCard } from "src/components/purchases";
 import { ContentState } from "src/components/common";
@@ -99,13 +99,13 @@ const {
   error: clientError,
   client,
 } = useClientDetails(toRef(clientId));
+const { payments } = usePurchasePayments(toRef(purchaseId));
 const { submitting, isActive, submitDialog } = useActiveToggleConfirmation(
   toRef(purchase),
   dialogConfig,
   notifyConfig,
   submit,
 );
-const payments = ref<Payment[]>([]);
 
 watch(
   [purchaseId, error],
@@ -118,13 +118,6 @@ watch(
   },
   { immediate: true },
 );
-
-watch(purchaseId, async (newPurchaseId) => {
-  if (purchaseId.value <= 0) return;
-  const response = await getPurchasePayments(newPurchaseId);
-
-  payments.value = response.payments;
-});
 
 const loadState = computed(() => {
   if (loading.value) return "loading";
