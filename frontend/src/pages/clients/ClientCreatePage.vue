@@ -40,40 +40,34 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
 import { useQuasar } from "quasar";
-import { createClient } from "src/services";
 import { useNavigation } from "src/composables/core/useNavigation";
 import type { ClientPayload } from "src/components/types";
 import { ClientForm } from "src/components/clients";
+import { useCreateClient } from "src/composables";
 
 const { navigateTo } = useNavigation();
-const $q = useQuasar();
-const submitting = ref(false);
+const { notify } = useQuasar();
+const { submitting, error, create } = useCreateClient();
 
 async function submit(payload: ClientPayload) {
-  if (submitting.value) return;
+  const response = await create(payload);
 
-  try {
-    submitting.value = true;
-    const { client } = await createClient(payload);
-
-    $q.notify({
-      type: "positive",
-      message: "Cliente criado com sucesso",
-    });
-
-    await navigateTo(`/clients/${client.id}`);
-  } catch (err) {
-    if (err instanceof Error) {
-      $q.notify({
+  // skipped or error
+  if (!response) {
+    if (error.value) {
+      notify({
         type: "negative",
-        message: err.message || "Erro ao criar Cliente",
+        message: error.value.message || "Erro ao criar Cliente",
       });
     }
-  } finally {
-    submitting.value = false;
+    return;
   }
+
+  notify({
+    type: "positive",
+    message: "Cliente criado com sucesso",
+  });
 }
 </script>
 

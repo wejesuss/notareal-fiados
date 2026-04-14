@@ -1,26 +1,26 @@
-import { ref, watch, type Ref } from "vue";
+import { watch, type Ref } from "vue";
 import type { ClientSummary } from "src/models";
 import { getClientSummary } from "src/services";
+import { useResource } from "../core/useResource";
 
 export function useClientSummary(clientId: Ref<number>) {
-  const loading = ref(false);
-  const error = ref<Error | null>(null);
-  const summary = ref<ClientSummary | null>(null);
+  const resource = useResource<ClientSummary>();
 
   async function load() {
-    loading.value = true;
-    error.value = null;
-    try {
-      summary.value = await getClientSummary(clientId.value);
-    } catch (e) {
-      error.value = e as Error;
-      summary.value = null;
-    } finally {
-      loading.value = false;
+    if (!Number.isInteger(clientId.value) || clientId.value <= 0) {
+      resource.setError("Identificador do cliente inválido!", "validation");
+      return;
     }
+
+    await resource.load(getClientSummary, clientId.value);
   }
 
   watch(clientId, load, { immediate: true });
 
-  return { loading, error, summary, reload: load };
+  return {
+    loading: resource.loading,
+    error: resource.error,
+    summary: resource.data,
+    reload: load,
+  };
 }

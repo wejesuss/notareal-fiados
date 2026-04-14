@@ -33,7 +33,7 @@
       :purchase="purchase"
       :is-active="isActive"
       :submitting="submitting"
-      :client-name="clientName"
+      :client-name="client?.name"
       @toggle-is-active="submitDialog"
     />
 
@@ -43,7 +43,7 @@
 
       <q-separator />
 
-      <q-list>
+      <q-list v-if="purchase">
         <q-item v-for="payment in payments" :key="payment.id" class="q-py-md">
           <q-item-section
             class="payment-item"
@@ -69,56 +69,72 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, toRef, watch } from "vue";
+import { useQuasar } from "quasar";
+import { computed, toRef, watch } from "vue";
 import { useRoute } from "vue-router";
-import { updatePurchaseActiveStatus, getPurchasePayments } from "src/services";
-import type { Payment } from "src/models";
+import { updatePurchaseActiveStatus } from "src/services";
 import { formatCurrency, formatDate } from "src/utils/formatters";
 import {
   useActiveToggleConfirmation,
   useClientDetails,
+  useNavigation,
   usePurchaseDetails,
+  usePurchasePayments,
 } from "src/composables";
 import { PurchaseDetailsCard } from "src/components/purchases";
 import { ContentState } from "src/components/common";
 import { dialogConfig, notifyConfig } from "src/config/purchases/dialogs";
 
 const $route = useRoute();
-const purchaseId = computed(() => Number($route.params.id));
+const { notify } = useQuasar();
+const { navigateTo } = useNavigation();
+const purchaseId = computed(() => {
+  const id = Number($route.params.id);
+  return Number.isInteger(id) && id > 0 ? id : 0;
+});
 const { loading, error, purchase } = usePurchaseDetails(toRef(purchaseId));
 const clientId = computed(() => purchase.value?.clientId || 0);
-const {
-  loading: clientLoading,
-  error: clientError,
-  client,
-} = useClientDetails(toRef(clientId));
+const { client } = useClientDetails(toRef(clientId));
+const { payments, reload: reloadPayments } = usePurchasePayments(
+  toRef(purchaseId),
+);
 const { submitting, isActive, submitDialog } = useActiveToggleConfirmation(
   toRef(purchase),
   dialogConfig,
   notifyConfig,
   submit,
 );
-const payments = ref<Payment[]>([]);
+
 watch(
   purchaseId,
-  async (newPurchaseId) => {
-    const response = await getPurchasePayments(newPurchaseId);
-
-    payments.value = response.payments;
+  async (id) => {
+    if (id <= 0) {
+      notify({
+        type: "negative",
+        message: "Identificador da compra inválido!",
+      });
+      await navigateTo("/purchases");
+    }
   },
   { immediate: true },
 );
+
+watch(error, async (err) => {
+  if (!err) return;
+
+  notify({
+    type: err.type === "validation" ? "negative" : "warning",
+    message: err.message,
+  });
+
+  await navigateTo("/purchases");
+});
 
 const loadState = computed(() => {
   if (loading.value) return "loading";
   if (error.value || !purchase.value) return "error";
 
   return "ready";
-});
-const clientName = computed(() => {
-  if (clientLoading.value || clientError.value) return undefined;
-
-  return client.value?.name;
 });
 const errorMessage = computed(
   () => error.value?.message || "Erro inesperado ao carregar compra",
@@ -127,13 +143,24 @@ const errorMessage = computed(
 async function submit(nextValue: boolean) {
   if (!purchase.value) return;
 
-  const response = await updatePurchaseActiveStatus(
-    purchaseId.value,
-    nextValue,
-  );
+  try {
+    const response = await updatePurchaseActiveStatus(
+      purchaseId.value,
+      nextValue,
+    );
 
-  // Keep local purchase snapshot in sync after successful update
-  purchase.value = response.purchase;
+    // Keep local purchase snapshot in sync after successful update
+    purchase.value = response.purchase;
+    await reloadPayments();
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : "Erro ao atualizar compra!";
+
+    notify({
+      type: "negative",
+      message,
+    });
+  }
 }
 </script>
 

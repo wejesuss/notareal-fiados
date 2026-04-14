@@ -97,7 +97,7 @@ const hasOverflow = ref<Record<string, boolean>>({});
 
 const hasTextOverflow = (id: string) => !!hasOverflow.value[id];
 
-function measureOverflow(el: HTMLElement, id: string) {
+function measureAndSetOverflow(el: HTMLElement, id: string) {
   const overflow = el.scrollWidth - el.clientWidth;
 
   if (overflow <= 0) return;
@@ -114,7 +114,7 @@ onMounted(async () => {
     const id = el.dataset.id;
     if (!id) return;
 
-    measureOverflow(el, id);
+    measureAndSetOverflow(el, id);
   });
 });
 

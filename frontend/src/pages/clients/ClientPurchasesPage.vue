@@ -105,7 +105,7 @@
         </q-list>
 
         <q-pagination
-          v-model="page.stateValue"
+          v-bind="page.bind"
           :max="totalPages"
           direction-links
           boundary-links
@@ -137,16 +137,19 @@ import {
 } from "src/composables";
 import { ContentState, ListFilter } from "src/components/common";
 import { PurchaseRow } from "src/components/purchases";
-import { APIError } from "src/api/errors";
 
 type LoadState = "loading" | "client-error" | "error" | "empty" | "ready";
 
 const $route = useRoute();
 const $q = useQuasar();
 const { navigateTo } = useNavigation();
-const clientId = computed(() => Number($route.params.id));
+const clientId = computed(() => {
+  const value = Number($route.params.id);
+  return Number.isInteger(value) && value > 0 ? value : 0;
+});
 
 const {
+  loading: clientLoading,
   client,
   error: clientError,
   reload: reloadClient,
@@ -165,16 +168,16 @@ const { purchasesWithUI } = usePurchasesUI(purchases);
 
 const loadState = computed<LoadState>(() => {
   // loading is always false after successful fetching or error
+  if (clientLoading.value || loading.value) return "loading";
   if (clientError.value) return "client-error";
-  if (loading.value) return "loading";
   if (error.value) return "error";
   // purchases is set as empty on error, so check is made after error check
   if (purchases.value.length === 0) return "empty";
   return "ready";
 });
 
-async function handleClientNotFound(e: Error) {
-  $q.notify({ type: "negative", message: e.message });
+async function handleClientError(message: string) {
+  $q.notify({ type: "negative", message });
 
   await navigateTo("/clients");
 }
@@ -211,10 +214,20 @@ const reload = async () => {
   if (error.value) await reloadPurchases();
 };
 
+watch(
+  clientId,
+  async (id) => {
+    if (id <= 0) {
+      await handleClientError("Identificador do cliente inválido!");
+    }
+  },
+  { immediate: true },
+);
+
 watch(clientError, async (err) => {
   if (!err) return;
-  if (err instanceof APIError && err.status === 404) {
-    await handleClientNotFound(err);
+  if (err.type === "not_found") {
+    await handleClientError(err.message);
   }
 });
 </script>

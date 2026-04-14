@@ -5,13 +5,16 @@ export async function getPayments(): Promise<PaymentListResponse> {
   // Zero (0) means from all purchases
   const purchaseId = 0;
 
-  return await getPurchasePayments(purchaseId);
+  return await getPurchasePayments({ purchaseId });
 }
 
-export async function getPurchasePayments(
-  purchaseId: number,
-  params?: PaymentListParams
-): Promise<PaymentListResponse> {
+export async function getPurchasePayments({
+  purchaseId,
+  params,
+}: {
+  purchaseId: number;
+  params?: PaymentListParams;
+}): Promise<PaymentListResponse> {
   const { data } = await api.get<PaymentListResponse>(
     `/purchases/${purchaseId}/payments`,
     {
