@@ -44,25 +44,11 @@
       <q-separator />
 
       <q-list v-if="purchase">
-        <q-item v-for="payment in payments" :key="payment.id" class="q-py-md">
-          <q-item-section
-            class="payment-item"
-            :class="{ 'payment-item-negative': !payment.isActive }"
-          >
-            <div class="row items-start justify-between">
-              <div class="row q-gutter-md">
-                <div class="text-body2">{{ payment.description }}</div>
-                <div class="text-caption text-grey-7">
-                  {{ formatCurrency(payment.amount) }}
-                </div>
-              </div>
-              <div class="text-caption">{{ payment.method }}</div>
-              <div class="text-body2 text-weight-medium">
-                {{ payment.receiptNumber }}
-              </div>
-            </div>
-          </q-item-section>
-        </q-item>
+        <PaymentRow
+          v-for="payment in payments"
+          :key="payment.id"
+          :payment="payment"
+        ></PaymentRow>
       </q-list>
     </q-card>
   </q-page>
@@ -73,7 +59,7 @@ import { useQuasar } from "quasar";
 import { computed, toRef, watch } from "vue";
 import { useRoute } from "vue-router";
 import { updatePurchaseActiveStatus } from "src/services";
-import { formatCurrency, formatDate } from "src/utils/formatters";
+import { formatDate } from "src/utils/formatters";
 import {
   useActiveToggleConfirmation,
   useClientDetails,
@@ -81,8 +67,9 @@ import {
   usePurchaseDetails,
   usePurchasePayments,
 } from "src/composables";
-import { PurchaseDetailsCard } from "src/components/purchases";
 import { ContentState } from "src/components/common";
+import { PurchaseDetailsCard } from "src/components/purchases";
+import PaymentRow from "src/components/payments/PaymentRow.vue";
 import { dialogConfig, notifyConfig } from "src/config/purchases/dialogs";
 
 const $route = useRoute();
@@ -163,15 +150,3 @@ async function submit(nextValue: boolean) {
   }
 }
 </script>
-
-<style scoped>
-.payment-item {
-  padding: 8px 12px;
-  border: 1px #26cf4d solid;
-  border-radius: 6px;
-}
-
-.payment-item-negative {
-  border-color: var(--q-negative);
-}
-</style>
