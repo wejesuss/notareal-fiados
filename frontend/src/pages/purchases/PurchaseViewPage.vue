@@ -38,35 +38,12 @@
     />
 
     <!-- Payments list -->
-    <q-card v-if="paymentLoading" class="q-mb-xl q-pa-md">
-      <ContentState
-        message="Carregando pagamentos..."
-        icon-name="find_in_page"
-      ></ContentState>
-    </q-card>
-
-    <q-card v-else-if="paymentError" class="q-my-xl q-pa-md">
-      <ContentState
-        :message="paymentError.message"
-        message-color="text-amber-8"
-        icon-name="error_outline"
-        icon-color="amber-10"
-      ></ContentState>
-    </q-card>
-
-    <q-card v-else-if="purchase">
-      <q-card-section class="text-subtitle1">Pagamentos</q-card-section>
-
-      <q-separator />
-
-      <q-list>
-        <PaymentRow
-          v-for="payment in payments"
-          :key="payment.id"
-          :payment="payment"
-        ></PaymentRow>
-      </q-list>
-    </q-card>
+    <PaymentListCard
+      v-if="purchase"
+      :loading="paymentsLoading"
+      :error="paymentsError"
+      :payments="payments"
+    ></PaymentListCard>
   </q-page>
 </template>
 
@@ -85,7 +62,7 @@ import {
 } from "src/composables";
 import { ContentState } from "src/components/common";
 import { PurchaseDetailsCard } from "src/components/purchases";
-import PaymentRow from "src/components/payments/PaymentRow.vue";
+import { PaymentListCard } from "src/components/payments";
 import { dialogConfig, notifyConfig } from "src/config/purchases/dialogs";
 
 const $route = useRoute();
@@ -99,8 +76,8 @@ const { loading, error, purchase } = usePurchaseDetails(toRef(purchaseId));
 const clientId = computed(() => purchase.value?.clientId || 0);
 const { client } = useClientDetails(toRef(clientId));
 const {
-  loading: paymentLoading,
-  error: paymentError,
+  loading: paymentsLoading,
+  error: paymentsError,
   payments,
   reload: reloadPayments,
 } = usePurchasePayments(toRef(purchaseId));
