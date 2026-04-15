@@ -16,7 +16,13 @@
   </q-card>
 
   <q-card v-else>
-    <q-card-section class="text-subtitle1">Pagamentos</q-card-section>
+    <q-card-section class="text-subtitle1">
+      <span>Pagamentos</span>
+      <span class="q-ml-sm"
+        >| Ativos: {{ paymentsStatusCount.active }} | Inativos:
+        {{ paymentsStatusCount.inactive }}</span
+      >
+    </q-card-section>
 
     <q-separator />
 
@@ -52,4 +58,18 @@ const loadState = computed(() => {
 const errorMessage = computed(
   () => props.error?.message || "Erro inesperado ao carregar pagamentos",
 );
+const paymentsStatusCount = computed(() => {
+  return props.payments.reduce(
+    (count, p) => {
+      if (p.isActive) {
+        count.active++;
+      } else {
+        count.inactive++;
+      }
+
+      return count;
+    },
+    { active: 0, inactive: 0 },
+  );
+});
 </script>
