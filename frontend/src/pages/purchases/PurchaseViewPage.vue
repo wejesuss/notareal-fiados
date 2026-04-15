@@ -38,12 +38,28 @@
     />
 
     <!-- Payments list -->
-    <q-card>
+    <q-card v-if="paymentLoading" class="q-mb-xl q-pa-md">
+      <ContentState
+        message="Carregando pagamentos..."
+        icon-name="find_in_page"
+      ></ContentState>
+    </q-card>
+
+    <q-card v-else-if="paymentError" class="q-my-xl q-pa-md">
+      <ContentState
+        :message="paymentError.message"
+        message-color="text-amber-8"
+        icon-name="error_outline"
+        icon-color="amber-10"
+      ></ContentState>
+    </q-card>
+
+    <q-card v-else-if="purchase">
       <q-card-section class="text-subtitle1">Pagamentos</q-card-section>
 
       <q-separator />
 
-      <q-list v-if="purchase">
+      <q-list>
         <PaymentRow
           v-for="payment in payments"
           :key="payment.id"
@@ -82,9 +98,12 @@ const purchaseId = computed(() => {
 const { loading, error, purchase } = usePurchaseDetails(toRef(purchaseId));
 const clientId = computed(() => purchase.value?.clientId || 0);
 const { client } = useClientDetails(toRef(clientId));
-const { payments, reload: reloadPayments } = usePurchasePayments(
-  toRef(purchaseId),
-);
+const {
+  loading: paymentLoading,
+  error: paymentError,
+  payments,
+  reload: reloadPayments,
+} = usePurchasePayments(toRef(purchaseId));
 const { submitting, isActive, submitDialog } = useActiveToggleConfirmation(
   toRef(purchase),
   dialogConfig,
