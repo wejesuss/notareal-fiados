@@ -15,7 +15,7 @@
     ></ContentState>
   </q-card>
 
-  <q-card v-else>
+  <q-card v-else class="q-mb-lg q-pa-xs">
     <q-card-section class="text-subtitle1">
       <span>Pagamentos</span>
       <span class="q-ml-sm"
