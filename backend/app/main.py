@@ -5,7 +5,11 @@ from app.database import init_database
 
 app = FastAPI()
 
-origins = ["http://localhost:9000", "http://127.0.0.1:9000"]  # Quasar dev
+origins = [
+    "http://localhost:9000",
+    "http://127.0.0.1:9000",
+    "http://192.168.18.8:9000",
+]  # Quasar dev
 
 app.add_middleware(
     CORSMiddleware,
