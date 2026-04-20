@@ -14,14 +14,6 @@
             </div>
 
             <div class="text-caption text-grey-7 row items-center q-gutter-xs">
-              <!-- inline status -->
-              <q-icon
-                v-if="!payment.isActive"
-                name="money_off"
-                size="18px"
-                class="q-ml-none text-grey-5"
-              />
-
               <span v-if="payment.method">{{ payment.method }}</span>
               <span v-if="payment.method">•</span>
               <span>{{ payment.receiptNumber }}</span>
@@ -30,15 +22,29 @@
 
           <!-- right side -->
           <div class="text-right column items-end justify-center">
-            <div class="text-body1 text-light-green-6 text-weight-bold">
+            <div
+              class="text-body1"
+              :class="
+                payment.isActive
+                  ? 'amount-color text-weight-bold'
+                  : 'text-grey-7 text-weight-medium'
+              "
+            >
               {{ formatCurrency(payment.amount) }}
             </div>
 
             <div
               v-if="!payment.isActive"
-              class="text-caption text-red-7 q-mt-xs"
+              class="row items-center q-gutter-xs text-caption text-grey-7 q-mt-xs"
             >
-              Desativado
+              <span>Desativado</span>
+              <!-- inline status -->
+              <q-icon
+                v-if="!payment.isActive"
+                name="money_off"
+                size="16px"
+                class="text-grey-5"
+              />
             </div>
           </div>
         </div>
@@ -58,7 +64,7 @@ defineProps<{
 
 <style scoped>
 .payment-item {
-  padding: 14px 12px;
+  padding: 12px 12px;
   border: 1px solid #e0e0e0;
   border-radius: 12px;
   background-color: white;
@@ -72,6 +78,10 @@ defineProps<{
 .payment-item-negative {
   background-color: #f5f5f5;
   border-color: #e5e5e5;
-  opacity: 0.7;
+  opacity: 0.9;
+}
+
+.amount-color {
+  color: #6f8518;
 }
 </style>
