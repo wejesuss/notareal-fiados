@@ -17,6 +17,9 @@
               <span v-if="payment.method">{{ payment.method }}</span>
               <span v-if="payment.method">•</span>
               <span>{{ payment.receiptNumber }}</span>
+
+              <span v-if="payment.paymentDate">•</span>
+              <span v-if="payment.paymentDate">{{ paymentDate }}</span>
             </div>
           </div>
 
@@ -55,11 +58,23 @@
 
 <script setup lang="ts">
 import { type Payment } from "src/models";
-import { formatCurrency } from "src/utils/formatters";
+import { formatCurrency, formatDate } from "src/utils/formatters";
 
-defineProps<{
+const props = defineProps<{
   payment: Payment;
 }>();
+
+const paymentDate = formatDate(
+  props.payment.paymentDate || "",
+  undefined,
+  undefined,
+  {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    weekday: "short",
+  },
+);
 </script>
 
 <style scoped>
