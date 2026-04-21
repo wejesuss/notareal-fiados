@@ -9,8 +9,13 @@
         <div class="row items-start justify-between">
           <!-- left side -->
           <div class="column justify-center">
-            <div class="text-body1 text-weight-medium">
-              {{ payment.description || "Pagamento" }}
+            <div class="payment-description text-body1 text-weight-medium">
+              <span>
+                {{ payment.description || "Pagamento" }}
+              </span>
+              <q-tooltip v-if="payment.description" :hide-delay="1000">{{
+                payment.description
+              }}</q-tooltip>
             </div>
 
             <div class="text-caption text-grey-7 row items-center q-gutter-xs">
@@ -94,6 +99,27 @@ const paymentDate = formatDate(
   background-color: #f5f5f5;
   border-color: #e5e5e5;
   opacity: 0.9;
+}
+
+.payment-description {
+  max-width: 280px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (min-width: 540px) {
+  .payment-description {
+    max-width: 380px;
+  }
+}
+
+@media (max-width: 340px) {
+  .payment-description {
+    max-width: 100%;
+    white-space: wrap;
+    text-wrap: wrap;
+  }
 }
 
 .amount-color {
