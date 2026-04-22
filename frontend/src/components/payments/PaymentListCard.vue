@@ -16,12 +16,21 @@
   </q-card>
 
   <q-card v-else class="q-mb-lg q-pa-xs">
-    <q-card-section class="text-subtitle1">
-      <span>Pagamentos</span>
-      <span class="q-ml-sm"
-        >| Ativos: {{ paymentsStatusCount.active }} | Inativos:
-        {{ paymentsStatusCount.inactive }}</span
-      >
+    <q-card-section class="row items-center justify-between q-gutter-y-sm">
+      <div class="text-subtitle1">
+        <span>Pagamentos</span>
+        <span class="q-ml-sm"
+          >| Ativos: {{ paymentsStatusCount.active }} | Inativos:
+          {{ paymentsStatusCount.inactive }}</span
+        >
+      </div>
+
+      <q-btn
+        color="primary"
+        icon="wallet"
+        label="Novo Pagamento"
+        @click="emit('create-payment')"
+      />
     </q-card-section>
 
     <q-separator />
@@ -48,6 +57,7 @@ const props = defineProps<{
   error: UIError | null;
   payments: Payment[];
 }>();
+const emit = defineEmits(["create-payment"]);
 
 const loadState = computed(() => {
   if (props.loading) return "loading";

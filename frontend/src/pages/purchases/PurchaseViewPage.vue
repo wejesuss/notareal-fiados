@@ -43,6 +43,7 @@
       :loading="paymentsLoading"
       :error="paymentsError"
       :payments="payments"
+      @create-payment="navigateTo(`/payments/${purchaseId}/new`)"
     ></PaymentListCard>
   </q-page>
 </template>
