@@ -6,16 +6,22 @@
       :class="{ 'payment-item-negative': !payment.isActive }"
     >
       <q-item-section>
-        <div class="row items-start justify-between">
+        <div class="payment-grid">
           <!-- left side -->
           <div class="column justify-center">
             <div class="payment-description text-body1 text-weight-medium">
               <span>
                 {{ payment.description || "Pagamento" }}
               </span>
-              <q-tooltip v-if="payment.description" :hide-delay="1000">{{
-                payment.description
-              }}</q-tooltip>
+
+              <q-tooltip
+                v-if="payment.description"
+                :hide-delay="1000"
+                :delay="200"
+                style="font-size: 0.8rem"
+              >
+                {{ payment.description }}
+              </q-tooltip>
             </div>
 
             <div class="text-caption text-grey-7 row items-center q-gutter-xs">
@@ -34,8 +40,8 @@
               class="text-body1"
               :class="
                 payment.isActive
-                  ? 'amount-color text-weight-bold'
-                  : 'text-grey-7 text-weight-medium'
+                  ? 'amount-active'
+                  : 'text-grey-6 text-weight-medium'
               "
             >
               {{ formatCurrency(payment.amount) }}
@@ -43,16 +49,10 @@
 
             <div
               v-if="!payment.isActive"
-              class="row items-center q-gutter-xs text-caption text-grey-7 q-mt-xs"
+              class="row items-center text-caption text-grey-6 q-mt-xs"
             >
               <span>Desativado</span>
-              <!-- inline status -->
-              <q-icon
-                v-if="!payment.isActive"
-                name="money_off"
-                size="16px"
-                class="text-grey-5"
-              />
+              <q-icon name="money_off" size="14px" class="text-grey-5" />
             </div>
           </div>
         </div>
@@ -84,45 +84,43 @@ const paymentDate = formatDate(
 
 <style scoped>
 .payment-item {
-  padding: 12px 12px;
+  padding: 12px;
   border: 1px solid #e0e0e0;
   border-radius: 12px;
   background-color: white;
   transition: all 0.3s ease;
+
+  /* This is for the description part */
+  max-width: 720px;
+  margin: 0 auto;
 }
 
 .payment-item:active {
-  background: #f0f0f0;
+  background: #f2f2f2;
 }
 
 .payment-item-negative {
-  background-color: #f5f5f5;
+  background-color: #f7f7f7;
   border-color: #e5e5e5;
-  opacity: 0.9;
+}
+
+.payment-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
 }
 
 .payment-description {
-  max-width: 280px;
+  max-width: 100%;
+  width: max-content;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-@media (min-width: 540px) {
-  .payment-description {
-    max-width: 380px;
-  }
-}
-
-@media (max-width: 340px) {
-  .payment-description {
-    max-width: 100%;
-    white-space: wrap;
-    text-wrap: wrap;
-  }
-}
-
-.amount-color {
+.amount-active {
   color: #6f8518;
+  font-weight: bold;
 }
 </style>
