@@ -90,7 +90,6 @@ const paymentDate = formatDate(
   background-color: white;
   transition: all 0.3s ease;
 
-  /* This is for the description part */
   max-width: 720px;
   margin: 0 auto;
 }
