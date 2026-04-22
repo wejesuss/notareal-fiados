@@ -8,7 +8,7 @@
       <q-item-section>
         <div class="payment-grid">
           <!-- left side -->
-          <div class="column justify-center">
+          <div class="column justify-center q-col-gutter-y-xs">
             <div class="payment-description text-body1 text-weight-medium">
               <span>
                 {{ payment.description || "Pagamento" }}
