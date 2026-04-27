@@ -15,6 +15,23 @@
     ></ContentState>
   </q-card>
 
+  <q-card v-else-if="loadState === 'empty'" class="q-my-xl q-pa-md">
+    <ContentState
+      message="Nenhum pagamento registrado ainda..."
+      icon-name="receipt_long"
+    ></ContentState>
+    <div class="text-center q-mt-md">
+      <q-btn
+        flat
+        color="primary"
+        icon="wallet"
+        label="Novo Pagamento"
+        class="full-width"
+        @click="emit('create-payment')"
+      />
+    </div>
+  </q-card>
+
   <q-card v-else class="q-mb-lg q-pa-xs">
     <q-card-section class="row items-center justify-between q-gutter-y-sm">
       <div class="text-subtitle1">
@@ -62,6 +79,7 @@ const emit = defineEmits(["create-payment"]);
 const loadState = computed(() => {
   if (props.loading) return "loading";
   if (props.error) return "error";
+  if (props.payments.length === 0) return "empty";
 
   return "ready";
 });
