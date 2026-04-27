@@ -36,20 +36,30 @@
         </div>
 
         <div class="purchase-totals">
-          <div class="row items-center justify-between text-grey-9">
-            <div class="text-subtitle1">Total</div>
-            <div class="text-h6 text-weight-bold text-blue-grey-7">
+          <div class="row items-center justify-between">
+            <div class="text-subtitle1 text-grey-9">Total</div>
+            <div class="text-h6 text-weight-bold text-grey-7">
               {{ formatCurrency(purchase.total) }}
             </div>
           </div>
 
-          <div class="row items-center justify-between q-mt-md">
+          <div class="row items-center justify-between q-mt-md divisor-line">
             <div class="text-subtitle1 text-grey-9">Pago</div>
             <div
               class="text-h6 text-weight-bold"
               :class="purchaseStatusUI.textColor"
             >
               {{ formatCurrency(purchase.totalPaid) }}
+            </div>
+          </div>
+
+          <div
+            v-if="remainingAmount > 0 && remainingAmount < purchase.total"
+            class="row items-center justify-between q-mt-md divisor-line"
+          >
+            <div class="text-subtitle1 text-grey-9">Restante</div>
+            <div class="text-h6 text-weight-bold text-grey-7">
+              {{ formatCurrency(remainingAmount) }}
             </div>
           </div>
         </div>
@@ -139,6 +149,7 @@ const emit = defineEmits<{
 }>();
 
 const { navigateTo } = useNavigation();
+
 const purchaseId = computed(() => props.purchase.id);
 const purchaseStatusUI = computed(() => {
   if (!props.purchase) return { color: "", label: "", textColor: "" };
@@ -151,6 +162,9 @@ const purchaseActiveStatusUI = computed(() => {
   return getPurchaseActiveStatusUI(props.purchase.isActive);
 });
 const purchaseEditRoute = computed(() => `/purchases/${purchaseId.value}/edit`);
+const remainingAmount = computed(
+  () => (props.purchase.totalCents - props.purchase.totalPaidCents) / 100,
+);
 
 function onToggleIsActive(nextValue: boolean) {
   emit("toggleIsActive", nextValue);
@@ -177,9 +191,9 @@ function onToggleIsActive(nextValue: boolean) {
   padding: 8px 4px;
 }
 
-.purchase-totals > :first-child {
-  padding-bottom: 12px;
-  border-bottom: 1px solid #bbbbbb;
+.purchase-totals .divisor-line {
+  padding-top: 12px;
+  border-top: 1px solid #bbbbbb;
 }
 
 .purchase-action {
