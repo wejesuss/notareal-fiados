@@ -57,7 +57,7 @@
         v-for="payment in payments"
         :key="payment.id"
         :payment="payment"
-        @click="handleRowClick"
+        @click="(data) => emit('edit-payment', data)"
       ></PaymentRow>
     </q-list>
   </q-card>
@@ -104,8 +104,4 @@ const paymentsStatusCount = computed(() => {
     { active: 0, inactive: 0 },
   );
 });
-
-function handleRowClick(data: { purchaseId: number; id: number }) {
-  emit("edit-payment", data);
-}
 </script>

@@ -43,15 +43,40 @@
       :loading="paymentsLoading"
       :error="paymentsError"
       :payments="payments"
-      @create-payment="navigateTo(`/payments/${purchaseId}/new`)"
-      @edit-payment="openEditModal"
+      @create-payment="openPaymentModal"
+      @edit-payment="openPaymentModal"
     ></PaymentListCard>
+
+    <q-dialog
+      :model-value="isPaymentModalOpen"
+      persistent
+      @hide="cancelPaymentModal"
+    >
+      <q-card class="full-width" style="max-width: 500px">
+        <q-card-section class="text-h6">{{
+          selectedPaymentId
+            ? "Editar Pagamento " + `(${selectedPaymentId})`
+            : "Novo Pagamento"
+        }}</q-card-section>
+
+        <q-separator />
+
+        <q-card-section> form </q-card-section>
+
+        <q-separator />
+
+        <q-card-actions align="right">
+          <q-btn flat label="Cancelar" v-close-popup />
+          <q-btn color="primary" label="Salvar" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
 <script setup lang="ts">
 import { useQuasar } from "quasar";
-import { computed, toRef, watch } from "vue";
+import { computed, ref, toRef, watch } from "vue";
 import { useRoute } from "vue-router";
 import { updatePurchaseActiveStatus } from "src/services";
 import { formatDate } from "src/utils/formatters";
@@ -89,6 +114,8 @@ const { submitting, isActive, submitDialog } = useActiveToggleConfirmation(
   notifyConfig,
   submit,
 );
+const selectedPaymentId = ref<number | null>(null);
+const isPaymentModalOpen = ref(false);
 
 watch(
   purchaseId,
@@ -148,7 +175,21 @@ async function submit(nextValue: boolean) {
   }
 }
 
-function openEditModal(data: { purchaseId: number; id: number }) {
-  console.log(data);
+function openPaymentModal(data?: { purchaseId: number; id: number }) {
+  console.log(selectedPaymentId.value);
+  if (selectedPaymentId.value) return;
+  if (data) {
+    selectedPaymentId.value = data.id;
+  } else {
+    selectedPaymentId.value = null;
+  }
+
+  isPaymentModalOpen.value = true;
+}
+
+function cancelPaymentModal() {
+  console.log(selectedPaymentId.value);
+  selectedPaymentId.value = null;
+  isPaymentModalOpen.value = false;
 }
 </script>
