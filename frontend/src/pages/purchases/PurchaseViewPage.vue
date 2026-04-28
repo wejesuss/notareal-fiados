@@ -44,6 +44,7 @@
       :error="paymentsError"
       :payments="payments"
       @create-payment="navigateTo(`/payments/${purchaseId}/new`)"
+      @edit-payment="openEditModal"
     ></PaymentListCard>
   </q-page>
 </template>
@@ -145,5 +146,9 @@ async function submit(nextValue: boolean) {
       message,
     });
   }
+}
+
+function openEditModal(data: { purchaseId: number; id: number }) {
+  console.log(data);
 }
 </script>

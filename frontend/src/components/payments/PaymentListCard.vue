@@ -57,6 +57,7 @@
         v-for="payment in payments"
         :key="payment.id"
         :payment="payment"
+        @click="handleRowClick"
       ></PaymentRow>
     </q-list>
   </q-card>
@@ -74,7 +75,10 @@ const props = defineProps<{
   error: UIError | null;
   payments: Payment[];
 }>();
-const emit = defineEmits(["create-payment"]);
+const emit = defineEmits<{
+  (e: "create-payment"): void;
+  (e: "edit-payment", data: { purchaseId: number; id: number }): void;
+}>();
 
 const loadState = computed(() => {
   if (props.loading) return "loading";
@@ -100,4 +104,8 @@ const paymentsStatusCount = computed(() => {
     { active: 0, inactive: 0 },
   );
 });
+
+function handleRowClick(data: { purchaseId: number; id: number }) {
+  emit("edit-payment", data);
+}
 </script>
