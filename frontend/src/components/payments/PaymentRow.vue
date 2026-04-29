@@ -3,9 +3,7 @@
     <q-item
       class="payment-item"
       clickable
-      @click="
-        () => emit('click', { purchaseId: payment.purchaseId, id: payment.id })
-      "
+      @click="() => emit('click', payment.id)"
       :class="{ 'payment-item-negative': !payment.isActive }"
     >
       <q-item-section>
@@ -72,7 +70,7 @@ const props = defineProps<{
   payment: Payment;
 }>();
 const emit = defineEmits<{
-  (e: "click", data: { purchaseId: number; id: number }): void;
+  (e: "click", id: number): void;
 }>();
 
 const paymentDate = formatDate(

@@ -57,7 +57,7 @@
         v-for="payment in payments"
         :key="payment.id"
         :payment="payment"
-        @click="(data) => emit('edit-payment', data)"
+        @click="(id) => emit('edit-payment', id)"
       ></PaymentRow>
     </q-list>
   </q-card>
@@ -77,7 +77,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{
   (e: "create-payment"): void;
-  (e: "edit-payment", data: { purchaseId: number; id: number }): void;
+  (e: "edit-payment", id: number): void;
 }>();
 
 const loadState = computed(() => {

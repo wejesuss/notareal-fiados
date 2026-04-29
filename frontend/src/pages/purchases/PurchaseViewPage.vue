@@ -180,12 +180,12 @@ async function submit(nextValue: boolean) {
   }
 }
 
-function openPaymentModal(data?: { purchaseId: number; id: number }) {
+function openPaymentModal(id?: number) {
   if (selectedPayment.value.id) return;
-  if (data) {
-    selectedPayment.value.id = data.id;
+  if (id) {
+    selectedPayment.value.id = id;
     selectedPayment.value.payment =
-      payments.value.find((p) => p.id === data.id) || null;
+      payments.value.find((p) => p.id === id) || null;
   }
 
   isPaymentModalOpen.value = true;
