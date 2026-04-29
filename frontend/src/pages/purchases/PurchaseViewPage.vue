@@ -54,8 +54,9 @@
     >
       <q-card class="full-width" style="max-width: 500px">
         <q-card-section class="text-h6">{{
-          selectedPaymentId
-            ? "Editar Pagamento " + `(${selectedPaymentId})`
+          selectedPayment.id
+            ? "Editar Pagamento " +
+              `(${selectedPayment.payment?.receiptNumber})`
             : "Novo Pagamento"
         }}</q-card-section>
 
@@ -87,6 +88,7 @@ import {
   usePurchaseDetails,
   usePurchasePayments,
 } from "src/composables";
+import type { Payment } from "src/models";
 import { ContentState } from "src/components/common";
 import { PurchaseDetailsCard } from "src/components/purchases";
 import { PaymentListCard } from "src/components/payments";
@@ -114,7 +116,10 @@ const { submitting, isActive, submitDialog } = useActiveToggleConfirmation(
   notifyConfig,
   submit,
 );
-const selectedPaymentId = ref<number | null>(null);
+const selectedPayment = ref<{ id: number | null; payment: Payment | null }>({
+  id: null,
+  payment: null,
+});
 const isPaymentModalOpen = ref(false);
 
 watch(
@@ -176,20 +181,19 @@ async function submit(nextValue: boolean) {
 }
 
 function openPaymentModal(data?: { purchaseId: number; id: number }) {
-  console.log(selectedPaymentId.value);
-  if (selectedPaymentId.value) return;
+  if (selectedPayment.value.id) return;
   if (data) {
-    selectedPaymentId.value = data.id;
-  } else {
-    selectedPaymentId.value = null;
+    selectedPayment.value.id = data.id;
+    selectedPayment.value.payment =
+      payments.value.find((p) => p.id === data.id) || null;
   }
 
   isPaymentModalOpen.value = true;
 }
 
 function cancelPaymentModal() {
-  console.log(selectedPaymentId.value);
-  selectedPaymentId.value = null;
+  selectedPayment.value.id = null;
+  selectedPayment.value.payment = null;
   isPaymentModalOpen.value = false;
 }
 </script>
