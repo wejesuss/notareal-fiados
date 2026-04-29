@@ -52,7 +52,7 @@
       persistent
       @hide="cancelPaymentModal"
     >
-      <q-card class="full-width" style="max-width: 500px">
+      <q-card class="full-width" style="max-width: 540px">
         <q-card-section class="text-h6">{{
           selectedPayment.id
             ? "Editar Pagamento " +
