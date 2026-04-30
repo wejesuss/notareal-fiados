@@ -3,7 +3,8 @@
   letter-spacing: 0.06em;
 }
 
-.caption-medium {
+.caption-medium,
+.tooltip-medium {
   font-size: 0.8rem;
 }
 

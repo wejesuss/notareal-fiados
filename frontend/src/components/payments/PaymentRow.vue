@@ -19,7 +19,7 @@
                 v-if="payment.description"
                 :hide-delay="1000"
                 :delay="200"
-                style="font-size: 0.8rem"
+                class="tooltip-medium"
               >
                 {{ payment.description }}
               </q-tooltip>
