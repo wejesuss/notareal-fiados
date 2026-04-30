@@ -47,29 +47,67 @@
       @edit-payment="openPaymentModal"
     ></PaymentListCard>
 
-    <q-dialog
-      :model-value="isPaymentModalOpen"
-      persistent
-      @hide="cancelPaymentModal"
-    >
+    <q-dialog :model-value="isPaymentModalOpen" @hide="cancelPaymentModal">
       <q-card class="full-width" style="max-width: 540px">
         <q-card-section class="text-h6">{{
-          selectedPayment.id
-            ? "Editar Pagamento " +
-              `(${selectedPayment.payment?.receiptNumber})`
+          selectedPayment
+            ? "Editar Pagamento " + `(${selectedPayment.receiptNumber})`
             : "Novo Pagamento"
         }}</q-card-section>
 
         <q-separator />
 
-        <q-card-section> form </q-card-section>
+        <q-card-section>
+          <q-form class="col q-gutter-xs q-col-gutter-md">
+            <q-input
+              outlined
+              color="secondary"
+              :model-value="paymentFormData.description"
+              debounce="300"
+              label="Descrição *"
+            >
+              <template #append>
+                <q-icon name="label_outline" size="xs">
+                  <q-tooltip
+                    anchor="top middle"
+                    self="bottom middle"
+                    :delay="250"
+                    :hide-delay="300"
+                    class="tooltip-medium"
+                    >Descreva o pagamento</q-tooltip
+                  >
+                </q-icon>
+              </template>
+            </q-input>
 
-        <q-separator />
+            <q-input
+              outlined
+              color="secondary"
+              :model-value="paymentFormData.receiptNumber"
+              debounce="300"
+              :disable="!!selectedPayment?.id"
+              label="Número do recibo"
+            >
+              <template #append>
+                <q-icon name="person" size="xs">
+                  <q-tooltip
+                    anchor="top middle"
+                    self="bottom middle"
+                    :delay="250"
+                    :hide-delay="300"
+                    class="tooltip-medium"
+                    >Identificador único do pagamento (REC-***)</q-tooltip
+                  >
+                </q-icon>
+              </template>
+            </q-input>
 
-        <q-card-actions align="right">
-          <q-btn flat label="Cancelar" v-close-popup />
-          <q-btn color="primary" label="Salvar" />
-        </q-card-actions>
+            <q-card-actions align="right">
+              <q-btn flat label="Cancelar" v-close-popup />
+              <q-btn color="primary" type="submit" label="Salvar" />
+            </q-card-actions>
+          </q-form>
+        </q-card-section>
       </q-card>
     </q-dialog>
   </q-page>
@@ -89,6 +127,7 @@ import {
   usePurchasePayments,
 } from "src/composables";
 import type { Payment } from "src/models";
+import { type PaymentPayload } from "src/components/types";
 import { ContentState } from "src/components/common";
 import { PurchaseDetailsCard } from "src/components/purchases";
 import { PaymentListCard } from "src/components/payments";
@@ -116,11 +155,15 @@ const { submitting, isActive, submitDialog } = useActiveToggleConfirmation(
   notifyConfig,
   submit,
 );
-const selectedPayment = ref<{ id: number | null; payment: Payment | null }>({
-  id: null,
-  payment: null,
-});
+const selectedPayment = ref<Payment | null>(null);
 const isPaymentModalOpen = ref(false);
+const paymentFormData = ref<PaymentPayload>({
+  description: null,
+  amountCents: 0,
+  method: "",
+  paymentDate: null,
+  receiptNumber: "",
+});
 
 watch(
   purchaseId,
@@ -180,20 +223,41 @@ async function submit(nextValue: boolean) {
   }
 }
 
+function setPaymentFormData(data?: PaymentPayload) {
+  const payload = data || {
+    description: null,
+    amountCents: 0,
+    method: "",
+    paymentDate: null,
+    receiptNumber: "",
+  };
+
+  paymentFormData.value = payload;
+}
+
 function openPaymentModal(id?: number) {
-  if (selectedPayment.value.id) return;
+  if (selectedPayment.value) return;
+
   if (id) {
-    selectedPayment.value.id = id;
-    selectedPayment.value.payment =
-      payments.value.find((p) => p.id === id) || null;
+    const paymentFound = payments.value.find((p) => p.id === id);
+    if (!paymentFound) return;
+
+    selectedPayment.value = paymentFound;
+    setPaymentFormData({
+      description: paymentFound.description,
+      amountCents: paymentFound.amountCents,
+      method: paymentFound.method,
+      paymentDate: paymentFound.paymentDate,
+      receiptNumber: paymentFound.receiptNumber,
+    });
   }
 
   isPaymentModalOpen.value = true;
 }
 
 function cancelPaymentModal() {
-  selectedPayment.value.id = null;
-  selectedPayment.value.payment = null;
+  selectedPayment.value = null;
+  setPaymentFormData();
   isPaymentModalOpen.value = false;
 }
 </script>

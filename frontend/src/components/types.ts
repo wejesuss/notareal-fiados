@@ -56,6 +56,15 @@ export type ClientPayload = {
   email: string | null;
 };
 
+export type PaymentPayload = {
+  description: string | null;
+  amountCents: number;
+  paymentDate: string | null; // ISO date
+  method: string;
+  /** TODO: remove manual receipt number creation */
+  receiptNumber: string; // REC-0001
+};
+
 export type PurchaseStatusUI = {
   label: string;
   color: string;
