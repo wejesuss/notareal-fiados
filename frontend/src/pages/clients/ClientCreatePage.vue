@@ -68,6 +68,8 @@ async function submit(payload: ClientPayload) {
     type: "positive",
     message: "Cliente criado com sucesso",
   });
+
+  await navigateTo(`/clients/${response.id}`);
 }
 </script>
 
