@@ -83,13 +83,78 @@
             <q-input
               outlined
               color="secondary"
+              :model-value="paymentFormData.amountCents"
+              debounce="300"
+              label="Valor (R$)"
+            >
+              <template #append>
+                <q-icon name="attach_money" size="xs">
+                  <q-tooltip
+                    anchor="top middle"
+                    self="bottom middle"
+                    :delay="250"
+                    :hide-delay="300"
+                    class="tooltip-medium"
+                    >Valor pago nesta transação.</q-tooltip
+                  >
+                </q-icon>
+              </template>
+            </q-input>
+
+            <q-input
+              outlined
+              color="secondary"
+              :model-value="paymentFormData.paymentDate"
+              debounce="300"
+              label="Data do pagamento"
+            >
+              <template #append>
+                <q-icon name="today" size="xs">
+                  <q-tooltip
+                    anchor="top middle"
+                    self="bottom middle"
+                    :delay="250"
+                    :hide-delay="300"
+                    class="tooltip-medium"
+                    >Data e hora do pagamento (deixe em branco se
+                    desconhecido).</q-tooltip
+                  >
+                </q-icon>
+              </template>
+            </q-input>
+
+            <q-input
+              outlined
+              color="secondary"
+              :model-value="paymentFormData.method"
+              debounce="300"
+              label="Forma de pagamento"
+            >
+              <template #append>
+                <q-icon name="price_check" size="xs">
+                  <q-tooltip
+                    anchor="top middle"
+                    self="bottom middle"
+                    :delay="250"
+                    :hide-delay="300"
+                    class="tooltip-medium"
+                    >Forma de pagamento (ex: dinheiro, pix,
+                    transferência).</q-tooltip
+                  >
+                </q-icon>
+              </template>
+            </q-input>
+
+            <q-input
+              outlined
+              color="secondary"
               :model-value="paymentFormData.receiptNumber"
               debounce="300"
               :disable="!!selectedPayment?.id"
               label="Número do recibo"
             >
               <template #append>
-                <q-icon name="person" size="xs">
+                <q-icon name="receipt" size="xs">
                   <q-tooltip
                     anchor="top middle"
                     self="bottom middle"
