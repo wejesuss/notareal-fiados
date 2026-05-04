@@ -72,7 +72,7 @@
                     anchor="top middle"
                     self="bottom middle"
                     :delay="250"
-                    :hide-delay="300"
+                    :hide-delay="150"
                     class="tooltip-medium"
                     >Descreva o pagamento</q-tooltip
                   >
@@ -93,7 +93,7 @@
                     anchor="top middle"
                     self="bottom middle"
                     :delay="250"
-                    :hide-delay="300"
+                    :hide-delay="150"
                     class="tooltip-medium"
                     >Valor pago nesta transação.</q-tooltip
                   >
@@ -114,7 +114,7 @@
                     anchor="top middle"
                     self="bottom middle"
                     :delay="250"
-                    :hide-delay="300"
+                    :hide-delay="150"
                     class="tooltip-medium"
                     >Data e hora do pagamento (deixe em branco se
                     desconhecido).</q-tooltip
@@ -136,7 +136,7 @@
                     anchor="top middle"
                     self="bottom middle"
                     :delay="250"
-                    :hide-delay="300"
+                    :hide-delay="150"
                     class="tooltip-medium"
                     >Forma de pagamento (ex: dinheiro, pix,
                     transferência).</q-tooltip
@@ -159,7 +159,7 @@
                     anchor="top middle"
                     self="bottom middle"
                     :delay="250"
-                    :hide-delay="300"
+                    :hide-delay="150"
                     class="tooltip-medium"
                     >Identificador único do pagamento (REC-***)</q-tooltip
                   >
