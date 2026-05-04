@@ -48,7 +48,7 @@
     ></PaymentListCard>
 
     <q-dialog :model-value="isPaymentModalOpen" @hide="cancelPaymentModal">
-      <q-card class="full-width" style="max-width: 540px">
+      <q-card class="full-width payment-form-card">
         <q-card-section class="text-h6">{{
           selectedPayment
             ? "Editar Pagamento " + `(${selectedPayment.receiptNumber})`
@@ -326,3 +326,9 @@ function cancelPaymentModal() {
   isPaymentModalOpen.value = false;
 }
 </script>
+
+<style scoped>
+.payment-form-card {
+  max-width: 580px;
+}
+</style>
