@@ -123,49 +123,53 @@
               </template>
             </q-input>
 
-            <q-input
-              outlined
-              color="secondary"
-              :model-value="paymentFormData.method"
-              debounce="300"
-              label="Forma de pagamento"
-            >
-              <template #append>
-                <q-icon name="price_check" size="xs">
-                  <q-tooltip
-                    anchor="top middle"
-                    self="bottom middle"
-                    :delay="250"
-                    :hide-delay="150"
-                    class="tooltip-medium"
-                    >Forma de pagamento (ex: dinheiro, pix,
-                    transferência).</q-tooltip
-                  >
-                </q-icon>
-              </template>
-            </q-input>
+            <div class="row q-col-gutter-md">
+              <q-input
+                outlined
+                color="secondary"
+                :model-value="paymentFormData.method"
+                debounce="300"
+                label="Forma de pagamento"
+                class="col-12 col-sm-5"
+              >
+                <template #append>
+                  <q-icon name="price_check" size="xs">
+                    <q-tooltip
+                      anchor="top middle"
+                      self="bottom middle"
+                      :delay="250"
+                      :hide-delay="150"
+                      class="tooltip-medium"
+                      >Forma de pagamento (ex: dinheiro, pix,
+                      transferência).</q-tooltip
+                    >
+                  </q-icon>
+                </template>
+              </q-input>
 
-            <q-input
-              outlined
-              color="secondary"
-              :model-value="paymentFormData.receiptNumber"
-              debounce="300"
-              :disable="!!selectedPayment?.id"
-              label="Número do recibo"
-            >
-              <template #append>
-                <q-icon name="receipt" size="xs">
-                  <q-tooltip
-                    anchor="top middle"
-                    self="bottom middle"
-                    :delay="250"
-                    :hide-delay="150"
-                    class="tooltip-medium"
-                    >Identificador único do pagamento (REC-***)</q-tooltip
-                  >
-                </q-icon>
-              </template>
-            </q-input>
+              <q-input
+                outlined
+                color="secondary"
+                :model-value="paymentFormData.receiptNumber"
+                debounce="300"
+                :disable="!!selectedPayment?.id"
+                label="Número do recibo"
+                class="col-12 col-sm-7"
+              >
+                <template #append>
+                  <q-icon name="receipt" size="xs">
+                    <q-tooltip
+                      anchor="top middle"
+                      self="bottom middle"
+                      :delay="250"
+                      :hide-delay="150"
+                      class="tooltip-medium"
+                      >Identificador único do pagamento (REC-***)</q-tooltip
+                    >
+                  </q-icon>
+                </template>
+              </q-input>
+            </div>
 
             <q-card-actions align="right">
               <q-btn flat label="Cancelar" v-close-popup />
