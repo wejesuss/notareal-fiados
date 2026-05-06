@@ -5,7 +5,7 @@
     <q-separator />
 
     <q-card-section>
-      <q-form class="col q-gutter-xs q-col-gutter-md">
+      <q-form ref="paymentForm" class="col q-gutter-xs q-col-gutter-md">
         <q-input
           outlined
           color="secondary"
@@ -51,22 +51,40 @@
         <q-input
           outlined
           color="secondary"
-          v-model="paymentFormData.paymentDate"
-          debounce="300"
+          v-model="displayDate"
           label="Data do pagamento"
+          bottom-slots
+          :rules="[dateTimeRule]"
+          error-message="Data ou Hora inválidos"
         >
           <template #append>
-            <q-icon name="today" size="xs">
-              <q-tooltip
-                anchor="top middle"
-                self="bottom middle"
-                :delay="250"
-                :hide-delay="150"
-                class="tooltip-medium"
-                >Data e hora do pagamento (deixe em branco se
-                desconhecido).</q-tooltip
+            <q-icon name="event" class="cursor-pointer"
+              ><q-popup-proxy
+                cover
+                transition-show="scale"
+                transition-hide="scale"
               >
+                <q-date v-model="datePart" mask="YYYY-MM-DD"></q-date>
+              </q-popup-proxy>
             </q-icon>
+            <q-icon name="schedule" class="cursor-pointer"
+              ><q-popup-proxy
+                cover
+                transition-show="scale"
+                transition-hide="scale"
+              >
+                <q-time
+                  v-model="timePart"
+                  format24h
+                  mask="HH:mm"
+                ></q-time> </q-popup-proxy
+            ></q-icon>
+          </template>
+
+          <template #hint>
+            <div>
+              Data e hora do pagamento (deixe em branco se desconhecido).
+            </div>
           </template>
         </q-input>
 
@@ -131,6 +149,7 @@
 import { ref, watch } from "vue";
 import type { Payment } from "src/models";
 import { type PaymentPayload } from "src/components/types";
+import { QForm } from "quasar";
 
 interface PaymentFormProps {
   payload?: PaymentPayload | null;
@@ -147,6 +166,26 @@ const paymentFormData = ref<PaymentPayload>({
   receiptNumber: props.payload?.receiptNumber || "",
 });
 
+const paymentForm = ref<QForm | null>(null);
+const displayDate = ref<string | null>(null);
+const datePart = ref<string | null>(null);
+const timePart = ref<string | null>(null);
+
+watch([datePart, timePart], ([date, time]) => {
+  if (date && time) {
+    displayDate.value = `${date}T${time}`;
+  } else {
+    displayDate.value = date || time;
+  }
+});
+
+watch(displayDate, (date) => {
+  if (!date) {
+    datePart.value = null;
+    timePart.value = null;
+  }
+});
+
 watch(
   () => props.payload,
   (payload) => {
@@ -161,6 +200,28 @@ const formTitle = props.selectedPayment
   : "Novo Pagamento";
 
 const isEditingPayment = !!props.selectedPayment?.id;
+
+function dateTimeRule(vl?: string | null) {
+  // console.log(typeof vl, vl);
+  if (!vl) return true;
+
+  // At least the date part or time part
+  const match = vl.match(
+    /^((?:\d{4})(?:[-/]\d{2}){2})(T[0-2]\d:[0-5]\d)?$|^([0-2]\d:[0-5]\d)$/g,
+  );
+  if (!match) {
+    // No date no time
+    return false;
+  }
+
+  const fullDate = match[0].includes("T");
+  if (fullDate) {
+    const date = new Date(match[0].replaceAll("/", "-"));
+    return !Number.isNaN(date.valueOf());
+  }
+
+  return true;
+}
 </script>
 
 <style scoped>
