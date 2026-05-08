@@ -5,7 +5,7 @@
     <q-separator />
 
     <q-card-section>
-      <q-form ref="paymentForm" class="col q-gutter-xs q-col-gutter-md">
+      <q-form ref="paymentForm" class="payment-form">
         <div>
           <q-input
             outlined
@@ -243,6 +243,16 @@ function resetDateTime() {
   max-width: 580px;
 }
 
+.payment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px 16px;
+}
+
+.payment-form > * {
+  margin-left: 4px;
+}
+
 .payment-meta-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -250,7 +260,8 @@ function resetDateTime() {
 }
 
 .hint-text {
-  margin-top: -8px;
+  margin-top: -12px;
+  margin-left: 12px;
 }
 
 @media (min-width: 560px) {
