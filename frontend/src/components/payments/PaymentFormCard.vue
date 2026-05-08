@@ -206,11 +206,11 @@ interface PaymentFormProps {
 const props = defineProps<PaymentFormProps>();
 
 const paymentFormData = ref<PaymentPayload>({
-  description: props.payload?.description || null,
-  amountCents: props.payload?.amountCents || 0,
-  method: props.payload?.method || "",
-  paymentDate: props.payload?.paymentDate || null,
-  receiptNumber: props.payload?.receiptNumber || "",
+  description: null,
+  amountCents: 0,
+  method: "",
+  paymentDate: null,
+  receiptNumber: "",
 });
 
 const paymentForm = ref<QForm | null>(null);
@@ -223,7 +223,14 @@ watch(
     if (!payload) return;
 
     paymentFormData.value = { ...payload };
+    if (payload.paymentDate) {
+      const [date, time] = payload.paymentDate.split("T");
+
+      datePart.value = date ? date : null;
+      timePart.value = time ? time.slice(0, 5) : null;
+    }
   },
+  { immediate: true },
 );
 
 const formTitle = props.selectedPayment
