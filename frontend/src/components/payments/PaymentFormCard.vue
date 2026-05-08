@@ -193,7 +193,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import type { Payment } from "src/models";
 import { type PaymentPayload } from "src/components/types";
 import { QForm } from "quasar";
@@ -216,6 +216,14 @@ const paymentFormData = ref<PaymentPayload>({
 const paymentForm = ref<QForm | null>(null);
 const datePart = ref<string | null>(null);
 const timePart = ref<string | null>(null);
+
+const paymentDate = computed(() => {
+  if (!datePart.value) return null;
+
+  const time = timePart.value || "00:00";
+  return new Date(`${datePart.value}T${time}:00`);
+});
+console.log(paymentDate.value);
 
 watch(
   () => props.payload,
