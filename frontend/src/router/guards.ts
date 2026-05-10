@@ -7,9 +7,7 @@ export const validateClientID: NavigationGuard = (to) => {
   }
 };
 
-export const validatePurchaseID: NavigationGuard = (to, from) => {
-  console.log(from);
-
+export const validatePurchaseID: NavigationGuard = (to) => {
   const id = Number(to.params.id);
   if (!Number.isInteger(id) || id <= 0) {
     return "/purchases";
