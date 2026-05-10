@@ -59,7 +59,7 @@ export type ClientPayload = {
 export type PaymentPayload = {
   description: string | null;
   amountCents: number;
-  paymentDate: string | null; // ISO date
+  paymentDate: number | null; // ISO date
   method: string;
   /** TODO: remove manual receipt number creation */
   receiptNumber: string; // REC-0001

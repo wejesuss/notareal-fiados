@@ -1,19 +1,26 @@
 export function formatDate(
-  value?: string,
+  value?: number | null,
   locale?: Intl.LocalesArgument,
   timeZone?: string,
   options?: Intl.DateTimeFormatOptions
 ): string {
-  if (!value) return "—";
+  if (value === null || value === undefined) return "—";
   if (!locale) locale = "pt-BR";
-  if (!timeZone) timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  if (options) {
-    timeZone = options.timeZone || timeZone;
+  const resolvedTimeZone =
+    options?.timeZone ||
+    timeZone ||
+    Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  const date =
+    typeof value === "number" ? new Date(value * 1000) : new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Data inválida";
   }
 
-  return new Date(value).toLocaleString(locale, {
-    timeZone,
+  return date.toLocaleString(locale, {
+    timeZone: resolvedTimeZone,
     ...options,
   });
 }

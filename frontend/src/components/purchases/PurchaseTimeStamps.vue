@@ -22,8 +22,8 @@ import { formatDate } from "src/utils/formatters";
 import { computed } from "vue";
 
 const props = defineProps<{
-  createdAt: string;
-  updatedAt: string;
+  createdAt: number;
+  updatedAt: number;
   labelStyle?: string;
   dateStyle?: string;
   compact?: boolean;

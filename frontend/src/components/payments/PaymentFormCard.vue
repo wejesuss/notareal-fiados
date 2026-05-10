@@ -232,7 +232,9 @@ watch(
 
     paymentFormData.value = { ...payload };
     if (payload.paymentDate) {
-      const [date, time] = payload.paymentDate.split("T");
+      const [date, time] = new Date(payload.paymentDate * 1000)
+        .toISOString()
+        .split("T");
 
       datePart.value = date ? date : null;
       timePart.value = time ? time.slice(0, 5) : null;

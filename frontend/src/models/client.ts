@@ -6,8 +6,8 @@ export interface Client {
   phone: string | null;
   email: string | null;
   isActive: boolean;
-  createdAt: string; // ISO date
-  updatedAt: string; // ISO date
+  createdAt: number;
+  updatedAt: number;
 }
 
 export interface ClientCreate {

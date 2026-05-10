@@ -9,8 +9,8 @@ export interface Purchase {
   status: PurchaseStatus;
   noteNumber: string; // NF-0001
   isActive: boolean;
-  createdAt: string; // ISO date
-  updatedAt: string; // ISO date
+  createdAt: number;
+  updatedAt: number;
 
   // computed float by pydantic
   total: number;

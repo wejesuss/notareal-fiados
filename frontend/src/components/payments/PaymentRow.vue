@@ -74,7 +74,7 @@ const emit = defineEmits<{
 }>();
 
 const paymentDate = formatDate(
-  props.payment.paymentDate || "",
+  props.payment.paymentDate,
   undefined,
   undefined,
   {

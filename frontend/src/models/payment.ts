@@ -3,12 +3,12 @@ export interface Payment {
   purchaseId: number;
   description: string | null;
   amountCents: number;
-  paymentDate: string | null; // ISO date
+  paymentDate: number | null;
   method: string;
   receiptNumber: string; // REC-0001
   isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: number;
+  updatedAt: number;
 
   // computed float by pydantic
   amount: number;
