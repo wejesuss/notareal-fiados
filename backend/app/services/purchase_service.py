@@ -1,5 +1,4 @@
 from typing import List
-from datetime import datetime
 from app.models import Purchase, Payment
 from app.services import payment_service, domain_validations
 from app.repositories import purchase_repository

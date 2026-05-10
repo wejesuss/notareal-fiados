@@ -1,5 +1,4 @@
 from typing import List
-from datetime import datetime
 from pydantic import BaseModel, Field
 from app.schemas.base import CamelModel
 from app.schemas.mixins import TotalsMixin
@@ -58,8 +57,8 @@ class PurchaseResponseSchema(CamelModel, TotalsMixin):
     status: PurchaseStatus
     note_number: str | None
     is_active: bool
-    created_at: datetime
-    updated_at: datetime
+    created_at: int
+    updated_at: int
 
     model_config = dict(from_attributes=True)
 

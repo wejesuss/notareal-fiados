@@ -20,8 +20,8 @@ def init_database():
             phone TEXT,
             email TEXT,
             is_active INTEGER DEFAULT 1,
-            created_at INTEGER,
-            updated_at INTEGER
+            created_at INTEGER NOT NULL,
+            updated_at INTEGER NOT NULL
         );
     """
     )
@@ -37,8 +37,8 @@ def init_database():
             status TEXT DEFAULT 'pending',
             note_number TEXT UNIQUE,
             is_active INTEGER DEFAULT 1,
-            created_at INTEGER,
-            updated_at INTEGER,
+            created_at INTEGER NOT NULL,
+            updated_at INTEGER NOT NULL,
 
             FOREIGN KEY (client_id) REFERENCES clients (id)
         );
@@ -57,7 +57,7 @@ def init_database():
             receipt_number TEXT UNIQUE,
             is_active INTEGER DEFAULT 1,
             created_at INTEGER NOT NULL,
-            updated_at INTEGER,
+            updated_at INTEGER NOT NULL,
 
             FOREIGN KEY (purchase_id) REFERENCES purchases (id)
         );
