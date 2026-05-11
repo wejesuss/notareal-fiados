@@ -50,16 +50,13 @@
               readonly
             >
               <template #append>
-                <q-icon name="event" class="cursor-pointer">
-                  <q-tooltip
-                    anchor="top middle"
-                    self="bottom middle"
-                    :delay="250"
-                    class="tooltip-medium"
-                  >
-                    Selecionar a data
-                  </q-tooltip>
-
+                <FieldHint
+                  icon="event"
+                  icon-size="sm"
+                  clickable
+                  tooltip="Selecionar a data"
+                  :tooltip-delay="{ delay: 250 }"
+                >
                   <q-popup-proxy
                     cover
                     transition-show="scale"
@@ -75,7 +72,7 @@
                       />
                     </q-date>
                   </q-popup-proxy>
-                </q-icon>
+                </FieldHint>
               </template>
             </q-input>
           </div>
@@ -89,15 +86,13 @@
               readonly
             >
               <template #append>
-                <q-icon name="schedule" class="cursor-pointer">
-                  <q-tooltip
-                    anchor="top middle"
-                    self="bottom middle"
-                    :delay="250"
-                    class="tooltip-medium"
-                  >
-                    Selecionar o horário
-                  </q-tooltip>
+                <FieldHint
+                  icon="schedule"
+                  icon-size="sm"
+                  clickable
+                  tooltip="Selecionar o horário"
+                  :tooltip-delay="{ delay: 250 }"
+                >
                   <q-popup-proxy
                     cover
                     transition-show="scale"
@@ -111,8 +106,9 @@
                         class="full-width"
                         @click="resetDateTime"
                       />
-                    </q-time> </q-popup-proxy
-                ></q-icon>
+                    </q-time>
+                  </q-popup-proxy>
+                </FieldHint>
               </template>
             </q-input>
           </div>
