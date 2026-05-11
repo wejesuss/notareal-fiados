@@ -15,16 +15,10 @@
             label="Descrição *"
           >
             <template #append>
-              <q-icon name="label_outline" size="xs">
-                <q-tooltip
-                  anchor="top middle"
-                  self="bottom middle"
-                  :delay="250"
-                  :hide-delay="150"
-                  class="tooltip-medium"
-                  >Descreva o pagamento</q-tooltip
-                >
-              </q-icon>
+              <FieldHint
+                icon="label_outline"
+                tooltip="Descreva o pagamento"
+              ></FieldHint>
             </template>
           </q-input>
         </div>
@@ -38,16 +32,10 @@
             label="Valor (R$)"
           >
             <template #append>
-              <q-icon name="attach_money" size="xs">
-                <q-tooltip
-                  anchor="top middle"
-                  self="bottom middle"
-                  :delay="250"
-                  :hide-delay="150"
-                  class="tooltip-medium"
-                  >Valor pago nesta transação.</q-tooltip
-                >
-              </q-icon>
+              <FieldHint
+                icon="attach_money"
+                tooltip="Valor pago nesta transação"
+              ></FieldHint>
             </template>
           </q-input>
         </div>
@@ -143,17 +131,11 @@
               label="Forma de pagamento"
             >
               <template #append>
-                <q-icon name="price_check" size="xs">
-                  <q-tooltip
-                    anchor="top middle"
-                    self="bottom middle"
-                    :delay="250"
-                    :hide-delay="150"
-                    class="tooltip-medium"
-                    >Forma de pagamento (ex: dinheiro, pix,
-                    transferência).</q-tooltip
-                  >
-                </q-icon>
+                <FieldHint
+                  icon="price_check"
+                  tooltip="Forma de pagamento (ex: dinheiro, pix, transferência)"
+                >
+                </FieldHint>
               </template>
             </q-input>
           </div>
@@ -168,16 +150,11 @@
               label="Número do recibo"
             >
               <template #append>
-                <q-icon name="receipt" size="xs">
-                  <q-tooltip
-                    anchor="top middle"
-                    self="bottom middle"
-                    :delay="250"
-                    :hide-delay="150"
-                    class="tooltip-medium"
-                    >Identificador único do pagamento (REC-***)</q-tooltip
-                  >
-                </q-icon>
+                <FieldHint
+                  icon="receipt"
+                  tooltip="Identificador único do pagamento (REC-***)"
+                >
+                </FieldHint>
               </template>
             </q-input>
           </div>
@@ -198,6 +175,7 @@ import { QForm } from "quasar";
 import type { Payment } from "src/models";
 import { type PaymentPayload } from "src/components/types";
 import { formatDateTime } from "src/utils/formatters";
+import { FieldHint } from "src/components/common";
 
 interface PaymentFormProps {
   payload?: PaymentPayload | null;
