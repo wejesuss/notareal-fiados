@@ -12,8 +12,7 @@ export function formatDate(
     timeZone ||
     Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  const date =
-    typeof value === "number" ? new Date(value * 1000) : new Date(value);
+  const date = new Date(value * 1000);
 
   if (Number.isNaN(date.getTime())) {
     return "Data inválida";
