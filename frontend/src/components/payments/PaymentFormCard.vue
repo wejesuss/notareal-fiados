@@ -194,9 +194,10 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
+import { QForm } from "quasar";
 import type { Payment } from "src/models";
 import { type PaymentPayload } from "src/components/types";
-import { QForm } from "quasar";
+import { formatDateTime } from "src/utils/formatters";
 
 interface PaymentFormProps {
   payload?: PaymentPayload | null;
@@ -232,12 +233,10 @@ watch(
 
     paymentFormData.value = { ...payload };
     if (payload.paymentDate) {
-      const [date, time] = new Date(payload.paymentDate * 1000)
-        .toISOString()
-        .split("T");
+      const [date, time] = formatDateTime(payload.paymentDate);
 
-      datePart.value = date ? date : null;
-      timePart.value = time ? time.slice(0, 5) : null;
+      datePart.value = date;
+      timePart.value = time;
     }
   },
   { immediate: true },
