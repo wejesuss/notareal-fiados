@@ -50,29 +50,10 @@
               readonly
             >
               <template #append>
-                <FieldHint
-                  icon="event"
-                  icon-size="sm"
-                  clickable
-                  tooltip="Selecionar a data"
-                  :tooltip-delay="{ delay: 250 }"
-                >
-                  <q-popup-proxy
-                    cover
-                    transition-show="scale"
-                    transition-hide="scale"
-                  >
-                    <q-date v-model="datePart" mask="YYYY-MM-DD">
-                      <q-btn
-                        flat
-                        color="grey-7"
-                        label="Limpar"
-                        class="full-width"
-                        @click="resetDateTime"
-                      />
-                    </q-date>
-                  </q-popup-proxy>
-                </FieldHint>
+                <DatePickerAppend
+                  v-model="datePart"
+                  @reset="resetDateTime"
+                ></DatePickerAppend>
               </template>
             </q-input>
           </div>
@@ -86,29 +67,10 @@
               readonly
             >
               <template #append>
-                <FieldHint
-                  icon="schedule"
-                  icon-size="sm"
-                  clickable
-                  tooltip="Selecionar o horário"
-                  :tooltip-delay="{ delay: 250 }"
-                >
-                  <q-popup-proxy
-                    cover
-                    transition-show="scale"
-                    transition-hide="scale"
-                  >
-                    <q-time v-model="timePart" format24h mask="HH:mm">
-                      <q-btn
-                        flat
-                        color="grey"
-                        label="Limpar"
-                        class="full-width"
-                        @click="resetDateTime"
-                      />
-                    </q-time>
-                  </q-popup-proxy>
-                </FieldHint>
+                <TimePickerAppend
+                  v-model="timePart"
+                  @reset="resetDateTime"
+                ></TimePickerAppend>
               </template>
             </q-input>
           </div>
@@ -172,6 +134,7 @@ import type { Payment } from "src/models";
 import { type PaymentPayload } from "src/components/types";
 import { formatDateTime } from "src/utils/formatters";
 import { FieldHint } from "src/components/common";
+import { DatePickerAppend, TimePickerAppend } from "src/components/payments";
 
 interface PaymentFormProps {
   payload?: PaymentPayload | null;
