@@ -27,9 +27,9 @@
           <q-input
             outlined
             color="secondary"
-            v-model="paymentFormData.amountCents"
-            debounce="300"
+            v-model="amountInput"
             label="Valor (R$)"
+            inputmode="numeric"
           >
             <template #append>
               <FieldHint
@@ -132,9 +132,13 @@ import { computed, ref, watch } from "vue";
 import { QForm } from "quasar";
 import type { Payment } from "src/models";
 import { type PaymentPayload } from "src/components/types";
-import { formatDateTime } from "src/utils/formatters";
 import { FieldHint } from "src/components/common";
 import { DatePickerAppend, TimePickerAppend } from "src/components/payments";
+import {
+  formatDateTime,
+  formatCurrency,
+  parseCurrencyToCents,
+} from "src/utils/formatters";
 
 interface PaymentFormProps {
   payload?: PaymentPayload | null;
@@ -162,6 +166,16 @@ const paymentDate = computed(() => {
   return new Date(`${datePart.value}T${time}:00`);
 });
 console.log(paymentDate.value);
+
+const amountInput = computed({
+  get() {
+    return formatCurrency(paymentFormData.value.amountCents / 100);
+  },
+
+  set(vl: string) {
+    paymentFormData.value.amountCents = parseCurrencyToCents(vl);
+  },
+});
 
 watch(
   () => props.payload,
