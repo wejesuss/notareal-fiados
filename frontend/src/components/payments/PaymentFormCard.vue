@@ -45,7 +45,7 @@
             <q-input
               outlined
               color="secondary"
-              v-model="datePart"
+              v-model="displayDate"
               label="Data do pagamento"
               readonly
             >
@@ -166,6 +166,13 @@ const paymentDate = computed(() => {
   return new Date(`${datePart.value}T${time}:00`);
 });
 console.log(paymentDate.value);
+const displayDate = computed(() => {
+  if (!datePart.value) return null;
+
+  const [year, month, day] = datePart.value.split("-");
+
+  return `${day}/${month}/${year}`;
+});
 
 const amountInput = computed({
   get() {
