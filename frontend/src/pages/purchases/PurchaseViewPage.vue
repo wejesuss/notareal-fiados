@@ -47,7 +47,11 @@
       @edit-payment="openPaymentModal"
     ></PaymentListCard>
 
-    <q-dialog :model-value="isPaymentModalOpen" @hide="cancelPaymentModal">
+    <q-dialog
+      :maximized="$q.screen.width < 480"
+      :model-value="isPaymentModalOpen"
+      @hide="cancelPaymentModal"
+    >
       <PaymentFormCard
         :payload="paymentFormData"
         :selected-payment="selectedPayment"
