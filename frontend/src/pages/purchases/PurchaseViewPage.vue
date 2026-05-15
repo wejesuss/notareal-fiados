@@ -54,7 +54,7 @@
     >
       <PaymentFormCard
         :payload="paymentFormData"
-        :selected-payment="selectedPayment"
+        :payment-id="selectedPayment?.id ?? null"
       >
         <q-btn flat label="Cancelar" v-close-popup />
       </PaymentFormCard>

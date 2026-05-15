@@ -140,7 +140,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { QForm } from "quasar";
-import type { Payment } from "src/models";
 import { type PaymentPayload } from "src/components/types";
 import { FieldHint } from "src/components/common";
 import { DatePickerAppend, TimePickerAppend } from "src/components/payments";
@@ -152,7 +151,7 @@ import {
 
 interface PaymentFormProps {
   payload?: PaymentPayload | null;
-  selectedPayment: Payment | null;
+  paymentId: number | null;
 }
 
 const props = defineProps<PaymentFormProps>();
@@ -211,11 +210,10 @@ watch(
   { immediate: true },
 );
 
-const formTitle = props.selectedPayment
-  ? "Editar Pagamento " + `(${props.selectedPayment.receiptNumber})`
+const isEditingPayment = !!props.paymentId;
+const formTitle = isEditingPayment
+  ? "Editar Pagamento " + `(${props.payload?.receiptNumber})`
   : "Novo Pagamento";
-
-const isEditingPayment = !!props.selectedPayment?.id;
 
 function resetDateTime() {
   datePart.value = null;
