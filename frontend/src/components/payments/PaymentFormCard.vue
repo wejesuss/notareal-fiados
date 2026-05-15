@@ -118,20 +118,10 @@
           </div>
         </div>
 
-        <div class="actions-container row items-center justify-between q-mt-xs">
-          <q-toggle
-            v-model="isActive"
-            checked-icon="check"
-            color="green"
-            :label="isActive ? 'Pagamento Ativo' : 'Pagamento Inativo'"
-            unchecked-icon="clear"
-          />
-
-          <q-card-actions align="right">
-            <slot></slot>
-            <q-btn color="primary" type="submit" label="Salvar" />
-          </q-card-actions>
-        </div>
+        <q-card-actions align="right">
+          <slot></slot>
+          <q-btn color="primary" type="submit" label="Salvar" />
+        </q-card-actions>
       </q-form>
     </q-card-section>
   </q-card>
@@ -164,7 +154,6 @@ const paymentFormData = ref<PaymentPayload>({
   receiptNumber: "",
 });
 
-const isActive = ref(false);
 const paymentForm = ref<QForm | null>(null);
 const datePart = ref<string | null>(null);
 const timePart = ref<string | null>(null);
@@ -250,12 +239,6 @@ function resetDateTime() {
 @media (min-width: 560px) {
   .payment-meta-grid {
     grid-template-columns: minmax(220px, 1fr) 1fr;
-  }
-}
-
-@media (max-width: 450px) {
-  .actions-container {
-    flex-direction: column;
   }
 }
 </style>

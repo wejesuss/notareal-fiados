@@ -56,6 +56,16 @@
         :payload="paymentFormData"
         :payment-id="selectedPayment?.id ?? null"
       >
+        <q-toggle
+          v-model="selectedPaymentIsActive"
+          checked-icon="check"
+          color="green"
+          :label="
+            selectedPaymentIsActive ? 'Pagamento Ativo' : 'Pagamento Inativo'
+          "
+          unchecked-icon="clear"
+          class="full-width"
+        />
         <q-btn flat label="Cancelar" v-close-popup />
       </PaymentFormCard>
     </q-dialog>
@@ -118,6 +128,7 @@ const paymentFormData = computed<PaymentPayload | null>(() => {
     receiptNumber: selectedPayment.value.receiptNumber,
   };
 });
+const selectedPaymentIsActive = ref<boolean>(false);
 
 watch(
   purchaseId,
@@ -185,6 +196,7 @@ function openPaymentModal(id?: number) {
     if (!paymentFound) return;
 
     selectedPayment.value = paymentFound;
+    selectedPaymentIsActive.value = paymentFound.isActive;
   }
 
   isPaymentModalOpen.value = true;
@@ -192,6 +204,7 @@ function openPaymentModal(id?: number) {
 
 function cancelPaymentModal() {
   selectedPayment.value = null;
+  selectedPaymentIsActive.value = false;
   isPaymentModalOpen.value = false;
 }
 
