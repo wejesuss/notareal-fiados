@@ -64,7 +64,7 @@
             selectedPaymentIsActive ? 'Pagamento Ativo' : 'Pagamento Inativo'
           "
           unchecked-icon="clear"
-          class="full-width"
+          :class="$q.screen.width < 480 ? 'full-width' : 'q-mr-lg'"
         />
         <q-btn flat label="Cancelar" v-close-popup />
       </PaymentFormCard>
