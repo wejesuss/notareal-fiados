@@ -120,7 +120,12 @@
 
         <q-card-actions align="right">
           <slot></slot>
-          <q-btn color="primary" type="submit" label="Salvar" />
+          <q-btn
+            color="primary"
+            type="submit"
+            label="Salvar"
+            @click.prevent="onSubmit"
+          />
         </q-card-actions>
       </q-form>
     </q-card-section>
@@ -145,6 +150,9 @@ interface PaymentFormProps {
 }
 
 const props = defineProps<PaymentFormProps>();
+const emit = defineEmits<{
+  submit: [id: number | null, payload: PaymentPayload];
+}>();
 
 const paymentFormData = ref<PaymentPayload>({
   description: null,
@@ -207,6 +215,30 @@ const formTitle = isEditingPayment
 function resetDateTime() {
   datePart.value = null;
   timePart.value = null;
+}
+
+function isValidDate(date: Date) {
+  return !Number.isNaN(date.getTime());
+}
+
+function onSubmit() {
+  const id = props.paymentId ?? null;
+
+  const isValidPaymentDate =
+    paymentDate.value !== null && isValidDate(paymentDate.value);
+  const paymentTimestamp = isValidPaymentDate
+    ? Math.floor(paymentDate.value.getTime() / 1000)
+    : null;
+
+  const payload: PaymentPayload = {
+    description: paymentFormData.value.description || null,
+    amountCents: paymentFormData.value.amountCents,
+    method: paymentFormData.value.method,
+    receiptNumber: paymentFormData.value.receiptNumber,
+    paymentDate: paymentTimestamp,
+  };
+
+  emit("submit", id, payload);
 }
 </script>
 

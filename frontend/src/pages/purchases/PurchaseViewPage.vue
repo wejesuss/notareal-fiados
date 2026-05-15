@@ -55,6 +55,7 @@
       <PaymentFormCard
         :payload="paymentFormData"
         :payment-id="selectedPayment?.id ?? null"
+        @submit="console.log"
       >
         <q-toggle
           v-model="selectedPaymentIsActive"
