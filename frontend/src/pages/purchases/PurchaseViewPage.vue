@@ -55,7 +55,7 @@
       <PaymentFormCard
         :payload="paymentFormData"
         :payment-id="selectedPayment?.id ?? null"
-        @submit="console.log"
+        @submit="onPaymentSubmit"
       >
         <q-toggle
           v-model="selectedPaymentIsActive"
@@ -209,4 +209,21 @@ function cancelPaymentModal() {
   isPaymentModalOpen.value = false;
 }
 
+function onPaymentSubmit(id: number | null, payload: PaymentPayload) {
+  if (!id) {
+    // create payment
+    return;
+  }
+
+  if (!selectedPayment.value) return;
+
+  const isActiveChanged =
+    selectedPayment.value.isActive !== selectedPaymentIsActive.value;
+  if (isActiveChanged) {
+    // call updatePaymentStatus(selectedPaymentIsActive.value)
+  }
+
+  // call updatePayment(id, payload)
+  console.log(payload);
+}
 </script>
