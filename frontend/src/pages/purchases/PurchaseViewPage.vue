@@ -209,7 +209,4 @@ function cancelPaymentModal() {
   isPaymentModalOpen.value = false;
 }
 
-setTimeout(() => {
-  openPaymentModal(6);
-}, 1000);
 </script>
