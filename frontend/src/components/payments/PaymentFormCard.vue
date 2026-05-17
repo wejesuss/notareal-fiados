@@ -13,6 +13,8 @@
             v-model="paymentFormData.description"
             debounce="300"
             label="Descrição *"
+            :rules="[required]"
+            hide-bottom-space
           >
             <template #append>
               <FieldHint
@@ -28,8 +30,10 @@
             outlined
             color="secondary"
             v-model="amountInput"
-            label="Valor (R$)"
+            label="Valor (R$) *"
             inputmode="numeric"
+            :rules="[amountRule]"
+            hide-bottom-space
           >
             <template #append>
               <FieldHint
@@ -221,7 +225,15 @@ function isValidDate(date: Date) {
   return !Number.isNaN(date.getTime());
 }
 
-function onSubmit() {
+const required = (val: string) => !!val?.trim() || false;
+const amountRule = () => paymentFormData.value.amountCents > 0;
+
+async function onSubmit() {
+  if (!paymentForm.value) return;
+
+  const valid = await paymentForm.value.validate(false);
+  if (!valid) return;
+
   const id = props.paymentId ?? null;
 
   const isValidPaymentDate =
@@ -231,9 +243,9 @@ function onSubmit() {
     : null;
 
   const payload: PaymentPayload = {
-    description: paymentFormData.value.description || null,
+    description: paymentFormData.value.description?.trim() || null,
     amountCents: paymentFormData.value.amountCents,
-    method: paymentFormData.value.method,
+    method: paymentFormData.value.method.trim(),
     receiptNumber: paymentFormData.value.receiptNumber,
     paymentDate: paymentTimestamp,
   };
