@@ -20,6 +20,11 @@ export type PaymentListParams = {
   offset?: number;
 };
 
+export type PaymentWithMessageResponse = {
+  message: string;
+  payment: Payment;
+};
+
 export type PaymentListResponse = {
   message: string;
   payments: Payment[];

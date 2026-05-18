@@ -77,7 +77,10 @@
 import { useQuasar } from "quasar";
 import { computed, ref, toRef, watch } from "vue";
 import { useRoute } from "vue-router";
-import { updatePurchaseActiveStatus } from "src/services";
+import {
+  updatePaymentActiveStatus,
+  updatePurchaseActiveStatus,
+} from "src/services";
 import { formatDate } from "src/utils/formatters";
 import {
   useActiveToggleConfirmation,
@@ -209,7 +212,7 @@ function cancelPaymentModal() {
   isPaymentModalOpen.value = false;
 }
 
-function onPaymentSubmit(id: number | null, payload: PaymentPayload) {
+async function onPaymentSubmit(id: number | null, payload: PaymentPayload) {
   if (!id) {
     // create payment
     return;
@@ -220,7 +223,11 @@ function onPaymentSubmit(id: number | null, payload: PaymentPayload) {
   const isActiveChanged =
     selectedPayment.value.isActive !== selectedPaymentIsActive.value;
   if (isActiveChanged) {
-    // call updatePaymentStatus(selectedPaymentIsActive.value)
+    await updatePaymentActiveStatus(
+      purchaseId.value,
+      id,
+      selectedPaymentIsActive.value,
+    );
   }
 
   // call updatePayment(id, payload)
