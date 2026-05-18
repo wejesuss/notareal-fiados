@@ -14,6 +14,13 @@ export interface Payment {
   amount: number;
 }
 
+export interface PaymentUpdate {
+  description?: string | null;
+  amountCents?: number;
+  paymentDate?: number | null;
+  method?: string;
+}
+
 // API models
 export type PaymentListParams = {
   limit?: number;

@@ -1,6 +1,7 @@
 import type {
   PaymentListParams,
   PaymentListResponse,
+  PaymentUpdate,
   PaymentWithMessageResponse,
 } from "src/models";
 import { api } from "src/api/api";
@@ -51,4 +52,17 @@ export async function updatePaymentActiveStatus(
   }
 
   return response;
+}
+
+export async function updatePayment(
+  purchaseId: number,
+  id: number,
+  payload: PaymentUpdate
+): Promise<PaymentWithMessageResponse> {
+  const { data } = await api.put<PaymentWithMessageResponse>(
+    `/purchases/${purchaseId}/payments/${id}`,
+    payload
+  );
+
+  return data;
 }

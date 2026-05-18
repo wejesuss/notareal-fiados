@@ -78,8 +78,9 @@ import { useQuasar } from "quasar";
 import { computed, ref, toRef, watch } from "vue";
 import { useRoute } from "vue-router";
 import {
-  updatePaymentActiveStatus,
   updatePurchaseActiveStatus,
+  updatePayment,
+  updatePaymentActiveStatus,
 } from "src/services";
 import { formatDate } from "src/utils/formatters";
 import {
@@ -95,6 +96,8 @@ import { ContentState } from "src/components/common";
 import { PurchaseDetailsCard } from "src/components/purchases";
 import { PaymentFormCard, PaymentListCard } from "src/components/payments";
 import { dialogConfig, notifyConfig } from "src/config/purchases/dialogs";
+import { isShallowEqual } from "src/utils/checkers/isShalowEqual";
+import { APIError } from "src/api/errors";
 
 const $route = useRoute();
 const { notify } = useQuasar();
@@ -103,7 +106,12 @@ const purchaseId = computed(() => {
   const id = Number($route.params.id);
   return Number.isInteger(id) && id > 0 ? id : 0;
 });
-const { loading, error, purchase } = usePurchaseDetails(toRef(purchaseId));
+const {
+  loading,
+  error,
+  purchase,
+  reload: reloadPurchase,
+} = usePurchaseDetails(toRef(purchaseId));
 const clientId = computed(() => purchase.value?.clientId || 0);
 const { client } = useClientDetails(toRef(clientId));
 const {
@@ -213,24 +221,36 @@ function cancelPaymentModal() {
 }
 
 async function onPaymentSubmit(id: number | null, payload: PaymentPayload) {
-  if (!id) {
-    // create payment
-    return;
+  try {
+    if (!id) {
+      // create payment
+      return;
+    }
+
+    if (!selectedPayment.value || !paymentFormData.value) return;
+
+    const isActiveChanged =
+      selectedPayment.value.isActive !== selectedPaymentIsActive.value;
+    if (isActiveChanged) {
+      await updatePaymentActiveStatus(
+        purchaseId.value,
+        id,
+        selectedPaymentIsActive.value,
+      );
+    }
+
+    const isFormDirty = !isShallowEqual(paymentFormData.value, payload);
+    if (isFormDirty) {
+      await updatePayment(purchaseId.value, id, payload);
+    }
+
+    if (isActiveChanged || isFormDirty) {
+      await Promise.allSettled([reloadPurchase(), reloadPayments()]);
+    }
+  } catch (err) {
+    if (err instanceof APIError) {
+      notify({ type: "negative", message: err.message });
+    }
   }
-
-  if (!selectedPayment.value) return;
-
-  const isActiveChanged =
-    selectedPayment.value.isActive !== selectedPaymentIsActive.value;
-  if (isActiveChanged) {
-    await updatePaymentActiveStatus(
-      purchaseId.value,
-      id,
-      selectedPaymentIsActive.value,
-    );
-  }
-
-  // call updatePayment(id, payload)
-  console.log(payload);
 }
 </script>
