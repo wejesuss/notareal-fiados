@@ -37,9 +37,7 @@ export async function createPayment(
 ): Promise<PaymentWithMessageResponse> {
   const { data } = await api.post<PaymentWithMessageResponse>(
     `/purchases/${purchaseId}/payments`,
-    {
-      ...payload,
-    }
+    payload
   );
 
   return data;
