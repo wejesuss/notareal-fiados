@@ -12,8 +12,7 @@
             color="secondary"
             v-model="paymentFormData.description"
             debounce="300"
-            label="Descrição *"
-            :rules="[required]"
+            label="Descrição"
             hide-bottom-space
           >
             <template #append>
@@ -176,7 +175,6 @@ const paymentDate = computed(() => {
   const time = timePart.value || "00:00";
   return new Date(`${datePart.value}T${time}:00`);
 });
-console.log(paymentDate.value);
 const displayDate = computed(() => {
   if (!datePart.value) return null;
 
@@ -225,7 +223,6 @@ function isValidDate(date: Date) {
   return !Number.isNaN(date.getTime());
 }
 
-const required = (val: string) => !!val?.trim() || false;
 const amountRule = () => paymentFormData.value.amountCents > 0;
 
 async function onSubmit() {
