@@ -89,7 +89,9 @@
               color="secondary"
               v-model="paymentFormData.method"
               debounce="300"
-              label="Forma de pagamento"
+              label="Forma de pagamento *"
+              :rules="[required]"
+              hide-bottom-space
             >
               <template #append>
                 <FieldHint
@@ -223,6 +225,7 @@ function isValidDate(date: Date) {
   return !Number.isNaN(date.getTime());
 }
 
+const required = (val: string) => !!val?.trim() || false;
 const amountRule = () => paymentFormData.value.amountCents > 0;
 
 async function onSubmit() {
