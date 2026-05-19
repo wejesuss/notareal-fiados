@@ -1,4 +1,5 @@
 import type {
+  PaymentCreate,
   PaymentListParams,
   PaymentListResponse,
   PaymentUpdate,
@@ -24,6 +25,20 @@ export async function getPurchasePayments({
     `/purchases/${purchaseId}/payments`,
     {
       params,
+    }
+  );
+
+  return data;
+}
+
+export async function createPayment(
+  purchaseId: number,
+  payload: PaymentCreate
+): Promise<PaymentWithMessageResponse> {
+  const { data } = await api.post<PaymentWithMessageResponse>(
+    `/purchases/${purchaseId}/payments`,
+    {
+      ...payload,
     }
   );
 

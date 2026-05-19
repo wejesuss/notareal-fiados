@@ -14,6 +14,14 @@ export interface Payment {
   amount: number;
 }
 
+export interface PaymentCreate {
+  description?: string | null;
+  amountCents: number;
+  paymentDate?: number | null;
+  method: string;
+  receiptNumber?: string;
+}
+
 export interface PaymentUpdate {
   description?: string | null;
   amountCents?: number;

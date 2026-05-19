@@ -50,7 +50,7 @@
     <q-dialog
       :maximized="$q.screen.width < 480"
       :model-value="isPaymentModalOpen"
-      @hide="cancelPaymentModal"
+      @hide="closePaymentModal"
     >
       <PaymentFormCard
         :payload="paymentFormData"
@@ -79,6 +79,7 @@ import { computed, ref, toRef, watch } from "vue";
 import { useRoute } from "vue-router";
 import {
   updatePurchaseActiveStatus,
+  createPayment,
   updatePayment,
   updatePaymentActiveStatus,
 } from "src/services";
@@ -214,7 +215,7 @@ function openPaymentModal(id?: number) {
   isPaymentModalOpen.value = true;
 }
 
-function cancelPaymentModal() {
+function closePaymentModal() {
   selectedPayment.value = null;
   selectedPaymentIsActive.value = false;
   isPaymentModalOpen.value = false;
@@ -223,7 +224,9 @@ function cancelPaymentModal() {
 async function onPaymentSubmit(id: number | null, payload: PaymentPayload) {
   try {
     if (!id) {
-      // create payment
+      await createPayment(purchaseId.value, payload);
+      await Promise.allSettled([reloadPurchase(), reloadPayments()]);
+      closePaymentModal();
       return;
     }
 
@@ -246,6 +249,7 @@ async function onPaymentSubmit(id: number | null, payload: PaymentPayload) {
 
     if (isActiveChanged || isFormDirty) {
       await Promise.allSettled([reloadPurchase(), reloadPayments()]);
+      closePaymentModal();
     }
   } catch (err) {
     if (err instanceof APIError) {
