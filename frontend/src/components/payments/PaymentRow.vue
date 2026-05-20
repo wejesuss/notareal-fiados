@@ -107,6 +107,10 @@ const paymentDate = formatDate(
   border-color: #e5e5e5;
 }
 
+.payment-item-negative .payment-description {
+  opacity: 0.72;
+}
+
 .payment-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
