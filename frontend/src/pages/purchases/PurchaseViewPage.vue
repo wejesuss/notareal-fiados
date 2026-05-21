@@ -54,15 +54,16 @@
     >
       <PaymentFormCard
         :payload="paymentFormData"
-        :mode="paymentModalMode"
+        :mode="paymentModalState.mode"
         @submit="onPaymentSubmit"
       >
         <q-toggle
-          v-model="selectedPaymentIsActive"
+          v-if="paymentModalState.mode === 'edit'"
+          v-model="paymentModalState.isActive"
           checked-icon="check"
           color="green"
           :label="
-            selectedPaymentIsActive ? 'Pagamento Ativo' : 'Pagamento Inativo'
+            paymentModalState.isActive ? 'Pagamento Ativo' : 'Pagamento Inativo'
           "
           unchecked-icon="clear"
           :class="$q.screen.width < 480 ? 'full-width' : 'q-mr-lg'"
@@ -128,21 +129,23 @@ const { submitting, isActive, submitDialog } = useActiveToggleConfirmation(
   submit,
 );
 
-const paymentModalMode = ref<"create" | "edit">("create");
-const selectedPayment = ref<Payment | null>(null);
+type PaymentModalState =
+  | { mode: "create" }
+  | { mode: "edit"; payment: Payment; isActive: boolean };
+
 const isPaymentModalOpen = ref(false);
+const paymentModalState = ref<PaymentModalState>({ mode: "create" });
 const paymentFormData = computed<PaymentPayload | null>(() => {
-  if (!selectedPayment.value) return null;
+  if (paymentModalState.value.mode === "create") return null;
 
   return {
-    description: selectedPayment.value.description,
-    amountCents: selectedPayment.value.amountCents,
-    method: selectedPayment.value.method,
-    paymentDate: selectedPayment.value.paymentDate,
-    receiptNumber: selectedPayment.value.receiptNumber,
+    description: paymentModalState.value.payment.description,
+    amountCents: paymentModalState.value.payment.amountCents,
+    method: paymentModalState.value.payment.method,
+    paymentDate: paymentModalState.value.payment.paymentDate,
+    receiptNumber: paymentModalState.value.payment.receiptNumber,
   };
 });
-const selectedPaymentIsActive = ref<boolean>(false);
 
 watch(
   purchaseId,
@@ -203,58 +206,58 @@ async function submit(nextValue: boolean) {
 }
 
 function openPaymentModal(id?: number) {
-  if (selectedPayment.value) return;
+  if (isPaymentModalOpen.value) return;
 
   if (id) {
     const paymentFound = payments.value.find((p) => p.id === id);
     if (!paymentFound) return;
 
-    paymentModalMode.value = "edit";
-    selectedPayment.value = paymentFound;
-    selectedPaymentIsActive.value = paymentFound.isActive;
+    paymentModalState.value = {
+      mode: "edit",
+      payment: paymentFound,
+      isActive: paymentFound.isActive,
+    };
   } else {
-    paymentModalMode.value = "create";
+    paymentModalState.value = { mode: "create" };
   }
 
   isPaymentModalOpen.value = true;
 }
 
 function closePaymentModal() {
-  paymentModalMode.value = "create";
-  selectedPayment.value = null;
-  selectedPaymentIsActive.value = false;
+  paymentModalState.value = { mode: "create" };
   isPaymentModalOpen.value = false;
 }
 
 async function onPaymentSubmit(payload: PaymentPayload) {
   try {
-    if (paymentModalMode.value === "create") {
+    const modalState = paymentModalState.value;
+    if (modalState.mode === "create") {
       await createPayment(purchaseId.value, payload);
       await Promise.allSettled([reloadPurchase(), reloadPayments()]);
       closePaymentModal();
-      return;
-    }
+    } else {
+      const isActiveChanged =
+        modalState.payment.isActive !== modalState.isActive;
+      if (isActiveChanged) {
+        await updatePaymentActiveStatus(
+          purchaseId.value,
+          modalState.payment.id,
+          modalState.isActive,
+        );
+      }
 
-    if (!selectedPayment.value || !paymentFormData.value) return;
+      const isFormDirty =
+        paymentFormData.value &&
+        !isShallowEqual(paymentFormData.value, payload);
+      if (isFormDirty) {
+        await updatePayment(purchaseId.value, modalState.payment.id, payload);
+      }
 
-    const isActiveChanged =
-      selectedPayment.value.isActive !== selectedPaymentIsActive.value;
-    if (isActiveChanged) {
-      await updatePaymentActiveStatus(
-        purchaseId.value,
-        selectedPayment.value.id,
-        selectedPaymentIsActive.value,
-      );
-    }
-
-    const isFormDirty = !isShallowEqual(paymentFormData.value, payload);
-    if (isFormDirty) {
-      await updatePayment(purchaseId.value, selectedPayment.value.id, payload);
-    }
-
-    if (isActiveChanged || isFormDirty) {
-      await Promise.allSettled([reloadPurchase(), reloadPayments()]);
-      closePaymentModal();
+      if (isActiveChanged || isFormDirty) {
+        await Promise.allSettled([reloadPurchase(), reloadPayments()]);
+        closePaymentModal();
+      }
     }
   } catch (err) {
     if (err instanceof APIError) {
