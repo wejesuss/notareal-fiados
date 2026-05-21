@@ -159,13 +159,14 @@ const emit = defineEmits<{
   submit: [payload: PaymentPayload];
 }>();
 
-const paymentFormData = ref<PaymentPayload>({
+const createDefaultPaymentData = () => ({
   description: null,
   amountCents: 0,
   method: "",
   paymentDate: null,
   receiptNumber: "",
 });
+const paymentFormData = ref<PaymentPayload>(createDefaultPaymentData());
 
 const paymentForm = ref<QForm | null>(null);
 const datePart = ref<string | null>(null);
@@ -198,7 +199,11 @@ const amountInput = computed({
 watch(
   () => props.payload,
   (payload) => {
-    if (!payload) return;
+    if (!payload) {
+      paymentFormData.value = createDefaultPaymentData();
+      resetDateTime();
+      return;
+    }
 
     paymentFormData.value = { ...payload };
     if (payload.paymentDate) {
