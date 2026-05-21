@@ -151,12 +151,12 @@ import {
 
 interface PaymentFormProps {
   payload?: PaymentPayload | null;
-  paymentId: number | null;
+  mode: "create" | "edit";
 }
 
 const props = defineProps<PaymentFormProps>();
 const emit = defineEmits<{
-  submit: [id: number | null, payload: PaymentPayload];
+  submit: [payload: PaymentPayload];
 }>();
 
 const paymentFormData = ref<PaymentPayload>({
@@ -211,7 +211,7 @@ watch(
   { immediate: true },
 );
 
-const isEditingPayment = !!props.paymentId;
+const isEditingPayment = props.mode === "edit";
 const formTitle = isEditingPayment
   ? "Editar Pagamento " + `(${props.payload?.receiptNumber})`
   : "Novo Pagamento";
@@ -234,8 +234,6 @@ async function onSubmit() {
   const valid = await paymentForm.value.validate(false);
   if (!valid) return;
 
-  const id = props.paymentId ?? null;
-
   const isValidPaymentDate =
     paymentDate.value !== null && isValidDate(paymentDate.value);
   const paymentTimestamp = isValidPaymentDate
@@ -250,7 +248,7 @@ async function onSubmit() {
     paymentDate: paymentTimestamp,
   };
 
-  emit("submit", id, payload);
+  emit("submit", payload);
 }
 </script>
 

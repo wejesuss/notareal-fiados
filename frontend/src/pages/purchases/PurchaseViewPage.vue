@@ -54,7 +54,7 @@
     >
       <PaymentFormCard
         :payload="paymentFormData"
-        :payment-id="selectedPayment?.id ?? null"
+        :mode="paymentModalMode"
         @submit="onPaymentSubmit"
       >
         <q-toggle
@@ -128,6 +128,7 @@ const { submitting, isActive, submitDialog } = useActiveToggleConfirmation(
   submit,
 );
 
+const paymentModalMode = ref<"create" | "edit">("create");
 const selectedPayment = ref<Payment | null>(null);
 const isPaymentModalOpen = ref(false);
 const paymentFormData = computed<PaymentPayload | null>(() => {
@@ -208,22 +209,26 @@ function openPaymentModal(id?: number) {
     const paymentFound = payments.value.find((p) => p.id === id);
     if (!paymentFound) return;
 
+    paymentModalMode.value = "edit";
     selectedPayment.value = paymentFound;
     selectedPaymentIsActive.value = paymentFound.isActive;
+  } else {
+    paymentModalMode.value = "create";
   }
 
   isPaymentModalOpen.value = true;
 }
 
 function closePaymentModal() {
+  paymentModalMode.value = "create";
   selectedPayment.value = null;
   selectedPaymentIsActive.value = false;
   isPaymentModalOpen.value = false;
 }
 
-async function onPaymentSubmit(id: number | null, payload: PaymentPayload) {
+async function onPaymentSubmit(payload: PaymentPayload) {
   try {
-    if (!id) {
+    if (paymentModalMode.value === "create") {
       await createPayment(purchaseId.value, payload);
       await Promise.allSettled([reloadPurchase(), reloadPayments()]);
       closePaymentModal();
@@ -237,14 +242,14 @@ async function onPaymentSubmit(id: number | null, payload: PaymentPayload) {
     if (isActiveChanged) {
       await updatePaymentActiveStatus(
         purchaseId.value,
-        id,
+        selectedPayment.value.id,
         selectedPaymentIsActive.value,
       );
     }
 
     const isFormDirty = !isShallowEqual(paymentFormData.value, payload);
     if (isFormDirty) {
-      await updatePayment(purchaseId.value, id, payload);
+      await updatePayment(purchaseId.value, selectedPayment.value.id, payload);
     }
 
     if (isActiveChanged || isFormDirty) {
