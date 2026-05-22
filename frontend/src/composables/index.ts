@@ -19,3 +19,4 @@ export * from "./purchases/useClientRecentPurchases";
 export * from "./purchases/useClientPurchases";
 
 export * from "./payments/usePurchasePayments";
+export * from "./payments/usePaymentModal";

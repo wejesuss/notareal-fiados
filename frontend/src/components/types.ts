@@ -1,5 +1,5 @@
 import type { QCardActionsProps, QIconProps } from "quasar";
-import type { Purchase } from "src/models";
+import type { Payment, Purchase } from "src/models";
 
 export interface SystemOverviewCardProps {
   /**
@@ -64,6 +64,10 @@ export interface PaymentPayload {
   /** TODO: remove manual receipt number creation */
   receiptNumber: string; // REC-0001
 }
+
+export type PaymentModalState =
+  | { mode: "create" }
+  | { mode: "edit"; payment: Payment; isActive: boolean };
 
 export interface PurchaseStatusUI {
   label: string;

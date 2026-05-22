@@ -43,28 +43,26 @@
       :loading="paymentsLoading"
       :error="paymentsError"
       :payments="payments"
-      @create-payment="openCreatePaymentModal"
+      @create-payment="openCreate"
       @edit-payment="openEditPaymentModal"
     ></PaymentListCard>
 
     <q-dialog
       :maximized="$q.screen.width < 480"
-      :model-value="isPaymentModalOpen"
-      @hide="closePaymentModal"
+      :model-value="isOpen"
+      @hide="close"
     >
       <PaymentFormCard
-        :payload="paymentFormData"
-        :mode="paymentModalState.mode"
+        :payload="formData"
+        :mode="state.mode"
         @submit="onPaymentSubmit"
       >
         <q-toggle
-          v-if="paymentModalState.mode === 'edit'"
-          v-model="paymentModalState.isActive"
+          v-if="state.mode === 'edit'"
+          v-model="state.isActive"
           checked-icon="check"
           color="green"
-          :label="
-            paymentModalState.isActive ? 'Pagamento Ativo' : 'Pagamento Inativo'
-          "
+          :label="state.isActive ? 'Pagamento Ativo' : 'Pagamento Inativo'"
           unchecked-icon="clear"
           :class="$q.screen.width < 480 ? 'full-width' : 'q-mr-lg'"
         />
@@ -76,14 +74,9 @@
 
 <script setup lang="ts">
 import { useQuasar } from "quasar";
-import { computed, ref, toRef, watch } from "vue";
+import { computed, toRef, watch } from "vue";
 import { useRoute } from "vue-router";
-import {
-  updatePurchaseActiveStatus,
-  createPayment,
-  updatePayment,
-  updatePaymentActiveStatus,
-} from "src/services";
+import { updatePurchaseActiveStatus } from "src/services";
 import { formatDate } from "src/utils/formatters";
 import {
   useActiveToggleConfirmation,
@@ -91,15 +84,14 @@ import {
   useNavigation,
   usePurchaseDetails,
   usePurchasePayments,
+  usePaymentModal,
 } from "src/composables";
-import type { Payment } from "src/models";
 import { type PaymentPayload } from "src/components/types";
 import { ContentState } from "src/components/common";
 import { PurchaseDetailsCard } from "src/components/purchases";
 import { PaymentFormCard, PaymentListCard } from "src/components/payments";
 import { dialogConfig, notifyConfig } from "src/config/purchases/dialogs";
-import { isShallowEqual } from "src/utils/checkers/isShalowEqual";
-import { APIError } from "src/api/errors";
+import type { APIError } from "src/api/errors";
 
 const $route = useRoute();
 const { notify } = useQuasar();
@@ -128,24 +120,8 @@ const { submitting, isActive, submitDialog } = useActiveToggleConfirmation(
   notifyConfig,
   submit,
 );
-
-type PaymentModalState =
-  | { mode: "create" }
-  | { mode: "edit"; payment: Payment; isActive: boolean };
-
-const isPaymentModalOpen = ref(false);
-const paymentModalState = ref<PaymentModalState>({ mode: "create" });
-const paymentFormData = computed<PaymentPayload | null>(() => {
-  if (paymentModalState.value.mode === "create") return null;
-
-  return {
-    description: paymentModalState.value.payment.description,
-    amountCents: paymentModalState.value.payment.amountCents,
-    method: paymentModalState.value.payment.method,
-    paymentDate: paymentModalState.value.payment.paymentDate,
-    receiptNumber: paymentModalState.value.payment.receiptNumber,
-  };
-});
+const { isOpen, state, formData, openCreate, openEdit, close, submitPayment } =
+  usePaymentModal(purchaseId);
 
 watch(
   purchaseId,
@@ -205,67 +181,22 @@ async function submit(nextValue: boolean) {
   }
 }
 
-function openCreatePaymentModal() {
-  if (isPaymentModalOpen.value) return;
-
-  paymentModalState.value = { mode: "create" };
-  isPaymentModalOpen.value = true;
-}
-
 function openEditPaymentModal(id: number) {
-  if (isPaymentModalOpen.value) return;
-
   const paymentFound = payments.value.find((p) => p.id === id);
   if (!paymentFound) return;
 
-  paymentModalState.value = {
-    mode: "edit",
-    payment: paymentFound,
-    isActive: paymentFound.isActive,
-  };
-
-  isPaymentModalOpen.value = true;
+  openEdit(paymentFound);
 }
 
-function closePaymentModal() {
-  paymentModalState.value = { mode: "create" };
-  isPaymentModalOpen.value = false;
+async function reloadAll() {
+  await Promise.allSettled([reloadPurchase(), reloadPayments()]);
+}
+
+function onError(err: APIError) {
+  notify({ type: "negative", message: err.message });
 }
 
 async function onPaymentSubmit(payload: PaymentPayload) {
-  try {
-    const modalState = paymentModalState.value;
-    if (modalState.mode === "create") {
-      await createPayment(purchaseId.value, payload);
-      await Promise.allSettled([reloadPurchase(), reloadPayments()]);
-      closePaymentModal();
-    } else {
-      const isActiveChanged =
-        modalState.payment.isActive !== modalState.isActive;
-      if (isActiveChanged) {
-        await updatePaymentActiveStatus(
-          purchaseId.value,
-          modalState.payment.id,
-          modalState.isActive,
-        );
-      }
-
-      const isFormDirty =
-        paymentFormData.value &&
-        !isShallowEqual(paymentFormData.value, payload);
-      if (isFormDirty) {
-        await updatePayment(purchaseId.value, modalState.payment.id, payload);
-      }
-
-      if (isActiveChanged || isFormDirty) {
-        await Promise.allSettled([reloadPurchase(), reloadPayments()]);
-        closePaymentModal();
-      }
-    }
-  } catch (err) {
-    if (err instanceof APIError) {
-      notify({ type: "negative", message: err.message });
-    }
-  }
+  await submitPayment(payload, reloadAll, onError);
 }
 </script>
