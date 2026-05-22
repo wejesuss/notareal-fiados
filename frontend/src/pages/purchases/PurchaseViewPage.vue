@@ -43,8 +43,8 @@
       :loading="paymentsLoading"
       :error="paymentsError"
       :payments="payments"
-      @create-payment="openPaymentModal"
-      @edit-payment="openPaymentModal"
+      @create-payment="openCreatePaymentModal"
+      @edit-payment="openEditPaymentModal"
     ></PaymentListCard>
 
     <q-dialog
@@ -205,21 +205,24 @@ async function submit(nextValue: boolean) {
   }
 }
 
-function openPaymentModal(id?: number) {
+function openCreatePaymentModal() {
   if (isPaymentModalOpen.value) return;
 
-  if (id) {
-    const paymentFound = payments.value.find((p) => p.id === id);
-    if (!paymentFound) return;
+  paymentModalState.value = { mode: "create" };
+  isPaymentModalOpen.value = true;
+}
 
-    paymentModalState.value = {
-      mode: "edit",
-      payment: paymentFound,
-      isActive: paymentFound.isActive,
-    };
-  } else {
-    paymentModalState.value = { mode: "create" };
-  }
+function openEditPaymentModal(id: number) {
+  if (isPaymentModalOpen.value) return;
+
+  const paymentFound = payments.value.find((p) => p.id === id);
+  if (!paymentFound) return;
+
+  paymentModalState.value = {
+    mode: "edit",
+    payment: paymentFound,
+    isActive: paymentFound.isActive,
+  };
 
   isPaymentModalOpen.value = true;
 }
