@@ -5,9 +5,10 @@ import {
   updatePaymentActiveStatus,
 } from "src/services";
 import type { Payment } from "src/models";
-import type { PaymentModalState, PaymentPayload } from "src/components/types";
+import type { PaymentPayload } from "src/components/types";
 import { isShallowEqual } from "src/utils/checkers/isShalowEqual";
 import { APIError } from "src/api/errors";
+import type { PaymentModalState } from "src/types/payments";
 
 export function usePaymentModal(purchaseId: Ref<number>) {
   const isOpen = ref(false);
