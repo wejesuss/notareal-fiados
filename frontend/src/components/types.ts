@@ -49,24 +49,33 @@ export interface RegistryCardProps {
   recentRegistries: Array<RecentRegistry>;
 }
 
-export type ClientPayload = {
+export interface ClientPayload {
   name: string;
   nickname: string | null;
   phone: string | null;
   email: string | null;
-};
+}
 
-export type PurchaseStatusUI = {
+export interface PaymentPayload {
+  description: string | null;
+  amountCents: number;
+  paymentDate: number | null;
+  method: string;
+  /** TODO: remove manual receipt number creation */
+  receiptNumber: string; // REC-0001
+}
+
+export interface PurchaseStatusUI {
   label: string;
   color: string;
   textColor: string;
-};
+}
 
-export type PurchaseActiveStatusUI = {
+export interface PurchaseActiveStatusUI {
   label: string;
   color: string;
   textColor: string;
-};
+}
 
 export type PurchaseUI = Purchase & {
   statusUI: PurchaseStatusUI;

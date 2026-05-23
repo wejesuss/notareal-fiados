@@ -61,28 +61,29 @@
 import { computed, ref, watch } from "vue";
 import { useQuasar } from "quasar";
 import { useRoute } from "vue-router";
-import type { ClientUpdate } from "src/models";
 import type { ClientPayload } from "src/components/types";
-import { updateClient } from "src/services";
 import { ClientForm } from "src/components/clients";
 import {
   useNavigation,
   useClientDetails,
   useDisableConfirmation,
+  useUpdateClient,
 } from "src/composables";
 import { dialogConfig } from "src/config/clients/dialogs";
 import { ContentState } from "src/components/common";
-import { isShallowEqual } from "src/utils/checkers/isShalowEqual";
 
 const $route = useRoute();
 const { navigateTo } = useNavigation();
 const $q = useQuasar();
 
-const id = computed(() => Number($route.params.id));
+const id = computed(() => {
+  const value = Number($route.params.id);
+  return Number.isInteger(value) && value > 0 ? value : 0;
+});
 const { loading, error, client } = useClientDetails(id);
 const { confirmDisable } = useDisableConfirmation();
+const { submitting, update } = useUpdateClient();
 const isActive = ref(false);
-const submitting = ref(false);
 
 const clientFormPayload = computed((): ClientPayload => {
   return {
@@ -93,20 +94,30 @@ const clientFormPayload = computed((): ClientPayload => {
   };
 });
 
-async function handleClientLoadError(e: Error) {
+async function handleClientError(message: string) {
   $q.notify({
     type: "negative",
-    message: e.message || "Cliente não encontrado",
+    message,
   });
   await navigateTo("/clients");
 }
 
 watch(
-  client,
-  (newClient) => {
-    if (!newClient) return;
+  id,
+  async (clientId) => {
+    if (clientId <= 0) {
+      await handleClientError("Identificador do cliente inválido!");
+    }
+  },
+  { immediate: true },
+);
 
-    isActive.value = newClient.isActive;
+watch(
+  () => client.value?.isActive,
+  (clientIsActive) => {
+    if (clientIsActive !== undefined) {
+      isActive.value = clientIsActive;
+    }
   },
   { immediate: true },
 );
@@ -114,7 +125,7 @@ watch(
 watch(error, async (err) => {
   if (!err) return;
 
-  await handleClientLoadError(err);
+  await handleClientError(err.message || "Cliente não encontrado");
 });
 
 async function toggleIsActive(nextValue: boolean) {
@@ -127,56 +138,42 @@ async function toggleIsActive(nextValue: boolean) {
   isActive.value = nextValue;
 }
 
-function isFormDirty(formData: ClientPayload) {
-  if (!client.value) return false;
-
-  const original: ClientPayload = clientFormPayload.value;
-
-  return !isShallowEqual(original, formData);
-}
-
 async function submit(formData: ClientPayload) {
-  if (submitting.value) return;
+  if (!client.value) return;
 
-  try {
-    submitting.value = true;
+  const response = await update(
+    id.value,
+    { data: clientFormPayload.value, isActive: client.value.isActive },
+    { data: formData, isActive: isActive.value },
+  );
 
-    const isActiveChanged = client.value?.isActive !== isActive.value;
+  if (!response) return;
 
-    if (!isActiveChanged && !isFormDirty(formData)) {
-      $q.notify({
-        type: "info",
-        message: "Nenhuma alteração para salvar",
-      });
-
-      return;
-    }
-
-    const payload: ClientUpdate = {
-      ...formData,
-      ...(isActiveChanged && {
-        isActive: isActive.value,
-      }),
-    };
-
-    await updateClient(id.value, payload);
-
+  if (response.skipped) {
     $q.notify({
-      type: "positive",
-      message: "Cliente atualizado com sucesso",
+      type: "info",
+      message: "Nenhuma alteração para salvar",
+      color: "light-blue-8",
     });
 
-    await navigateTo(`/clients/${id.value}`);
-  } catch (err) {
-    if (err instanceof Error) {
-      $q.notify({
-        type: "negative",
-        message: err.message || "Erro ao atualizar Cliente",
-      });
-    }
-  } finally {
-    submitting.value = false;
+    return;
   }
+
+  if (response.error) {
+    $q.notify({
+      type: response.error.type === "validation" ? "negative" : "warning",
+      message: response.error.message || "Erro ao atualizar Cliente",
+    });
+
+    return;
+  }
+
+  $q.notify({
+    type: "positive",
+    message: "Cliente atualizado com sucesso",
+  });
+
+  await navigateTo(`/clients/${id.value}`);
 }
 </script>
 

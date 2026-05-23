@@ -1,56 +1,36 @@
-import { ref, watch } from "vue";
-import type { Client } from "src/models";
+import { computed, ref, watch } from "vue";
+import type { ClientListParams, ClientListResponse } from "src/models";
 import { getClients } from "src/services/client";
-import { type useClientsQueryState } from "src/composables";
+import { type useClientsQueryState, useResource } from "src/composables";
 
 type ClientsQuerySchema = ReturnType<typeof useClientsQueryState>["schema"];
 
 export function useClients(queryState: ClientsQuerySchema) {
-  const loading = ref(false);
-  const error = ref<Error | null>(null);
-  const clients = ref<Client[]>([]);
+  const resource = useResource<ClientListResponse>();
   const totalPages = ref(1);
-
-  let requestId = 0;
+  const clients = computed(() => resource.data.value?.clients ?? []);
 
   async function fetchClients() {
-    const currentId = ++requestId;
+    // Get updated query state
+    const { page, rowsPerPage, onlyActive } = queryState.getSnapshot();
+    const offset = (page - 1) * rowsPerPage;
+    const params: ClientListParams = {
+      limit: rowsPerPage,
+      offset,
+      onlyActive: onlyActive,
+    };
 
-    loading.value = true;
-    error.value = null;
+    const response = await resource.load(getClients, params);
 
-    try {
-      // Get updated query state
-      const { page, rowsPerPage, onlyActive } = queryState.getSnapshot();
+    // outdated response was ignored (race condition)
+    if (!response) {
+      return;
+    }
 
-      const offset = (page - 1) * rowsPerPage;
-      const response = await getClients({
-        limit: rowsPerPage,
-        offset,
-        onlyActive: onlyActive,
-      });
-
-      // Ignore outdated response
-      if (currentId !== requestId) {
-        return;
-      }
-
-      totalPages.value = Math.max(1, Math.ceil(response.total / rowsPerPage));
-      if (page && page > totalPages.value && totalPages.value > 0) {
-        await queryState.setField("page", totalPages.value);
-        return;
-      }
-
-      clients.value = response.clients;
-    } catch (e) {
-      console.error(e);
-      error.value = e as Error;
-      clients.value = [];
-      totalPages.value = 1;
-    } finally {
-      if (currentId === requestId) {
-        loading.value = false;
-      }
+    totalPages.value = Math.max(1, Math.ceil(response.total / rowsPerPage));
+    if (page > totalPages.value) {
+      await queryState.setField("page", totalPages.value);
+      return;
     }
   }
 
@@ -60,15 +40,13 @@ export function useClients(queryState: ClientsQuerySchema) {
       queryState.state.rowsPerPage,
       queryState.state.onlyActive,
     ],
-    async () => {
-      await fetchClients();
-    },
+    fetchClients,
     { immediate: true }
   );
 
   return {
-    loading,
-    error,
+    loading: resource.loading,
+    error: resource.error,
     totalPages,
     clients,
     reload: fetchClients,

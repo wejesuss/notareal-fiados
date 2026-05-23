@@ -2,11 +2,45 @@ export interface Payment {
   id: number;
   purchaseId: number;
   description: string | null;
-  amount: number;
-  paymentDate: Date | string | null;
+  amountCents: number;
+  paymentDate: number | null;
   method: string;
   receiptNumber: string; // REC-0001
   isActive: boolean;
-  createdAt: Date | string;
-  updatedAt: Date | string;
+  createdAt: number;
+  updatedAt: number;
+
+  // computed float by pydantic
+  amount: number;
 }
+
+export interface PaymentCreate {
+  description?: string | null;
+  amountCents: number;
+  paymentDate?: number | null;
+  method: string;
+  receiptNumber?: string;
+}
+
+export interface PaymentUpdate {
+  description?: string | null;
+  amountCents?: number;
+  paymentDate?: number | null;
+  method?: string;
+}
+
+// API models
+export type PaymentListParams = {
+  limit?: number;
+  offset?: number;
+};
+
+export type PaymentWithMessageResponse = {
+  message: string;
+  payment: Payment;
+};
+
+export type PaymentListResponse = {
+  message: string;
+  payments: Payment[];
+};

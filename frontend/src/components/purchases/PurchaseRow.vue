@@ -39,6 +39,7 @@
         <PurchaseTimeStamps
           :created-at="purchase.createdAt"
           :updated-at="purchase.updatedAt"
+          compact
         ></PurchaseTimeStamps>
       </q-item-label>
 

@@ -1,27 +1,33 @@
-import { type Ref, ref, watch } from "vue";
-import type { Purchase } from "src/models";
-import { getClientRecentPurchases } from "src/services/purchase";
+import { computed, type Ref, watch } from "vue";
+import type { PurchaseListResponse } from "src/models";
+import { getClientPurchases } from "src/services/purchase";
+import { useResource } from "../core/useResource";
 
 export function useClientRecentPurchases(clientId: Ref<number>) {
-  const loading = ref(false);
-  const error = ref<Error | null>(null);
-  const recentPurchases = ref<Purchase[]>([]);
+  const resource = useResource<PurchaseListResponse>();
+  const recentPurchases = computed(() => resource.data.value?.purchases ?? []);
 
   async function load() {
-    loading.value = true;
-    error.value = null;
-    try {
-      const response = await getClientRecentPurchases(clientId.value);
-      recentPurchases.value = response.purchases;
-    } catch (e) {
-      error.value = e as Error;
-      recentPurchases.value = [];
-    } finally {
-      loading.value = false;
+    if (!Number.isInteger(clientId.value) || clientId.value <= 0) {
+      resource.setError("Identificador do cliente inválido!", "validation");
+      return;
     }
+
+    await resource.load(getClientPurchases, {
+      clientId: clientId.value,
+      params: {
+        limit: 3,
+        isActive: true,
+      },
+    });
   }
 
   watch(clientId, load, { immediate: true });
 
-  return { loading, error, recentPurchases, reload: load };
+  return {
+    loading: resource.loading,
+    error: resource.error,
+    recentPurchases,
+    reload: load,
+  };
 }

@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from datetime import datetime
 
 
 # Store basic information about the purchase
@@ -13,8 +12,8 @@ class Purchase:
     status: str  # 'pending' (default), 'partial', 'paid'
     note_number: str  # NF-0001
     is_active: int
-    created_at: datetime
-    updated_at: datetime
+    created_at: int
+    updated_at: int
 
     @staticmethod
     def from_row(row):
@@ -27,8 +26,8 @@ class Purchase:
             status=row[5],
             note_number=row[6],
             is_active=row[7],
-            created_at=datetime.fromtimestamp(row[8]),
-            updated_at=datetime.fromtimestamp(row[9]),
+            created_at=int(row[8]),
+            updated_at=int(row[9]),
         )
 
     def to_tuple(self):
@@ -40,6 +39,6 @@ class Purchase:
             self.status,
             self.note_number,
             self.is_active,
-            int(self.created_at.timestamp()),
-            int(self.updated_at.timestamp()),
+            self.created_at,
+            self.updated_at,
         )

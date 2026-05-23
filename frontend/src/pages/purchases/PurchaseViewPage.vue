@@ -33,79 +33,120 @@
       :purchase="purchase"
       :is-active="isActive"
       :submitting="submitting"
-      :client-name="clientName"
-      @toggle-is-active="handleToggle"
+      :client-name="client?.name"
+      @toggle-is-active="submitDialog"
     />
 
     <!-- Payments list -->
-    <q-card>
-      <q-card-section class="text-subtitle1">Pagamentos</q-card-section>
+    <PaymentListCard
+      v-if="purchase"
+      :loading="paymentsLoading"
+      :error="paymentsError"
+      :payments="payments"
+      @create-payment="openCreate"
+      @edit-payment="openEditPaymentModal"
+    ></PaymentListCard>
 
-      <q-separator />
-
-      <q-list>
-        <q-item v-for="payment in payments" :key="payment.id" class="q-py-md">
-          <q-item-section
-            class="payment-item"
-            :class="{ 'payment-item-negative': !payment.isActive }"
-          >
-            <div class="row items-start justify-between">
-              <div class="row q-gutter-md">
-                <div class="text-body2">{{ payment.description }}</div>
-                <div class="text-caption text-grey-7">
-                  {{ formatCurrency(payment.amount) }}
-                </div>
-              </div>
-              <div class="text-caption">{{ payment.method }}</div>
-              <div class="text-body2 text-weight-medium">
-                {{ payment.receiptNumber }}
-              </div>
-            </div>
-          </q-item-section>
-        </q-item>
-      </q-list>
-    </q-card>
+    <q-dialog
+      :maximized="$q.screen.width < 480"
+      :model-value="isOpen"
+      @hide="close"
+    >
+      <PaymentFormCard
+        :payload="formData"
+        :mode="state.mode"
+        @submit="onPaymentSubmit"
+      >
+        <q-toggle
+          v-if="state.mode === 'edit'"
+          v-model="state.isActive"
+          checked-icon="check"
+          color="green"
+          :label="state.isActive ? 'Pagamento Ativo' : 'Pagamento Inativo'"
+          unchecked-icon="clear"
+          :class="$q.screen.width < 480 ? 'full-width' : 'q-mr-lg'"
+        />
+        <q-btn flat label="Cancelar" v-close-popup />
+      </PaymentFormCard>
+    </q-dialog>
   </q-page>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, toRef, watch } from "vue";
+import { useQuasar } from "quasar";
+import { computed, toRef, watch } from "vue";
 import { useRoute } from "vue-router";
-import { getPurchasePayments, updatePurchase } from "src/services";
-import type { Payment, PurchaseUpdate } from "src/models";
-import { formatCurrency, formatDate } from "src/utils/formatters";
+import { updatePurchaseActiveStatus } from "src/services";
+import { formatDate } from "src/utils/formatters";
 import {
   useActiveToggleConfirmation,
   useClientDetails,
+  useNavigation,
   usePurchaseDetails,
+  usePurchasePayments,
+  usePaymentModal,
 } from "src/composables";
-import { PurchaseDetailsCard } from "src/components/purchases";
+import { type PaymentPayload } from "src/components/types";
 import { ContentState } from "src/components/common";
+import { PurchaseDetailsCard } from "src/components/purchases";
+import { PaymentFormCard, PaymentListCard } from "src/components/payments";
 import { dialogConfig, notifyConfig } from "src/config/purchases/dialogs";
+import type { APIError } from "src/api/errors";
 
 const $route = useRoute();
-const purchaseId = computed(() => Number($route.params.id));
-const clientId = computed(() => purchase.value?.clientId || 0);
-const { loading, error, purchase } = usePurchaseDetails(toRef(purchaseId));
+const { notify } = useQuasar();
+const { navigateTo } = useNavigation();
+const purchaseId = computed(() => {
+  const id = Number($route.params.id);
+  return Number.isInteger(id) && id > 0 ? id : 0;
+});
 const {
-  loading: clientLoading,
-  error: clientError,
-  client,
-} = useClientDetails(toRef(clientId));
+  loading,
+  error,
+  purchase,
+  reload: reloadPurchase,
+} = usePurchaseDetails(toRef(purchaseId));
+const clientId = computed(() => purchase.value?.clientId || 0);
+const { client } = useClientDetails(toRef(clientId));
+const {
+  loading: paymentsLoading,
+  error: paymentsError,
+  payments,
+  reload: reloadPayments,
+} = usePurchasePayments(toRef(purchaseId));
 const { submitting, isActive, submitDialog } = useActiveToggleConfirmation(
   toRef(purchase),
   dialogConfig,
   notifyConfig,
   submit,
 );
-const payments = ref<Payment[]>([]);
+const { isOpen, state, formData, openCreate, openEdit, close, submitPayment } =
+  usePaymentModal(purchaseId);
+
 watch(
   purchaseId,
-  async (newPurchaseId) => {
-    payments.value = await getPurchasePayments(newPurchaseId);
+  async (id) => {
+    if (id <= 0) {
+      notify({
+        type: "negative",
+        message: "Identificador da compra inválido!",
+      });
+      await navigateTo("/purchases");
+    }
   },
   { immediate: true },
 );
+
+watch(error, async (err) => {
+  if (!err) return;
+
+  notify({
+    type: err.type === "validation" ? "negative" : "warning",
+    message: err.message,
+  });
+
+  await navigateTo("/purchases");
+});
 
 const loadState = computed(() => {
   if (loading.value) return "loading";
@@ -113,42 +154,49 @@ const loadState = computed(() => {
 
   return "ready";
 });
-const clientName = computed(() => {
-  if (clientLoading.value || clientError.value) return undefined;
-
-  return client.value?.name;
-});
 const errorMessage = computed(
   () => error.value?.message || "Erro inesperado ao carregar compra",
 );
 
-async function handleToggle(nextValue: boolean) {
-  await submitDialog(nextValue);
-}
-
 async function submit(nextValue: boolean) {
   if (!purchase.value) return;
 
-  const payload: PurchaseUpdate = {
-    ...purchase.value,
-    isActive: nextValue,
-  };
+  try {
+    const response = await updatePurchaseActiveStatus(
+      purchaseId.value,
+      nextValue,
+    );
 
-  const updated = await updatePurchase(purchaseId.value, payload);
+    // Keep local purchase snapshot in sync after successful update
+    purchase.value = response.purchase;
+    await reloadPayments();
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : "Erro ao atualizar compra!";
 
-  // Keep local purchase snapshot in sync after successful update
-  purchase.value = updated;
+    notify({
+      type: "negative",
+      message,
+    });
+  }
+}
+
+function openEditPaymentModal(id: number) {
+  const paymentFound = payments.value.find((p) => p.id === id);
+  if (!paymentFound) return;
+
+  openEdit(paymentFound);
+}
+
+async function reloadAll() {
+  await Promise.allSettled([reloadPurchase(), reloadPayments()]);
+}
+
+function onError(err: APIError) {
+  notify({ type: "negative", message: err.message });
+}
+
+async function onPaymentSubmit(payload: PaymentPayload) {
+  await submitPayment(payload, reloadAll, onError);
 }
 </script>
-
-<style scoped>
-.payment-item {
-  padding: 8px 12px;
-  border: 1px #26cf4d solid;
-  border-radius: 6px;
-}
-
-.payment-item-negative {
-  border-color: var(--q-negative);
-}
-</style>

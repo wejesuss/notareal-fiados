@@ -1,5 +1,4 @@
 from typing import List
-from datetime import datetime
 from pydantic import BaseModel, Field
 from app.schemas.base import CamelModel
 from app.schemas.mixins import AmountMixin
@@ -31,13 +30,13 @@ class PaymentResponseSchema(CamelModel, AmountMixin):
     id: int
     purchase_id: int
     amount_cents: int
-    payment_date: datetime | None
+    payment_date: int | None
     method: str | None
     description: str | None
     receipt_number: str | None
-    is_active: int
-    created_at: datetime
-    updated_at: datetime | None
+    is_active: bool
+    created_at: int
+    updated_at: int | None
 
     model_config = dict(from_attributes=True)
 

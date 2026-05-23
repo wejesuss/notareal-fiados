@@ -4,7 +4,7 @@ import { activeOptions, rowsOptions } from "src/config/clients/options";
 
 export function useClientsQueryState() {
   const clientsQuery = {
-    page: { default: 1, type: "number", resetPageOnChange: false },
+    page: { default: 1, type: "number", ge: 1, resetPageOnChange: false },
     rowsPerPage: { default: 10, type: "number", resetPageOnChange: true },
     onlyActive: { default: true, type: "boolean", resetPageOnChange: true },
   } satisfies QuerySchema;
