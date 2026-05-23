@@ -1,4 +1,6 @@
-from fastapi import APIRouter, HTTPException, Depends
+from typing import List
+from fastapi import APIRouter, HTTPException, Depends, Query
+from app.common import PurchaseStatus
 from app.services.purchase_service import (
     get_purchase_by_id,
     get_purchase_by_note_number,
@@ -6,7 +8,7 @@ from app.services.purchase_service import (
     create_purchase,
     update_purchase,
     activate_purchase,
-    deactivate_purchase
+    deactivate_purchase,
 )
 from app.routes.payments import router as payment_router
 from app.utils.exceptions import handle_service_exceptions
@@ -16,21 +18,30 @@ from app.schemas.purchase import (
     PurchaseResponseSchema,
     PurchaseWithMessageResponseSchema,
     PurchaseCreateSchema,
-    PurchaseUpdateSchema
+    PurchaseUpdateSchema,
 )
 
 router = APIRouter(prefix="/purchases", tags=["Purchases"])
 
+
 @router.get("/", response_model=PurchaseListResponseSchema)
 @handle_service_exceptions
-def list_purchases(params: PurchaseListQuerySchema = Depends()):
+def list_purchases(
+    params: PurchaseListQuerySchema = Depends(),
+    statuses: List[PurchaseStatus] | None = Query(default=None),
+):
     """List all purchases."""
     limit = params.limit
     offset = params.offset
-    only_pending = params.only_pending
+    is_active = params.is_active
 
-    purchases = get_purchases(limit, offset, only_pending)
-    return {"message": "Compras encontradas.", "purchases": purchases}
+    result = get_purchases(limit, offset, statuses, is_active)
+    return {
+        "message": "Compras encontradas.",
+        "total": result.total,
+        "purchases": result.items,
+    }
+
 
 @router.get("/{purchase_id}", response_model=PurchaseResponseSchema)
 @handle_service_exceptions
@@ -39,12 +50,14 @@ def read_purchase(purchase_id: int):
     purchase = get_purchase_by_id(purchase_id)
     return purchase
 
+
 @router.get("/by-note/{note_number}", response_model=PurchaseResponseSchema)
 @handle_service_exceptions
 def read_purchase_by_note(note_number: str):
     """Get purchase by note_number."""
     purchase = get_purchase_by_note_number(note_number)
     return purchase
+
 
 @router.post("/{client_id}", response_model=PurchaseWithMessageResponseSchema)
 @handle_service_exceptions
@@ -53,10 +66,14 @@ def add_purchase(client_id: int, data: PurchaseCreateSchema):
     data: dict = data.model_dump()
 
     if not client_id or client_id < 1:
-        raise HTTPException(status_code=400, detail="Não é possível criar uma compra sem um cliente associado (client_id).")
+        raise HTTPException(
+            status_code=400,
+            detail="Não é possível criar uma compra sem um cliente associado (client_id).",
+        )
 
     purchase = create_purchase(client_id, data)
     return {"message": "Compra criada com sucesso.", "purchase": purchase}
+
 
 @router.put("/{purchase_id}", response_model=PurchaseWithMessageResponseSchema)
 @handle_service_exceptions
@@ -65,12 +82,14 @@ def edit_purchase(purchase_id: int, data: PurchaseUpdateSchema):
     purchase = update_purchase(purchase_id, data.model_dump(exclude_none=True))
     return {"message": "Compra atualizada.", "purchase": purchase}
 
-@router.put("/{purchase_id}/restore", response_model=PurchaseWithMessageResponseSchema)
+
+@router.put("/{purchase_id}/activate", response_model=PurchaseWithMessageResponseSchema)
 @handle_service_exceptions
-def restore_purchase(purchase_id: int):
+def activate_purchase_by_id(purchase_id: int):
     """Activate purchase changing is_active field. Related payments remain unchanged, but totals are recalculated."""
     purchase = activate_purchase(purchase_id)
     return {"message": "Compra restaurada.", "purchase": purchase}
+
 
 @router.delete("/{purchase_id}", response_model=PurchaseWithMessageResponseSchema)
 @handle_service_exceptions
@@ -78,6 +97,7 @@ def remove_purchase(purchase_id: int):
     """Delete purchase (soft delete)."""
     purchase = deactivate_purchase(purchase_id)
     return {"message": "Compra desativada com sucesso.", "purchase": purchase}
+
 
 # Include payment related routes
 router.include_router(payment_router)

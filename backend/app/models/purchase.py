@@ -1,44 +1,44 @@
 from dataclasses import dataclass
-from datetime import datetime
 
-# Store basic information about the client
+
+# Store basic information about the purchase
 @dataclass
 class Purchase:
     id: int
     client_id: int
     description: str
-    total_value: float
-    total_paid_value: float
-    status: str # 'pending' (default), 'partial', 'paid'
-    note_number: str # NF-0001
+    total_cents: int
+    total_paid_cents: int
+    status: str  # 'pending' (default), 'partial', 'paid'
+    note_number: str  # NF-0001
     is_active: int
-    created_at: datetime
-    updated_at: datetime
+    created_at: int
+    updated_at: int
 
     @staticmethod
     def from_row(row):
         return Purchase(
-            id = row[0],
-            client_id = row[1],
-            description = row[2],
-            total_value = row[3],
-            total_paid_value = row[4],
-            status = row[5],
-            note_number = row[6],
-            is_active = row[7],
-            created_at = datetime.fromtimestamp(row[8]),
-            updated_at = datetime.fromtimestamp(row[9])
+            id=row[0],
+            client_id=row[1],
+            description=row[2],
+            total_cents=row[3],
+            total_paid_cents=row[4],
+            status=row[5],
+            note_number=row[6],
+            is_active=row[7],
+            created_at=int(row[8]),
+            updated_at=int(row[9]),
         )
 
     def to_tuple(self):
         return (
             self.client_id,
             self.description,
-            self.total_value,
-            self.total_paid_value,
+            self.total_cents,
+            self.total_paid_cents,
             self.status,
             self.note_number,
-            self.is_active,    
-            int(self.created_at.timestamp()),
-            int(self.updated_at.timestamp())
+            self.is_active,
+            self.created_at,
+            self.updated_at,
         )

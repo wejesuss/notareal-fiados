@@ -271,7 +271,7 @@ ORDER BY payment_date DESC;
 
 ## 🔗 Documentos Relacionados
 
-- 📘 **[Escopo e visão do projeto](./README.md)** → `README.md`
+- 📘 **[Escopo e visão do projeto](../README.md)** → `README.md`
 
   Descreve o propósito, público-alvo e principais funcionalidades do sistema Nota Real Fiados.
 - 🗃️ **[Modelo de dados e fluxo de informações](./database_design.md)** → `database_design.md`

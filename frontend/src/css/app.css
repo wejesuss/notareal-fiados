@@ -1,0 +1,25 @@
+/* app global css */
+.letter-spaced {
+  letter-spacing: 0.06em;
+}
+
+.caption-medium,
+.tooltip-medium {
+  font-size: 0.8rem;
+}
+
+.client-container {
+  max-width: 560px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.client-container-border {
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  background-color: #fafafa;
+}
+
+.client-container-border:active {
+  background-color: #f0f0f0;
+}

@@ -1,7 +1,8 @@
 import regex as re
-from pydantic import field_validator
+from pydantic import field_validator, computed_field
 from app.utils.helpers import is_valid_name
 from app.utils.exceptions import error_messages
+
 
 class NameValidatorMixin:
     @field_validator("name", mode="after")
@@ -26,16 +27,24 @@ class NameValidatorMixin:
 
         return v
 
+
 class NicknameValidatorMixin:
     @field_validator("nickname", mode="after")
     def validate_nickname(cls, v):
         if v is None:
             return None
 
-        v = " ".join(v.split())  # Remove multiple spaces
-        v = v.casefold()         # Normalize
+        v = v.strip().casefold()  # Normalize to case comparison and remove spaces
+
+        if re.search(r"\s", v):
+            # Nickname must be a single-word value
+            raise ValueError("Apelido deve conter somente uma palavra.")
+
+        if len(v) < 3:
+            raise ValueError("Apelido deve conter pelo menos 3 caracteres.")
 
         return v
+
 
 class PhoneValidatorMixin:
     @field_validator("phone", mode="after")
@@ -45,3 +54,47 @@ class PhoneValidatorMixin:
 
         v = " ".join(v.split())  # Remove multiple spaces
         return v
+
+
+# ===== Summary Mixin =====
+class SummaryMixin:
+    @computed_field
+    @property
+    def total_paid(self) -> float | None:
+        if getattr(self, "total_paid_cents", None) is None:
+            return None
+        return round(self.total_paid_cents / 100, 2)
+
+    @computed_field
+    @property
+    def outstanding_balance(self) -> float | None:
+        if getattr(self, "outstanding_balance_cents", None) is None:
+            return None
+        return round(self.outstanding_balance_cents / 100, 2)
+
+
+# ===== Amount Mixin =====
+class AmountMixin:
+    @computed_field
+    @property
+    def amount(self) -> float | None:
+        if getattr(self, "amount_cents", None) is None:
+            return None
+        return round(self.amount_cents / 100, 2)
+
+
+# ===== Totals Mixin =====
+class TotalsMixin:
+    @computed_field
+    @property
+    def total(self) -> float | None:
+        if getattr(self, "total_cents", None) is None:
+            return None
+        return round(self.total_cents / 100, 2)
+
+    @computed_field
+    @property
+    def total_paid(self) -> float | None:
+        if getattr(self, "total_paid_cents", None) is None:
+            return None
+        return round(self.total_paid_cents / 100, 2)

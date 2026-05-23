@@ -2,12 +2,18 @@ from typing import List
 from datetime import datetime
 from app.database import get_connection, sqlite3
 from app.models import Client
+from app.common import PaginatedResult, ClientSummary
 from app.utils.exceptions import (
-    ValidationError, BusinessRuleError, DatabaseError,
-    error_messages
+    ValidationError,
+    BusinessRuleError,
+    DatabaseError,
+    error_messages,
 )
 
-def get_clients(limit: int = None, offset: int = 0, only_active: bool = True) -> List[Client]:
+
+def get_clients(
+    limit: int = None, offset: int = 0, only_active: bool = True
+) -> PaginatedResult[Client]:
     conn = None
     try:
         conn = get_connection()
@@ -19,42 +25,56 @@ def get_clients(limit: int = None, offset: int = 0, only_active: bool = True) ->
         if only_active:
             where_clause = "WHERE is_active = 1"
 
-        cursor.execute(f"""
+        # Get total count for pagination
+        cursor.execute(f"SELECT COUNT(*) FROM clients {where_clause}")
+        total = cursor.fetchone()[0]
+
+        cursor.execute(
+            f"""
             SELECT * FROM clients {where_clause} ORDER BY created_at DESC
             LIMIT ? OFFSET ?
-        """, (search_limit, offset))
+        """,
+            (search_limit, offset),
+        )
 
         rows = cursor.fetchall()
 
         if not rows:
-            return []
+            return PaginatedResult(items=[], total=total)
 
-        return [Client.from_row(row) for row in rows]
+        return PaginatedResult(
+            items=[Client.from_row(row) for row in rows],
+            total=total,
+        )
     except sqlite3.Error as e:
         raise DatabaseError(error_messages.DATABASE_ERROR) from e
     finally:
         if conn:
             conn.close()
 
+
 def insert_client(data: dict) -> Client:
     conn = None
     try:
         conn = get_connection()
         cursor = conn.cursor()
-        
+
         now = int(datetime.now().timestamp())
 
-        cursor.execute("""
+        cursor.execute(
+            """
             INSERT INTO clients (name, nickname, phone, email, is_active, created_at, updated_at)
             VALUES (?, ?, ?, ?, 1, ?, ?)
-        """, (
-            data.get("name"),
-            data.get("nickname"),
-            data.get("phone"),
-            data.get("email"),
-            now,
-            now
-        ))
+        """,
+            (
+                data.get("name"),
+                data.get("nickname"),
+                data.get("phone"),
+                data.get("email"),
+                now,
+                now,
+            ),
+        )
 
         conn.commit()
         client_id = cursor.lastrowid
@@ -69,6 +89,7 @@ def insert_client(data: dict) -> Client:
     finally:
         if conn:
             conn.close()
+
 
 def get_client_by_id(client_id: int) -> Client | None:
     conn = None
@@ -89,28 +110,23 @@ def get_client_by_id(client_id: int) -> Client | None:
         if conn:
             conn.close()
 
+
 def update_client(client_id: int, data: dict) -> Client | None:
     conn = None
-
-    # columns that are allowed to be updated
-    allowed_columns = ["name", "nickname", "phone", "email", "is_active"]
 
     columns = []
     values = []
     now = int(datetime.now().timestamp())
 
-    # validate data fields
     for key, value in data.items():
-        if key in allowed_columns:
-            columns.append(f"{key} = ?")
-            values.append(value)
-    
+        columns.append(f"{key} = ?")
+        values.append(value)
+
     if not columns:
         raise ValidationError(error_messages.DATA_FIELDS_EMPTY)
 
     # Add the updated_at timestamp
     columns.append("updated_at = ?")
-    # Add the timestamp for the updated_at column
     values.append(now)
     # Add the client_id for the WHERE clause
     values.append(client_id)
@@ -129,7 +145,7 @@ def update_client(client_id: int, data: dict) -> Client | None:
 
         if cursor.rowcount == 0:
             return None
-        
+
         return get_client_by_id(client_id)
     except sqlite3.IntegrityError as e:
         if "UNIQUE constraint failed" in str(e):
@@ -140,6 +156,7 @@ def update_client(client_id: int, data: dict) -> Client | None:
         if conn:
             conn.close()
 
+
 def deactivate_client(client_id: int) -> bool:
     """Deactivate (soft delete) a client."""
     conn = None
@@ -148,14 +165,53 @@ def deactivate_client(client_id: int) -> bool:
         cursor = conn.cursor()
 
         now = int(datetime.now().timestamp())
-        cursor.execute("""
+        cursor.execute(
+            """
             UPDATE clients SET is_active = 0, updated_at = ? 
             WHERE id = ? AND is_active = 1
-        """, (now, client_id))
+        """,
+            (now, client_id),
+        )
 
         conn.commit()
 
         return cursor.rowcount > 0
+    except sqlite3.Error as e:
+        raise DatabaseError(error_messages.DATABASE_ERROR) from e
+    finally:
+        if conn:
+            conn.close()
+
+
+# Financial summary
+def get_client_summary(client_id: int) -> ClientSummary:
+    conn = None
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            f"""
+            SELECT
+                COUNT(p.id) AS total_purchases,
+                COALESCE(SUM(p.total_paid_cents), 0) AS total_paid_cents,
+                COALESCE(SUM(p.total_cents),0) - COALESCE(SUM(p.total_paid_cents),0) AS outstanding_balance_cents
+            FROM purchases p 
+            WHERE p.client_id = ?
+            AND p.is_active = 1
+        """,
+            (client_id,),
+        )
+        row = cursor.fetchone()
+
+        if not row:
+            return None
+
+        return ClientSummary(
+            total_purchases=row["total_purchases"],
+            total_paid_cents=row["total_paid_cents"],
+            outstanding_balance_cents=row["outstanding_balance_cents"],
+        )
     except sqlite3.Error as e:
         raise DatabaseError(error_messages.DATABASE_ERROR) from e
     finally:
