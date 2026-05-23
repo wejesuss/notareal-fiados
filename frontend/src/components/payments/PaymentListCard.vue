@@ -33,7 +33,9 @@
   </q-card>
 
   <q-card v-else class="q-mb-lg q-pa-xs">
-    <q-card-section class="row items-center justify-between q-gutter-y-sm">
+    <q-card-section
+      class="row items-center justify-between q-gutter-y-sm q-gutter-x-lg"
+    >
       <div class="text-subtitle1">
         <span>Pagamentos</span>
         <span class="q-ml-sm"
@@ -50,11 +52,27 @@
       />
     </q-card-section>
 
+    <q-card-section
+      v-if="paymentsStatusCount.inactive >= 5"
+      class="filter-card"
+    >
+      <q-btn-toggle
+        rounded
+        padding="xs 14px"
+        v-model="showOnlyActive"
+        :options="[
+          { label: 'Todos', value: false },
+          { label: 'Somente Ativos', value: true },
+        ]"
+      >
+      </q-btn-toggle>
+    </q-card-section>
+
     <q-separator />
 
     <q-list>
       <PaymentRow
-        v-for="payment in payments"
+        v-for="payment in filteredPayments"
         :key="payment.id"
         :payment="payment"
         @click="(id) => emit('edit-payment', id)"
@@ -64,7 +82,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { type UIError } from "src/types/errors";
 import { type Payment } from "src/models";
 import { ContentState } from "src/components/common";
@@ -80,6 +98,7 @@ const emit = defineEmits<{
   (e: "edit-payment", id: number): void;
 }>();
 
+const showOnlyActive = ref(false);
 const loadState = computed(() => {
   if (props.loading) return "loading";
   if (props.error) return "error";
@@ -90,6 +109,11 @@ const loadState = computed(() => {
 const errorMessage = computed(
   () => props.error?.message || "Erro inesperado ao carregar pagamentos",
 );
+const filteredPayments = computed(() => {
+  return showOnlyActive.value
+    ? props.payments.filter((p) => p.isActive)
+    : props.payments;
+});
 const paymentsStatusCount = computed(() => {
   return props.payments.reduce(
     (count, p) => {
@@ -105,3 +129,11 @@ const paymentsStatusCount = computed(() => {
   );
 });
 </script>
+
+<style scoped>
+@media (max-width: 570px) {
+  .filter-card {
+    justify-self: center;
+  }
+}
+</style>
