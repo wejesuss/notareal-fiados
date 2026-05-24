@@ -6,7 +6,7 @@
 
       <q-btn
         color="primary"
-        icon="person_add"
+        icon="add_shopping_cart"
         label="Nova compra"
         @click="navigateTo('/purchases/new')"
       />
