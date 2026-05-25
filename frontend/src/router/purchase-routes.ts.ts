@@ -3,6 +3,10 @@ import { validatePurchaseID } from "./guards";
 
 export const purchaseRoutes: RouteRecordRaw[] = [
   {
+    path: "/purchases/new",
+    component: () => import("pages/purchases/PurchaseCreatePage.vue"),
+  },
+  {
     path: "/purchases/:id",
     component: () => import("pages/purchases/PurchaseViewPage.vue"),
     beforeEnter: validatePurchaseID,

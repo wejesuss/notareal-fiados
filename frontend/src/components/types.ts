@@ -56,6 +56,24 @@ export interface ClientPayload {
   email: string | null;
 }
 
+export interface PurchasePayload {
+  clientId: number;
+  description: string;
+  totalCents: number;
+  noteNumber: string;
+  // Optional payment fields for creation
+  initialPayment?:
+    | {
+        amountCents: number;
+        method: string;
+
+        paymentDescription?: string;
+        paymentDate?: number | null;
+        receiptNumber?: string;
+      }
+    | undefined;
+}
+
 export interface PaymentPayload {
   description: string | null;
   amountCents: number;
