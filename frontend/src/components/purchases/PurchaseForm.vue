@@ -44,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 import { QForm } from "quasar";
 import type { PurchasePayload } from "../types";
 
@@ -61,23 +61,13 @@ const props = defineProps<PurchaseFormProps>();
 
 const formRef = ref<QForm | null>(null);
 const formData = ref<PurchasePayload>({
-  clientId: props.payload?.clientId || 0,
   description: props.payload?.description || "",
   totalCents: props.payload?.totalCents || 0,
   noteNumber: props.payload?.noteNumber || "",
   ...(props.payload?.initialPayment && {
-    initialPayment: props.payload.initialPayment,
+    initialPayment: structuredClone(props.payload.initialPayment),
   }),
 });
-
-watch(
-  () => props.payload,
-  (payload: PurchasePayload | undefined) => {
-    if (!payload) return;
-    formData.value = { ...payload };
-  },
-  { immediate: true },
-);
 
 const isFormValid = computed(() => !!formData.value.description);
 
@@ -90,7 +80,6 @@ async function submit() {
   if (!valid) return;
 
   const payload: PurchasePayload = {
-    clientId: formData.value.clientId,
     description: formData.value.description.trim().replace(/\s+/g, " "),
     totalCents: formData.value.totalCents,
     noteNumber: formData.value.noteNumber,

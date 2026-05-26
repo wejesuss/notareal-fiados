@@ -16,7 +16,11 @@
 
       <q-card-section class="text-center q-pa-lg">
         <div class="form-container">
-          <PurchaseForm :submitting="false">
+          <PurchaseForm :payload="payload" :submitting="submitting">
+            <template #default>
+              <span>{{ clientId }}</span>
+            </template>
+
             <template #buttons-container>
               <q-btn
                 class="q-mr-md q-py-sm"
@@ -43,7 +47,22 @@
 </template>
 
 <script setup lang="ts">
+import { computed, ref } from "vue";
+import { useRoute } from "vue-router";
 import { PurchaseForm } from "src/components/purchases";
+import type { PurchasePayload } from "src/components/types";
+
+const $route = useRoute();
+const clientId = computed(() => {
+  const id = Number($route.query.clientId);
+  return Number.isInteger(id) && id > 0 ? id : undefined;
+});
+const payload = ref<PurchasePayload>({
+  description: "",
+  totalCents: 0,
+  noteNumber: "",
+});
+const submitting = ref(false);
 </script>
 
 <style scoped>

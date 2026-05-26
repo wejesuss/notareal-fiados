@@ -57,7 +57,6 @@ export interface ClientPayload {
 }
 
 export interface PurchasePayload {
-  clientId: number;
   description: string;
   totalCents: number;
   noteNumber: string;
