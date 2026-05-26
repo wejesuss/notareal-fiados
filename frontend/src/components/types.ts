@@ -62,16 +62,14 @@ export interface PurchasePayload {
   totalCents: number;
   noteNumber: string;
   // Optional payment fields for creation
-  initialPayment?:
-    | {
-        amountCents: number;
-        method: string;
+  initialPayment?: {
+    amountCents: number;
+    method: string;
 
-        paymentDescription?: string;
-        paymentDate?: number | null;
-        receiptNumber?: string;
-      }
-    | undefined;
+    paymentDescription?: string;
+    paymentDate?: number | null;
+    receiptNumber?: string;
+  };
 }
 
 export interface PaymentPayload {

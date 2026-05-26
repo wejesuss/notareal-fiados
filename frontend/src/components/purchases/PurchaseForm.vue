@@ -65,7 +65,9 @@ const formData = ref<PurchasePayload>({
   description: props.payload?.description || "",
   totalCents: props.payload?.totalCents || 0,
   noteNumber: props.payload?.noteNumber || "",
-  initialPayment: props.payload?.initialPayment,
+  ...(props.payload?.initialPayment && {
+    initialPayment: props.payload.initialPayment,
+  }),
 });
 
 watch(
@@ -92,7 +94,9 @@ async function submit() {
     description: formData.value.description.trim().replace(/\s+/g, " "),
     totalCents: formData.value.totalCents,
     noteNumber: formData.value.noteNumber,
-    initialPayment: formData.value.initialPayment,
+    ...(formData.value.initialPayment && {
+      initialPayment: formData.value.initialPayment,
+    }),
   };
 
   emit("submit", payload);
