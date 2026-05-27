@@ -18,7 +18,21 @@
         <div class="form-container">
           <PurchaseForm :payload="payload" :submitting="submitting">
             <template #default>
-              <span>{{ clientId }}</span>
+              <!-- form subtitle -->
+              <div
+                class="text-subtitle1 text-weight-medium text-uppercase letter-spaced text-center q-mb-sm"
+              >
+                Cliente {{ clientId }}
+              </div>
+
+              <ClientLookupField></ClientLookupField>
+
+              <!-- form subtitle -->
+              <div
+                class="text-subtitle1 text-weight-medium text-uppercase letter-spaced text-center q-mt-md"
+              >
+                Compra
+              </div>
             </template>
 
             <template #buttons-container>
@@ -49,6 +63,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { useRoute } from "vue-router";
+import { ClientLookupField } from "src/components/clients";
 import { PurchaseForm } from "src/components/purchases";
 import type { PurchasePayload } from "src/components/types";
 
