@@ -25,7 +25,7 @@
                 Cliente {{ clientId }}
               </div>
 
-              <ClientLookupField></ClientLookupField>
+              <ClientLookupField :client-id="clientId"></ClientLookupField>
 
               <!-- form subtitle -->
               <div
