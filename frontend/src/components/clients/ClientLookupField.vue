@@ -24,10 +24,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, shallowRef, watch } from "vue";
+import { computed, onMounted, shallowRef } from "vue";
 import { type QSelect, type QSelectProps } from "quasar";
 import { getClients } from "src/services";
-import { useRoute, useRouter } from "vue-router";
 
 type ClientLookupOption = {
   label: string;
@@ -37,41 +36,22 @@ type ClientLookupOption = {
   disable: boolean;
 };
 
-const props = defineProps<{ clientId: number | undefined }>();
-const router = useRouter();
-const route = useRoute();
+onMounted(async () => await searchClients());
 
+const clientId = defineModel<number | null>();
 const clientOptions = shallowRef<ClientLookupOption[]>([]);
 const options = shallowRef<ClientLookupOption[]>([]);
 const selectedClient = computed({
   get() {
     return clientOptions.value.find(
-      (client) => client.value === Number(route.query.clientId),
+      (client) => client.value === clientId.value,
     );
   },
 
   set(client) {
-    void router.replace({
-      query: client ? { clientId: client.value } : {},
-    });
+    clientId.value = client?.value ?? null;
   },
 });
-
-watch(
-  () => props.clientId,
-  async (id) => {
-    if (clientOptions.value.length === 0) {
-      await searchClients();
-    }
-
-    if (id) {
-      selectedClient.value = clientOptions.value.find(
-        (client) => client.value === id,
-      );
-    }
-  },
-  { immediate: true },
-);
 
 const filterFn: QSelectProps["onFilter"] = (
   val: string,
@@ -120,6 +100,8 @@ async function searchClients() {
 
       return acc;
     }, [] as Array<ClientLookupOption>);
+
+    options.value = clientOptions.value;
   } catch (err) {
     console.error(err);
   }

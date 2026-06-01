@@ -22,10 +22,10 @@
               <div
                 class="text-subtitle1 text-weight-medium text-uppercase letter-spaced text-center q-mb-sm"
               >
-                Cliente {{ clientId }}
+                Cliente
               </div>
 
-              <ClientLookupField :client-id="clientId"></ClientLookupField>
+              <ClientLookupField v-model="clientId"></ClientLookupField>
 
               <!-- form subtitle -->
               <div
@@ -62,15 +62,22 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { ClientLookupField } from "src/components/clients";
 import { PurchaseForm } from "src/components/purchases";
 import type { PurchasePayload } from "src/components/types";
 
 const $route = useRoute();
-const clientId = computed(() => {
-  const id = Number($route.query.clientId);
-  return Number.isInteger(id) && id > 0 ? id : undefined;
+const $router = useRouter();
+const clientId = computed({
+  get() {
+    const id = Number($route.query.clientId);
+    return Number.isInteger(id) && id > 0 ? id : null;
+  },
+
+  set(id) {
+    void $router.replace({ query: id ? { clientId: id } : {} });
+  },
 });
 const payload = ref<PurchasePayload>({
   description: "",
