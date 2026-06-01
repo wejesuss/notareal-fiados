@@ -32,8 +32,8 @@ type ClientLookupOption = {
   label: string;
   value: number;
   nickname?: string;
-  active?: boolean;
-  disable?: boolean;
+  active: boolean;
+  disable: boolean;
 };
 
 const props = defineProps<{ clientId: number | undefined }>();
