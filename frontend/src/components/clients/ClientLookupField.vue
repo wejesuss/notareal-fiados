@@ -24,9 +24,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, watch } from "vue";
+import { computed, shallowRef, watch } from "vue";
 import { type QSelect, type QSelectProps } from "quasar";
 import { getClients } from "src/services";
+import { useRoute, useRouter } from "vue-router";
 
 type ClientLookupOption = {
   label: string;
@@ -37,10 +38,24 @@ type ClientLookupOption = {
 };
 
 const props = defineProps<{ clientId: number | undefined }>();
+const router = useRouter();
+const route = useRoute();
 
 const clientOptions = shallowRef<ClientLookupOption[]>([]);
 const options = shallowRef<ClientLookupOption[]>([]);
-const selectedClient = ref<ClientLookupOption>();
+const selectedClient = computed({
+  get() {
+    return clientOptions.value.find(
+      (client) => client.value === Number(route.query.clientId),
+    );
+  },
+
+  set(client) {
+    void router.replace({
+      query: client ? { clientId: client.value } : {},
+    });
+  },
+});
 
 watch(
   () => props.clientId,
