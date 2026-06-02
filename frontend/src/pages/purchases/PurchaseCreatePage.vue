@@ -25,7 +25,10 @@
                 Cliente
               </div>
 
-              <ClientLookupField v-model="clientId"></ClientLookupField>
+              <ClientLookupField
+                v-model="clientId"
+                @search-error="console.error"
+              ></ClientLookupField>
 
               <!-- form subtitle -->
               <div

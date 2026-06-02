@@ -37,6 +37,7 @@ type ClientLookupOption = {
 
 onMounted(async () => await searchClients());
 
+const emit = defineEmits<{ searchError: [error: unknown] }>();
 const clientId = defineModel<number | null>();
 const clientOptions = shallowRef<ClientLookupOption[]>([]);
 const options = shallowRef<ClientLookupOption[]>([]);
@@ -66,7 +67,7 @@ async function searchClients() {
 
     options.value = clientOptions.value;
   } catch (err) {
-    console.error(err);
+    emit("searchError", err);
   }
 }
 
