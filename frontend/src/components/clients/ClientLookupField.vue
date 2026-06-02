@@ -31,7 +31,6 @@ import { normalizeText } from "src/utils/normalizers/text";
 type ClientLookupOption = {
   label: string;
   value: number;
-  nickname?: string;
   active: boolean;
   disable: boolean;
 };
@@ -57,11 +56,12 @@ async function searchClients() {
   try {
     const { clients } = await getClients({ onlyActive: false });
     clientOptions.value = clients.map((client) => ({
-      label: client.name,
+      label: client.nickname
+        ? `${client.name} (${client.nickname})`
+        : client.name,
       value: client.id,
       active: client.isActive,
       disable: !client.isActive,
-      ...(client.nickname && { nickname: client.nickname }),
     }));
 
     options.value = clientOptions.value;
