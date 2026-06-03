@@ -5,6 +5,9 @@ export const purchaseRoutes: RouteRecordRaw[] = [
   {
     path: "/purchases/new",
     component: () => import("pages/purchases/PurchaseCreatePage.vue"),
+    meta: {
+      preserveScroll: true,
+    },
   },
   {
     path: "/purchases/:id",
