@@ -7,6 +7,8 @@
       use-input
       hide-selected
       fill-input
+      bottom-slots
+      :error="!!loadingError"
       input-debounce="0"
       :options="options"
       label="Selecionar o cliente..."
@@ -15,7 +17,17 @@
     >
       <template #no-option>
         <q-item>
-          <q-item-section class="text-grey">Sem clientes</q-item-section>
+          <q-item-section class="text-grey">Sem cliente</q-item-section>
+        </q-item>
+      </template>
+
+      <template #error v-if="loadingError">
+        <q-item>
+          <q-item-section class="text-grey-7 q-mr-sm"
+            >Erro ao buscar clientes:
+            {{ loadingError.message }}
+          </q-item-section>
+          <q-btn @click="searchClients">Recarregar</q-btn>
         </q-item>
       </template>
     </q-select>
@@ -23,10 +35,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, shallowRef } from "vue";
+import { computed, onMounted, ref, shallowRef } from "vue";
 import { type QSelect, type QSelectProps } from "quasar";
 import { getClients } from "src/services";
 import { normalizeText } from "src/utils/normalizers/text";
+import { mapAPIError } from "src/utils/mappers/errors";
+import { type UIError } from "src/types/errors";
 
 type ClientLookupOption = {
   label: string;
@@ -38,6 +52,7 @@ type ClientLookupOption = {
 onMounted(async () => await searchClients());
 
 const emit = defineEmits<{ searchError: [error: unknown] }>();
+const loadingError = ref<UIError | null>(null);
 const clientId = defineModel<number | null>();
 const clientOptions = shallowRef<ClientLookupOption[]>([]);
 const options = shallowRef<ClientLookupOption[]>([]);
@@ -54,6 +69,8 @@ const selectedClient = computed({
 });
 
 async function searchClients() {
+  loadingError.value = null;
+
   try {
     const { clients } = await getClients({ onlyActive: false });
     clientOptions.value = clients.map((client) => ({
@@ -67,6 +84,8 @@ async function searchClients() {
 
     options.value = clientOptions.value;
   } catch (err) {
+    loadingError.value = mapAPIError(err);
+
     emit("searchError", err);
   }
 }
