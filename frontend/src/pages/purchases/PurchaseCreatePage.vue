@@ -16,7 +16,7 @@
 
       <q-card-section class="text-center q-pa-lg">
         <div class="form-container">
-          <PurchaseForm :payload="payload" :submitting="submitting">
+          <PurchaseForm :submitting="submitting">
             <template #default>
               <!-- form subtitle -->
               <div
@@ -45,7 +45,6 @@
               />
             </template>
           </PurchaseForm>
-          <p>description: str</p>
           <p>total_cents: int</p>
           <p>note_number: str | None</p>
           <p># optional payment fields for creation</p>
@@ -65,7 +64,6 @@ import { computed, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { ClientLookupField } from "src/components/clients";
 import { PurchaseForm } from "src/components/purchases";
-import type { PurchasePayload } from "src/components/types";
 
 const $route = useRoute();
 const $router = useRouter();
@@ -79,11 +77,7 @@ const clientId = computed({
     void $router.replace({ query: id ? { clientId: id } : {} });
   },
 });
-const payload = ref<PurchasePayload>({
-  description: "",
-  totalCents: 0,
-  noteNumber: "",
-});
+
 const submitting = ref(false);
 </script>
 
