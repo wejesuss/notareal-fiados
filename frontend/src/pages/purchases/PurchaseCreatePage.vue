@@ -45,8 +45,6 @@
               />
             </template>
           </PurchaseForm>
-          <p>total_cents: int</p>
-          <p>note_number: str | None</p>
           <p># optional payment fields for creation</p>
           <p>amount_cents: int | None</p>
           <p>payment_date: int | None</p>

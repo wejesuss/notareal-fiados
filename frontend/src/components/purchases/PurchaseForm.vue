@@ -27,6 +27,48 @@
       </template>
     </q-input>
 
+    <q-input
+      outlined
+      color="secondary"
+      v-model="totalInput"
+      label="Total da compra (R$) *"
+      lazy-rules
+      :rules="[totalRule]"
+      inputmode="numeric"
+    >
+      <template #append>
+        <q-icon name="attach_money" size="xs">
+          <q-tooltip
+            anchor="top middle"
+            self="bottom middle"
+            class="tooltip-medium"
+            :delay="250"
+            >O valor total da compra</q-tooltip
+          >
+        </q-icon>
+      </template>
+    </q-input>
+
+    <q-input
+      outlined
+      color="secondary"
+      v-model="formData.noteNumber"
+      label="Número da Nota"
+      lazy-rules
+    >
+      <template #append>
+        <q-icon name="receipt" size="xs">
+          <q-tooltip
+            anchor="top middle"
+            self="bottom middle"
+            class="tooltip-medium"
+            :delay="250"
+            >Código único da compra</q-tooltip
+          >
+        </q-icon>
+      </template>
+    </q-input>
+
     <div class="q-my-md">
       <slot name="buttons-container"></slot>
 
@@ -47,6 +89,7 @@
 import { computed, ref } from "vue";
 import { QForm } from "quasar";
 import type { PurchasePayload } from "../types";
+import { formatCurrency, parseCurrencyToCents } from "src/utils/formatters";
 
 interface PurchaseFormProps {
   payload?: PurchasePayload;
@@ -69,9 +112,22 @@ const formData = ref<PurchasePayload>({
   }),
 });
 
-const isFormValid = computed(() => !!formData.value.description);
+const isFormValid = computed(
+  () => !!formData.value.description.trim() && formData.value.totalCents > 0,
+);
+const totalInput = computed({
+  get() {
+    return formatCurrency(formData.value.totalCents / 100);
+  },
+
+  set(vl: string) {
+    formData.value.totalCents = parseCurrencyToCents(vl);
+  },
+});
 
 const required = (val: string) => !!val?.trim() || "Descrição é obrigatória";
+const totalRule = () =>
+  formData.value.totalCents > 0 || "Valor deve ser maior que zero";
 
 async function submit() {
   if (!formRef.value) return;
